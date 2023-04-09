@@ -22,7 +22,7 @@
 */
 
 /* Included libraries */
-#include "MQTT311.h"
+#include "MQTT311/MQTT311.h"
 
 /* Private function declaration */
 static void MQTT311_AppendMessagePayload(const char* message_payload);
@@ -101,68 +101,66 @@ static void MQTT311_PublishWithStruct(struct PUBLISH_MESSAGE *publish_message_da
         /* Send data to server */
         MQTT311_SendToMQTTBroker(current_index);
 
-        redelivery_flag = true;
+        /* Check puback only if QoS == 1 */
+        if((publish_message_data->qos1) & !(publish_message_data->qos2))
+        {
+            redelivery_flag = MQTT311_Puback(publish_message_data->packetIdentifier);
 
-        // /* Check puback only if QoS == 1 */
-        // if((publish_message_data->qos1) & !(publish_message_data->qos2))
-        // {
-        //     redelivery_flag = get_puback(publish_message_data->packetIdentifier);
+            if(!redelivery_flag)
+            {
+                MQTT311_Print("Republishing package...");
+                vTaskDelay(pdMS_TO_TICKS(3000));
 
-        //     if(!redelivery_flag)
-        //     {
-        //         printf("\r\nRepublishing package...\r\n");
-        //         msleep(3000);
-
-        //         /* Setting re-delivery flag */
-        //         bytes_to_send[1] |= (1 << DUP_FLAG);
-        //     }
-        //     else
-        //     {
-        //         break;
-        //     }
-        // }
-        // /* Check pubrec only if QoS == 2 */
-        // else if(!(publish_message_data->qos1) & (publish_message_data->qos2))
-        // {
-        //     redelivery_flag = get_puback(publish_message_data->packetIdentifier);
+                /* Setting re-delivery flag */
+                bytes_to_send[1] |= (1 << DUP_FLAG);
+            }
+            else
+            {
+                break;
+            }
+        }
+        /* Check pubrec only if QoS == 2 */
+        else if(!(publish_message_data->qos1) & (publish_message_data->qos2))
+        {
+            redelivery_flag = MQTT311_Puback(publish_message_data->packetIdentifier);
             
-        //     /* Get correct order of ack messages from the server */
-        //     /* If puback was received */
-        //     if(redelivery_flag)
-        //     {
-        //         redelivery_flag = get_pubrec(publish_message_data->packetIdentifier);
-        //     }
+            /* Get correct order of ack messages from the server */
+            /* If puback was received */
+            if(redelivery_flag)
+            {
+                redelivery_flag = MQTT311_Pubrec(publish_message_data->packetIdentifier);
+            }
             
-        //     /* If pubrec was received */
-        //     if(redelivery_flag)
-        //     {
-        //         redelivery_flag = get_pubrel(publish_message_data->packetIdentifier);
-        //     }
+            /* If pubrec was received */
+            if(redelivery_flag)
+            {
+                redelivery_flag = MQTT311_Pubrel(publish_message_data->packetIdentifier);
+            }
 
-        //     /* If pubrel was received */
-        //     if(redelivery_flag)
-        //     {
-        //         redelivery_flag = get_pubcomp(publish_message_data->packetIdentifier);
-        //     }
+            /* If pubrel was received */
+            if(redelivery_flag)
+            {
+                redelivery_flag = MQTT311_Pubcomp(publish_message_data->packetIdentifier);
+            }
             
-        //     /* If pubcomp was received */
-        //     if(!redelivery_flag)
-        //     {
-        //         printf("\r\nRepublishing package...\r\n");
-        //         msleep(3000);
+            /* If pubcomp was received */
+            if(!redelivery_flag)
+            {
+                MQTT311_Print("Republishing package...");
+                vTaskDelay(pdMS_TO_TICKS(3000));
 
-        //         /* Setting re-delivery flag */
-        //         bytes_to_send[1] |= (1 << DUP_FLAG);
-        //     }
-        //     else
-        //     {
-        //         break;
-        //     }
-        // }
-        // else
-        // {
-        //     break;
-        // }
+                /* Setting re-delivery flag */
+                bytes_to_send[1] |= (1 << DUP_FLAG);
+            }
+            else
+            {
+                break;
+            }
+        }
+        else
+        {
+            break;
+        }
     }
     /* Free dinamically allocated memory */
     vPortFree(publish_message_data->topicName);

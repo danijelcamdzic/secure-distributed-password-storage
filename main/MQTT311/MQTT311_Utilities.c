@@ -22,7 +22,7 @@
 */
 
 /* Included libraries */
-#include "MQTT311.h"
+#include "MQTT311/MQTT311.h"
 
 /* Variable definitions */
 
@@ -652,7 +652,7 @@ uint16_t MQTT311_GetPacketIdentifier(uint8_t offset)
 }
 
 /*
- * Function: get_pub_receive_packet_info
+ * Function: MQTT311_GetPubPacketInfo
  * ----------------------------
  *  Checks whether the pub receive packet parts indicate a succesfull response
  *
@@ -663,37 +663,31 @@ uint16_t MQTT311_GetPacketIdentifier(uint8_t offset)
  * 
  *  returns: bool
  */
-// bool get_pub_receive_packet_info(uint16_t packetIdentifier, uint8_t packet_type, uint16_t remaining_length, uint16_t offset) 
-// {
-//     /* Useful flag for keeping track of sucess of response message */
-//     bool success_message = true;
+bool MQTT311_GetPubPacketInfo(uint16_t packetIdentifier, uint8_t packet_type, uint16_t remaining_length, uint16_t offset) 
+{
+    /* Useful flag for keeping track of sucess of response message */
+    bool success_message = true;
 
-//     for (uint8_t i = 0; i < offset+1; i++)
-//     {
-//         success_message = true;
+    success_message = true;
 
-//         /* Check if correct response package was received */
-//         bool correct_response = check_response_headers(packet_type, remaining_length, i, false);
+    /* Check if correct response package was received */
+    bool correct_response = MQTT311_CheckResponseHeader(packet_type, remaining_length, 0);
 
-//         /* If incorrect reponse package, return false */
-//         if (!correct_response)
-//         {
-//             success_message = false;
-//             continue;
-//         }
+    /* If incorrect reponse package, return false */
+    if (!correct_response)
+    {
+        success_message = false;
+        return success_message;
+    }
 
-//         uint16_t packet_identifier = get_packet_identifier(i);
+    uint16_t packet_identifier = MQTT311_GetPacketIdentifier(2);
 
-//         /* Checking if this is the correct packet identifier */
-//         if (packet_identifier != packetIdentifier) 
-//         {
-//             success_message = false;
-//         }
-//         else
-//         {
-//             break;
-//         }
-//     }
+    /* Checking if this is the correct packet identifier */
+    if (packet_identifier != packetIdentifier) 
+    {
+        success_message = false;
+        return success_message;
+    }
 
-//     return success_message;
-// }
+    return success_message;
+}

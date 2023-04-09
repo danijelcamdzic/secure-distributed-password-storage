@@ -22,7 +22,7 @@
 */
 
 /* Included libraries */
-#include "MQTT311.h"
+#include "MQTT311/MQTT311.h"
 
 /*
  * Function: MQTT311_Suback
@@ -54,22 +54,11 @@ bool MQTT311_Suback(uint16_t packetIdentifier)
     /* Useful flag for keeping track of sucess of response message */
     bool success_message = true;
 
-    /* Check if correct response package was received */
-    bool correct_response = MQTT311_CheckResponseHeader(suback_message_data.packet_type, suback_message_data.remaining_length, 0);
+    /* Get remaining packet parts */
+    success_message = MQTT311_GetPubPacketInfo(packetIdentifier, suback_message_data.packet_type, suback_message_data.remaining_length, 0);
 
-    /* If incorrect reponse package, return false */
-    if (!correct_response)
+    if (success_message == false)
     {
-        success_message = false;
-        return success_message;
-    }
-
-    suback_message_data.packet_identifier = MQTT311_GetPacketIdentifier(2);
-
-    /* Checking if this is the correct packet identifier */
-    if (suback_message_data.packet_identifier != packetIdentifier) 
-    {
-        success_message = false;
         return success_message;
     }
 

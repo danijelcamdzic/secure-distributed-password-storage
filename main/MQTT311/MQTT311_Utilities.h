@@ -25,7 +25,7 @@
 #define MQTT311_UTILITIES_H
 
 /* Necessary inclusion */
-#include "MQTT311.h"
+#include "MQTT311/MQTT311.h"
 
 /* Function macros */
 #define NULL_CHECK(pointer)             if (pointer == NULL){/* printf("\r\nFailed to allocate memory for the connect_message_data\r\n")*/;}
@@ -175,6 +175,6 @@ uint8_t MQTT311_CheckRemainingLength(void);
 void MQTT311_MoveByteArrayToLeft(void);
 bool MQTT311_CheckResponseHeader(uint8_t packet_type, uint16_t remaining_length, uint8_t offset);
 uint16_t MQTT311_GetPacketIdentifier(uint8_t offset);
-// bool get_pub_receive_packet_info(uint16_t packetIdentifier, uint8_t packet_type, uint16_t remaining_length, uint16_t offset);
+bool MQTT311_GetPubPacketInfo(uint16_t packetIdentifier, uint8_t packet_type, uint16_t remaining_length, uint16_t offset);
 
 #endif

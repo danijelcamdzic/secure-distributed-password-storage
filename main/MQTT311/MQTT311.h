@@ -38,13 +38,17 @@
 #include "freertos/queue.h"
 
 /* MQTT Packet and Utilities Libraries */
-#include "MQTT311_Driver.h"
-#include "MQTT311_Utilities.h"
-#include "MQTT311_Connect.h"
-#include "MQTT311_Connack.h"
-#include "MQTT311_Publish.h"
-#include "MQTT311_Subscribe.h"
-#include "MQTT311_Suback.h"
+#include "MQTT311/MQTT311_Driver.h"
+#include "MQTT311/MQTT311_Utilities.h"
+#include "MQTT311/MQTT311_Connect.h"
+#include "MQTT311/MQTT311_Connack.h"
+#include "MQTT311/MQTT311_Publish.h"
+#include "MQTT311/MQTT311_Puback.h"
+#include "MQTT311/MQTT311_Pubrec.h"
+#include "MQTT311/MQTT311_Pubrel.h"
+#include "MQTT311/MQTT311_Pubcomp.h"
+#include "MQTT311/MQTT311_Subscribe.h"
+#include "MQTT311/MQTT311_Suback.h"
 
 /* DELETE THIS WHEN LIBRARY IS STANDALONE */
 #include <string.h>

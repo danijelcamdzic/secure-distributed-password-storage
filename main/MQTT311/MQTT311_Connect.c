@@ -22,7 +22,7 @@
 */
 
 /* Included libraries */
-#include "MQTT311.h"
+#include "MQTT311/MQTT311.h"
 
 /* Private function declarations */
 static void MQTT311_SetKeepAlive(uint16_t keepalive);

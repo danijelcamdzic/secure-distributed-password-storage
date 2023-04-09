@@ -22,7 +22,7 @@
 */
 
 /* Included libraries */
-#include "MQTT311.h"
+#include "MQTT311/MQTT311.h"
 
 /* Private functions */
 static void MQTT311_SubscribeWithStruct(struct SUBSCRIBE_MESSAGE *subscribe_message_data);

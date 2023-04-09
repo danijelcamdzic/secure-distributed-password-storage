@@ -21,11 +21,9 @@
 */
 
 /* Included libraries */
-#include "MQTT311_Driver.h"    
+#include "MQTT311/MQTT311_Driver.h"    
 
 /* Variable definitions */
-
-static const char *TAG = "MQTT311_Driver";
 
 /* Task handle */
 TaskHandle_t xMQTTSendTask = NULL;
