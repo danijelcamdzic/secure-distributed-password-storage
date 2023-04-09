@@ -165,7 +165,7 @@ void MQTT311_SendMQTTPacket(struct MQTTPacket *mqtt_packet);
 // void set_connection_monitoring_variable(uint16_t* monitoring_variable);
 void MQTT311_CreateClient(const char* deviceID);
 void MQTT311_SetUsernameAndPassword(const char* username, const char* password);
-void MQTT_EstablishConnectionToMQTTBroker(const char* brokerName, uint16_t port);
+void MQTT311_EstablishConnectionToMQTTBroker(const char* brokerName, uint16_t port);
 void MQTT311_AppendData(const char* data, uint16_t data_length, bool append_data_length);
 void MQTT311_AppendTopicName(const char* topic_name);
 void MQTT311_SendToMQTTBroker(uint16_t size);

@@ -271,20 +271,20 @@ void MQTT311_SendMQTTPacket(struct MQTTPacket *mqtt_packet)
             vPortFree(mqtt_packet->parent);
             break;
 
-        // case eUNSUBSCRIBE:
-        //     mqtt_packet->packet_data.unsubscribe_message_structure->unMQTT311_SubscribeWithStruct(mqtt_packet->packet_data.unsubscribe_message_structure);
-        //     vPortFree(mqtt_packet->parent);
-        //     break;
+        case eUNSUBSCRIBE:
+            mqtt_packet->packet_data.unsubscribe_message_structure->MQTT311_UnsubscribeWithStruct(mqtt_packet->packet_data.unsubscribe_message_structure);
+            vPortFree(mqtt_packet->parent);
+            break;
 
-        // case ePINGREQ:
-        //     mqtt_packet->packet_data.pingreq_message_structure->pingreq_with_struct(mqtt_packet->packet_data.pingreq_message_structure);
-        //     vPortFree(mqtt_packet->parent);
-        //     break;
+        case ePINGREQ:
+            mqtt_packet->packet_data.pingreq_message_structure->MQTT311_PingreqWithStruct(mqtt_packet->packet_data.pingreq_message_structure);
+            vPortFree(mqtt_packet->parent);
+            break;
 
-        // case eDISCONNECT:
-        //     mqtt_packet->packet_data.disconnect_message_structure->disMQTT311_ConnectWithStruct(mqtt_packet->packet_data.disconnect_message_structure);
-        //     vPortFree(mqtt_packet->parent);
-        //     break;
+        case eDISCONNECT:
+            mqtt_packet->packet_data.disconnect_message_structure->MQTT311_DisconnectWithStruct(mqtt_packet->packet_data.disconnect_message_structure);
+            vPortFree(mqtt_packet->parent);
+            break;
         default:
             break;
 
@@ -450,7 +450,7 @@ void MQTT311_SetUsernameAndPassword(const char* username, const char* password)
 // }
 
 /*
- * Function: MQTT_EstablishConnectionToMQTTBroker
+ * Function: MQTT311_EstablishConnectionToMQTTBroker
  * ----------------------------
  *   Establishes a TCP connection to the broker over a tcp port given.
  *
@@ -460,7 +460,7 @@ void MQTT311_SetUsernameAndPassword(const char* username, const char* password)
  *
  *   returns: no return value
  */
-void MQTT_EstablishConnectionToMQTTBroker(const char* brokerName, uint16_t port) 
+void MQTT311_EstablishConnectionToMQTTBroker(const char* brokerName, uint16_t port) 
 {
     MQTT311_ConnectTCPSocket(brokerName, port);
 }

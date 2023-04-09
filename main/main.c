@@ -278,7 +278,7 @@ void app_main(void)
     MQTT311_CreateMQTTFreeRTOSTasks();
     MQTT311_CreateClient("client_id_dado123");
     MQTT311_SetConnectTCPSocket(connect_tcp_socket);
-    MQTT_EstablishConnectionToMQTTBroker("mqtt.eclipseprojects.io", 1883);
+    MQTT311_EstablishConnectionToMQTTBroker("mqtt.eclipseprojects.io", 1883);
     MQTT311_SetUsernameAndPassword("", ""); // No username and password necessary
 
     /* Part 2: */
@@ -303,7 +303,10 @@ void app_main(void)
     /*
     subscribe(0x02, "s/e", 0x00);
     */
-   MQTT311_Subscribe(0x02, "/topic/qos1", 0x00);
+    MQTT311_Subscribe(0x02, "/topic/qos1", 0x00);
+    MQTT311_Unsubscribe(0x02, "/topic/qos1");
+    MQTT311_Pingreq();
+    MQTT311_Disconnect();
 
     ESP_LOGI(TAG, "HELLO FROM THE END OF THE MAIN\r\n");
 }

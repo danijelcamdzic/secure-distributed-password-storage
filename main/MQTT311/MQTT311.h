@@ -49,6 +49,11 @@
 #include "MQTT311/MQTT311_Pubcomp.h"
 #include "MQTT311/MQTT311_Subscribe.h"
 #include "MQTT311/MQTT311_Suback.h"
+#include "MQTT311/MQTT311_Unsubscribe.h"
+#include "MQTT311/MQTT311_Unsuback.h"
+#include "MQTT311/MQTT311_Pingreq.h"
+#include "MQTT311/MQTT311_Pingresp.h"
+#include "MQTT311/MQTT311_Disconnect.h"
 
 /* DELETE THIS WHEN LIBRARY IS STANDALONE */
 #include <string.h>

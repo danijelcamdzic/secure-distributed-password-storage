@@ -74,7 +74,8 @@ static void MQTT311_SubscribeWithStruct(struct SUBSCRIBE_MESSAGE *subscribe_mess
         MQTT311_Print("Unsuccesfull subscription!");
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
-
+    vPortFree(subscribe_message_data->topic_name);
+    vPortFree(subscribe_message_data);
 }
 
 /*
