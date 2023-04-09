@@ -28,21 +28,18 @@
 #include "MQTT311.h"        /* Include all the necessary MQTT311 Packets */
 
 /* Priorities at which the tasks are created. */
-// #define mqttQUEUE_SEND_TASK_PRIORITY		( tskIDLE_PRIORITY + 2 )
-// #define mqttCHECK_SUB_MES_TASK_PRIORITY	    ( tskIDLE_PRIORITY + 2 )
-// #define mqttDEBUG_TASK_PRIORITY		        ( tskIDLE_PRIORITY + 2 )
+#define mqttQUEUE_SEND_TASK_PRIORITY		( tskIDLE_PRIORITY + 2 )
+#define mqttCHECK_SUB_MES_TASK_PRIORITY	    ( tskIDLE_PRIORITY + 2 )
 
 /* Time definitions */
-// #define mainMQTT_SEND_FREQUENCY_MS          (100/portTICK_PERIOD_MS)
-// #define mainMQTT_SUB_MES_FREQUENCY_MS       (100/portTICK_PERIOD_MS)
-// #define mainDEBUG_FREQUENCY_MS              (100/portTICK_PERIOD_MS)
+#define mainMQTT_SEND_FREQUENCY_MS          (100/portTICK_PERIOD_MS)
+#define mainMQTT_SUB_MES_FREQUENCY_MS       (100/portTICK_PERIOD_MS)
 
 /* Task Handle */
-// extern TaskHandle_t xMQTTSendTask;
-// extern TaskHandle_t xMQTTCheckSubMesTask;
-// extern TaskHandle_t xDebugTask;
+extern TaskHandle_t xMQTTSendTask;
+extern TaskHandle_t xMQTTCheckSubMesTask;
 
 /* Function declarations */
-void create_mqtt_tasks(void);
+void MQTT311_CreateMQTTFreeRTOSTasks(void);
 
 #endif

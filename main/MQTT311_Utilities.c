@@ -30,12 +30,15 @@
 // struct MQTTExtFunctions mqtt_ext_functions;
 MQTT311_ConnectTCPSocketPtr MQTT311_ConnectTCPSocket = NULL;
 MQTT311_SendToTCPSocketPtr MQTT311_SendToTCPSocket = NULL;
+MQTT311_ReadFromTCPSocketPtr MQTT311_ReadFromTCPSocket = NULL;
 
 /* UserData structure */
 struct UserData userdata;
 
 /* Bytes to send to function */
 volatile char bytes_to_send[100];
+volatile char bytes_to_receive[100];
+uint16_t number_of_bytes_received = 0; 
 
 /* Variable to keep track of indexes */
 uint16_t current_index;
@@ -57,6 +60,10 @@ void MQTT311_SetConnectTCPSocket(MQTT311_ConnectTCPSocketPtr connect_tcp_socket)
 void MQTT311_SetSendToTCPSocket(MQTT311_SendToTCPSocketPtr send_to_tcp_socket)
 {
     MQTT311_SendToTCPSocket = send_to_tcp_socket;
+}
+void MQTT311_SetReadFromTCPSocket(MQTT311_ReadFromTCPSocketPtr read_from_tcp_socket)
+{
+    MQTT311_ReadFromTCPSocket = read_from_tcp_socket;
 }
 // static void set_broker_address(const char* brokerAddress);
 // static void set_port_number(uint16_t port);
@@ -250,18 +257,18 @@ void MQTT311_SendMQTTPacket(struct MQTTPacket *mqtt_packet)
             vPortFree(mqtt_packet->parent);
             break;
 
-        // case ePUBLISH:
-        //     mqtt_packet->packet_data.publish_message_structure->MQTT311_PublishWithStruct(mqtt_packet->packet_data.publish_message_structure);
-        //     vPortFree(mqtt_packet->parent);
-        //     break;
+        case ePUBLISH:
+            mqtt_packet->packet_data.publish_message_structure->MQTT311_PublishWithStruct(mqtt_packet->packet_data.publish_message_structure);
+            vPortFree(mqtt_packet->parent);
+            break;
 
-        // case eSUBSCRIBE:
-        //     mqtt_packet->packet_data.subscribe_message_structure->subscribe_with_struct(mqtt_packet->packet_data.subscribe_message_structure);
-        //     vPortFree(mqtt_packet->parent);
-        //     break;
+        case eSUBSCRIBE:
+            mqtt_packet->packet_data.subscribe_message_structure->MQTT311_SubscribeWithStruct(mqtt_packet->packet_data.subscribe_message_structure);
+            vPortFree(mqtt_packet->parent);
+            break;
 
         // case eUNSUBSCRIBE:
-        //     mqtt_packet->packet_data.unsubscribe_message_structure->unsubscribe_with_struct(mqtt_packet->packet_data.unsubscribe_message_structure);
+        //     mqtt_packet->packet_data.unsubscribe_message_structure->unMQTT311_SubscribeWithStruct(mqtt_packet->packet_data.unsubscribe_message_structure);
         //     vPortFree(mqtt_packet->parent);
         //     break;
 
@@ -509,6 +516,11 @@ void MQTT311_SendToMQTTBroker(uint16_t size)
 {
     MQTT311_SendToTCPSocket((const char *)bytes_to_send, size);
 }
+void MQTT311_ReceiveFromMQTTBroker(void) 
+{
+    MQTT311_ReadFromTCPSocket((char*)bytes_to_receive, &number_of_bytes_received);
+}
+
 
 /*
  * Function: MQTT311_EncodeRemainingLength

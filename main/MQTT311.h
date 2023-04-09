@@ -38,11 +38,13 @@
 #include "freertos/queue.h"
 
 /* MQTT Packet and Utilities Libraries */
+#include "MQTT311_Driver.h"
 #include "MQTT311_Utilities.h"
 #include "MQTT311_Connect.h"
 #include "MQTT311_Publish.h"
+#include "MQTT311_Subscribe.h"
 
-/* DELETE AFTER LIBRARY IS STANDALONE */
+/* DELETE THIS WHEN LIBRARY IS STANDALONE */
 #include <string.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -52,6 +54,7 @@
 #include "esp_event.h"
 #include "esp_log.h"
 #include "nvs_flash.h"
+#include <netdb.h>
 
 #include "lwip/err.h"
 #include "lwip/sys.h"
@@ -77,7 +80,7 @@
 
 /* Bytes to read when the notification system displays 0 available bytes to read */
 /* This is a precaution in case the system failed */
-#define MAX_BYTES_TO_READ                   (500)
+// #define MAX_BYTES_TO_READ                   (500)
 
 /* Uses macro to replace the pointer to the variable which holds the number of available bytes to read */
 /* It is flexible - any variable which retrieves the number of bytes to read can be written here */

@@ -231,7 +231,7 @@ void MQTT311_Publish(uint8_t header_flags, const char* topicName, uint16_t packe
     mqtt_packet->packet_data.publish_message_structure = publish_message_data;
     
     /* Send to queue for the sending task to receive */
-    // xQueueSend( xMQTTQueue, mqtt_packet, portMAX_DELAY );
+    xQueueSend( xMQTTQueue, mqtt_packet, portMAX_DELAY );
 
-    MQTT311_PublishWithStruct(publish_message_data);
+    // MQTT311_PublishWithStruct(publish_message_data);
 }

@@ -38,11 +38,12 @@
 // #define ASCII_LETTER                    55          /* Subtraction value to turn ascii letter to num */
 
 /* The number of items the queue can hold.  */
-#define mqttQUEUE_LENGTH			    32
+#define mqttQUEUE_LENGTH			    128
 
 /* External Function */
 typedef void (*MQTT311_ConnectTCPSocketPtr)(const char*, uint16_t);
 typedef void (*MQTT311_SendToTCPSocketPtr)(const char*, uint16_t);
+typedef void (*MQTT311_ReadFromTCPSocketPtr)(char*, uint16_t*);
 
 /* Define statement that is used in AT command socket opening */
 // #define OPEN_SOCKET_CODE                "6"
@@ -137,6 +138,7 @@ extern QueueHandle_t xMQTTQueue;
 /* Function declarations */
 void MQTT311_SetConnectTCPSocket(MQTT311_ConnectTCPSocketPtr connect_tcp_socket);
 void MQTT311_SetSendToTCPSocket(MQTT311_SendToTCPSocketPtr send_to_tcp_socket);
+void MQTT311_SetReadFromTCPSocket(MQTT311_ReadFromTCPSocketPtr read_from_tcp_socket);
 // void set_mqtt_external_functions(
 //     void (*close_socket)(const char*),
 //     void (*open_socket)(const char*, const char*),
@@ -165,6 +167,7 @@ void MQTT_EstablishConnectionToMQTTBroker(const char* brokerName, uint16_t port)
 void MQTT311_AppendData(const char* data, uint16_t data_length, bool append_data_length);
 void MQTT311_AppendTopicName(const char* topic_name);
 void MQTT311_SendToMQTTBroker(uint16_t size);
+void MQTT311_ReceiveFromMQTTBroker(void);
 uint8_t MQTT311_EncodeRemainingLength(uint16_t length);
 uint8_t MQTT311_CheckRemainingLength(void);
 void MQTT311_MoveByteArrayToLeft(void);

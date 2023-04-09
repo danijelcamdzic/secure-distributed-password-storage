@@ -16,6 +16,7 @@
 #include "esp_log.h"
 #include "nvs_flash.h"
 #include <netdb.h>
+#include <fcntl.h>
 
 #include "lwip/err.h"
 #include "lwip/sys.h"
@@ -224,6 +225,33 @@ void send_tcp_data(const char* data, uint16_t size)
     }
 }
 
+void receive_tcp_data(char* rx_buffer, uint16_t* number_of_bytes_received)
+{
+    vTaskDelay(pdMS_TO_TICKS(2000));
+
+    if (fcntl(sock, F_SETFL, fcntl(sock, F_GETFL) | O_NONBLOCK) < 0) {
+        ESP_LOGI(TAG, "CANNOT PUT IN NON BLOCKING MODE");
+    }
+
+    int len = recv(sock, rx_buffer, sizeof(rx_buffer) - 1, 0);
+
+    // No data available to read
+    if (len < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
+        ESP_LOGI(TAG, "No data to read");
+    }
+    // Error occurred during receiving
+    else if (len < 0) {
+        ESP_LOGI(TAG, "ERROR DURING RECEIVING");
+    }
+    // Data received
+    else {
+        rx_buffer[len] = 0; // Null-terminate whatever we received and treat like a string
+        ESP_LOGI(TAG, "Received %d bytes:", len);
+        ESP_LOGI(TAG, "%s", rx_buffer);
+    }
+}
+
+
 void app_main(void)
 {
     //Initialize NVS
@@ -243,6 +271,7 @@ void app_main(void)
     connect_to_broker("0", "mqtt.eu-latest.cumulocity.com", 1883, "117");
     set_username_pass("env782595/danijelcamdzic@gmail.com", "123");
     */
+    MQTT311_CreateMQTTFreeRTOSTasks();
     MQTT311_CreateClient("client_id_dado123");
     MQTT311_SetConnectTCPSocket(connect_tcp_socket);
     MQTT_EstablishConnectionToMQTTBroker("mqtt.eclipseprojects.io", 1883);
@@ -252,14 +281,25 @@ void app_main(void)
     /*
     connect(0xC2, 600, "", "");
     */
-   MQTT311_SetSendToTCPSocket(send_tcp_data);
-   MQTT311_Connect(0xC2, 600, "", "");
+    MQTT311_SetSendToTCPSocket(send_tcp_data);
+    MQTT311_SetReadFromTCPSocket(receive_tcp_data);
+    MQTT311_Connect(0xC2, 600, "", "");
+    vTaskDelay(pdMS_TO_TICKS(2000));
 
     /* Part 3: */
     /*
     publish(0x00, "s/us", 0x00, "100,My MQTT Device,c8y_MQTTDevice");
     */
-   MQTT311_Publish(0x00, "/topic/qos0", 0x00, "Hello, my name is Danijel");
+    MQTT311_Publish(0x00, "/topic/qos0", 0x00, "Hello, my name is Danijel");
+    vTaskDelay(pdMS_TO_TICKS(2000));
+    MQTT311_Publish(0x00, "/topic/qos1", 0x00, "Yes, indeed, my name is Danijel");
+    vTaskDelay(pdMS_TO_TICKS(2000));
+
+    /* Part 4: */
+    /*
+    subscribe(0x02, "s/e", 0x00);
+    */
+   MQTT311_Subscribe(0x02, "/topic/qos1", 0x00);
 
     ESP_LOGI(TAG, "HELLO FROM THE END OF THE MAIN\r\n");
 }

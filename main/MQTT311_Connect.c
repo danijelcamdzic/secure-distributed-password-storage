@@ -273,7 +273,7 @@ void MQTT311_Connect(uint8_t connect_flags, uint16_t keepalive, const char* will
     userdata.connect_flags = connect_flags;
     
     /* Send to queue for the sending task to receive */
-    // xQueueSend( xMQTTQueue, mqtt_packet, portMAX_DELAY ); 
+    xQueueSend( xMQTTQueue, mqtt_packet, portMAX_DELAY ); 
 
-    MQTT311_ConnectWithStruct(connect_message_data);
+    // MQTT311_ConnectWithStruct(connect_message_data);
 }
