@@ -31,6 +31,7 @@
 MQTT311_ConnectTCPSocketPtr MQTT311_ConnectTCPSocket = NULL;
 MQTT311_SendToTCPSocketPtr MQTT311_SendToTCPSocket = NULL;
 MQTT311_ReadFromTCPSocketPtr MQTT311_ReadFromTCPSocket = NULL;
+MQTT311_PrintPtr MQTT311_Print = NULL;
 
 /* UserData structure */
 struct UserData userdata;
@@ -64,6 +65,9 @@ void MQTT311_SetSendToTCPSocket(MQTT311_SendToTCPSocketPtr send_to_tcp_socket)
 void MQTT311_SetReadFromTCPSocket(MQTT311_ReadFromTCPSocketPtr read_from_tcp_socket)
 {
     MQTT311_ReadFromTCPSocket = read_from_tcp_socket;
+}
+void MQTT311_SetPrint(MQTT311_PrintPtr print) {
+    MQTT311_Print = print;
 }
 // static void set_broker_address(const char* brokerAddress);
 // static void set_port_number(uint16_t port);
@@ -594,51 +598,43 @@ void MQTT311_MoveByteArrayToLeft(void)
 }
 
 /*
- * Function: check_response_headers
+ * Function: MQTT311_CheckResponseHeader
  * ----------------------------
  *   Checks whether the appropriate response was received.
  *
  *   packet_type: type of MQTT packet
  *   remainingLength: remaining length of the MQTT packet
  *   offset: starting index from which the response is read
- *   header_starts_with_letter: information on whether the package header first byte is ASCII letter or ASCII num
  * 
  *   returns: information on whether the proper response was received
  */
-// bool check_response_headers(uint8_t packet_type, uint16_t remainingLength, uint8_t offset, bool header_starts_with_letter)
-// {
-//     uint8_t server_response_header;
+bool MQTT311_CheckResponseHeader(uint8_t packet_type, uint16_t remainingLength, uint8_t offset)
+{
+    uint8_t server_response_header;
 
-//     /* Getting proper bytes from URC message */
-//     if (header_starts_with_letter) 
-//     {
-//         server_response_header = ASCII_LETTER_TO_VAL(offset + STARTING_URC_INDEX)*16 + ASCII_NUM_TO_VAL(offset + STARTING_URC_INDEX + 1);
-//     }
-//     else 
-//     {
-//         server_response_header = ASCII_NUM_TO_VAL(offset + STARTING_URC_INDEX)*16 + ASCII_NUM_TO_VAL(offset + STARTING_URC_INDEX + 1);
-//     }
+    /* Getting proper bytes from the header */
+    server_response_header = bytes_to_receive[offset];
 
-//     /* Checking the response header */
-//     if (server_response_header != packet_type)
-//     {
-//         return false;
-//     }
+    /* Checking the response header */
+    if (server_response_header != packet_type)
+    {
+        return false;
+    }
 
-//     /* Getting remaining length */
-//     uint8_t remaining_length = ASCII_NUM_TO_VAL(offset + STARTING_URC_INDEX + 2)*16 + ASCII_NUM_TO_VAL(offset + STARTING_URC_INDEX + 3);
+    /* Getting remaining length */
+    uint8_t remaining_length = bytes_to_receive[offset + 1];
 
-//     /* Checking the remaining length */
-//     if (remaining_length != remainingLength)
-//     {
-//         return false;
-//     }
+    /* Checking the remaining length */
+    if (remaining_length != remainingLength)
+    {
+        return false;
+    }
 
-//     return true;
-// }
+    return true;
+}
 
 /*
- * Function: get_packet_identifier
+ * Function: MQTT311_GetPacketIdentifier
  * ----------------------------
  *  Gets the packet_identifier
  *
@@ -646,15 +642,14 @@ void MQTT311_MoveByteArrayToLeft(void)
  * 
  *  returns: packet_identifier
  */
-// uint16_t get_packet_identifier(uint8_t offset)
-// {
+uint16_t MQTT311_GetPacketIdentifier(uint8_t offset)
+{
 
-//     /* Getting packet identifier */
-//     uint16_t packet_identifier = ASCII_NUM_TO_VAL(offset + STARTING_URC_INDEX + 4)*16*16*16 + ASCII_NUM_TO_VAL(offset + STARTING_URC_INDEX + 5)*16*16 +
-//                                  ASCII_NUM_TO_VAL(offset + STARTING_URC_INDEX + 6)*16 + ASCII_NUM_TO_VAL(offset + STARTING_URC_INDEX + 7);
+    /* Getting packet identifier */
+    uint16_t packet_identifier = (bytes_to_receive[offset] << 8) | (bytes_to_receive[offset + 1]);
 
-//     return packet_identifier;
-// }
+    return packet_identifier;
+}
 
 /*
  * Function: get_pub_receive_packet_info

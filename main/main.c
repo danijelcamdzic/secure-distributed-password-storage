@@ -227,13 +227,11 @@ void send_tcp_data(const char* data, uint16_t size)
 
 void receive_tcp_data(char* rx_buffer, uint16_t* number_of_bytes_received)
 {
-    vTaskDelay(pdMS_TO_TICKS(2000));
-
     if (fcntl(sock, F_SETFL, fcntl(sock, F_GETFL) | O_NONBLOCK) < 0) {
         ESP_LOGI(TAG, "CANNOT PUT IN NON BLOCKING MODE");
     }
 
-    int len = recv(sock, rx_buffer, sizeof(rx_buffer) - 1, 0);
+    int len = recv(sock, &rx_buffer[*number_of_bytes_received], sizeof(rx_buffer) - 1, 0);
 
     // No data available to read
     if (len < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
@@ -245,10 +243,14 @@ void receive_tcp_data(char* rx_buffer, uint16_t* number_of_bytes_received)
     }
     // Data received
     else {
-        rx_buffer[len] = 0; // Null-terminate whatever we received and treat like a string
-        ESP_LOGI(TAG, "Received %d bytes:", len);
-        ESP_LOGI(TAG, "%s", rx_buffer);
+        *number_of_bytes_received += len;
+        ESP_LOGI(TAG, "Received %d bytes:", *number_of_bytes_received);
     }
+}
+
+void debug_print(char* message)
+{
+    ESP_LOGI(TAG, "%s\r\n", message);
 }
 
 
@@ -264,6 +266,8 @@ void app_main(void)
 
     ESP_LOGI(TAG, "ESP_WIFI_MODE_STA");
     wifi_init_sta();
+
+    MQTT311_SetPrint(debug_print);
 
     /* Part 1: */
     /*

@@ -29,13 +29,6 @@
 
 /* Function macros */
 #define NULL_CHECK(pointer)             if (pointer == NULL){/* printf("\r\nFailed to allocate memory for the connect_message_data\r\n")*/;}
-// #define ASCII_NUM_TO_VAL(index)         (mqtt_ext_functions.get_response_byte(index)-ASCII_NUM)
-// #define ASCII_LETTER_TO_VAL(index)      (mqtt_ext_functions.get_response_byte(index)-ASCII_LETTER)
-
-/* Constants */
-// #define STARTING_URC_INDEX              13          /* Index at which the elements are read */
-// #define ASCII_NUM                       48          /* Subtraction value to turn char num to num */
-// #define ASCII_LETTER                    55          /* Subtraction value to turn ascii letter to num */
 
 /* The number of items the queue can hold.  */
 #define mqttQUEUE_LENGTH			    128
@@ -44,6 +37,12 @@
 typedef void (*MQTT311_ConnectTCPSocketPtr)(const char*, uint16_t);
 typedef void (*MQTT311_SendToTCPSocketPtr)(const char*, uint16_t);
 typedef void (*MQTT311_ReadFromTCPSocketPtr)(char*, uint16_t*);
+typedef void (*MQTT311_PrintPtr)(char*);
+
+extern MQTT311_ConnectTCPSocketPtr MQTT311_ConnectTCPSocket;
+extern MQTT311_SendToTCPSocketPtr MQTT311_SendToTCPSocket;
+extern MQTT311_ReadFromTCPSocketPtr MQTT311_ReadFromTCPSocket;
+extern MQTT311_PrintPtr MQTT311_Print;
 
 /* Define statement that is used in AT command socket opening */
 // #define OPEN_SOCKET_CODE                "6"
@@ -123,6 +122,8 @@ extern struct UserData userdata;
 
 /* Bytes to send to function */
 extern volatile char bytes_to_send[100];
+extern volatile char bytes_to_receive[100];
+extern uint16_t number_of_bytes_received; 
 
 /* Variable used to keep track of indexes */
 extern uint16_t current_index;
@@ -139,6 +140,7 @@ extern QueueHandle_t xMQTTQueue;
 void MQTT311_SetConnectTCPSocket(MQTT311_ConnectTCPSocketPtr connect_tcp_socket);
 void MQTT311_SetSendToTCPSocket(MQTT311_SendToTCPSocketPtr send_to_tcp_socket);
 void MQTT311_SetReadFromTCPSocket(MQTT311_ReadFromTCPSocketPtr read_from_tcp_socket);
+void MQTT311_SetPrint(MQTT311_PrintPtr print);
 // void set_mqtt_external_functions(
 //     void (*close_socket)(const char*),
 //     void (*open_socket)(const char*, const char*),
@@ -171,8 +173,8 @@ void MQTT311_ReceiveFromMQTTBroker(void);
 uint8_t MQTT311_EncodeRemainingLength(uint16_t length);
 uint8_t MQTT311_CheckRemainingLength(void);
 void MQTT311_MoveByteArrayToLeft(void);
-// bool check_response_headers(uint8_t packet_type, uint16_t remaining_length, uint8_t offset, bool header_starts_with_letter);
-// uint16_t get_packet_identifier(uint8_t offset);
+bool MQTT311_CheckResponseHeader(uint8_t packet_type, uint16_t remaining_length, uint8_t offset);
+uint16_t MQTT311_GetPacketIdentifier(uint8_t offset);
 // bool get_pub_receive_packet_info(uint16_t packetIdentifier, uint8_t packet_type, uint16_t remaining_length, uint16_t offset);
 
 #endif

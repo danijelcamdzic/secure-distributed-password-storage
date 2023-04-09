@@ -190,21 +190,20 @@ static void MQTT311_ConnectWithStruct(struct CONNECT_MESSAGE *connect_message_da
         /* Send data to server */
         MQTT311_SendToMQTTBroker(current_index);
 
-        redelivery_flag = true; // DUMMY CODE
+        /* Read the acknowledge */
+        redelivery_flag = MQTT311_Connack();
 
-        /* Read the acknowledge and if no acknowledge, try to reconnect */
-        // redelivery_flag = get_connect_acknowledgement();
-
-        // if(!redelivery_flag) 
-        // {
-        //     printf("\r\nUnsuccesfull connection, trying to reconnect..\r\n");
-        //     msleep(1000);
-        // }
-        // else
-        // {
-        //     break;
-        // }
+        if(!redelivery_flag) 
+        {
+            MQTT311_Print("Unsuccesfull connection, trying to reconnect...");
+            vTaskDelay(pdMS_TO_TICKS(2000));
+        }
+        else
+        {
+            break;
+        }
     }
+
     /* Free the dynamically allocated structure */
     vPortFree(connect_message_data->willTopic);
     vPortFree(connect_message_data->willMessage);
@@ -274,6 +273,4 @@ void MQTT311_Connect(uint8_t connect_flags, uint16_t keepalive, const char* will
     
     /* Send to queue for the sending task to receive */
     xQueueSend( xMQTTQueue, mqtt_packet, portMAX_DELAY ); 
-
-    // MQTT311_ConnectWithStruct(connect_message_data);
 }

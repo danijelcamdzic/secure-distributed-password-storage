@@ -72,7 +72,6 @@ static void prvMQTTQueueSendTask( void *pvParameters )
                     MQTT311_SendMQTTPacket(&mqtt_packet);
                 }
                 /* Give sempahore back and delay the task */
-                ESP_LOGI(TAG, "HELLO FROM SEND TASK\r\n");
                 xSemaphoreGive( xMQTTSemaphore );
                 /* Delay the task for some time */
                 vTaskDelayUntil( &xNextWakeTime, mainMQTT_SEND_FREQUENCY_MS );
@@ -109,7 +108,14 @@ static void prvMQTTCheckSubMesTask( void *pvParameters )
             if( xSemaphoreTake( xMQTTSemaphore, portMAX_DELAY ) == pdTRUE )
             {
                 MQTT311_ReceiveFromMQTTBroker();
-                ESP_LOGI(TAG, "HELLO FROM RECEIVE TASK\r\n");
+                if (number_of_bytes_received > 50) 
+                {
+                    for (int i = 0; i < number_of_bytes_received; i++)
+                    {
+                        ESP_LOGI("MESSAGE", "%c ", bytes_to_receive[i]);
+                    }
+                    number_of_bytes_received = 0;
+                }
                 /* Give back the semaphore (unlock) */
                 xSemaphoreGive( xMQTTSemaphore );
                 /* Delay the task */

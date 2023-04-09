@@ -65,15 +65,15 @@ static void MQTT311_SubscribeWithStruct(struct SUBSCRIBE_MESSAGE *subscribe_mess
     MQTT311_SendToMQTTBroker(current_index);
 
     /* Read the acknowledge */
-    // if(get_subscribe_acknowledgement(subscribe_message_data->packet_identifier))
-    // {
-    //     printf("\r\nSuccess!\r\n");
-    // }
-    // else 
-    // {
-    //     printf("\r\nUnsuccesfull subscription!\r\n");
-    //     msleep(1000);
-    // }
+    if(MQTT311_Suback(subscribe_message_data->packet_identifier))
+    {
+        MQTT311_Print("Success");
+    }
+    else 
+    {
+        MQTT311_Print("Unsuccesfull subscription!");
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
 
 }
 
