@@ -52,11 +52,6 @@ bool MQTT311_Unsuback(uint16_t packetIdentifier)
 
     number_of_bytes_received = 0;
 
-    ESP_LOGI("TAG", "Received %x bytes:", (uint8_t)bytes_to_receive[0]);
-    ESP_LOGI("TAG", "Received %x bytes:", (uint8_t)bytes_to_receive[1]);
-    ESP_LOGI("TAG", "Received %x bytes:", (uint8_t)bytes_to_receive[2]);
-    ESP_LOGI("TAG", "Received %x bytes:", (uint8_t)bytes_to_receive[3]);
-
     /* Useful flag for keeping track of sucess of response message */
     bool success_message = true;
 
