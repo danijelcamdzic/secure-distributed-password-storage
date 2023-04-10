@@ -1,25 +1,11 @@
-/***********************************************************************
-* FILENAME:        MQTT311_Driver.h             
-*
-* DESCRIPTION:
-*                  Contains definitions, structures, variable and function declarations
-*                  necessary for freeRTOS implementation of the MQTT 3.1.1 Client.
-*
-* NOTES:
-*       
-*
-* AUTHOR:          Danijel Camdzic     
-*
-*   
-* DATE:            19 Aug 21
-*
-*
-* CHANGES:
-*
-* VERSION:         DATE:          WHO:         DETAIL:
-* 0.00.0           19 Aug 21      DC           Initial state of the file
-*
-*/
+/**
+ * @file MQTT311_Driver.h
+ * @brief Contains definitions, structures, variable and function declarations
+ * necessary for freeRTOS implementation of the MQTT 3.1.1 Client.
+ *
+ * @author Danijel Camdzic
+ * @date 10 Apr 2023
+ */
 
 #ifndef MQTT311_DRIVER_H
 #define MQTT311_DRIVER_H
@@ -42,4 +28,4 @@ extern TaskHandle_t xMQTTCheckSubMesTask;
 /* Function declarations */
 void MQTT311_CreateMQTTFreeRTOSTasks(void);
 
-#endif
+#endif /* MQTT311_DRIVER_H */

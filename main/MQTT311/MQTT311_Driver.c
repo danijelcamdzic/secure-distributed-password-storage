@@ -1,24 +1,10 @@
-/***********************************************************************
-* FILENAME:        MQTT311_Driver.c             
-*
-* DESCRIPTION:
-*                  Contains freeRTOS implementation of the MQTT 3.1.1 Client.
-*
-* NOTES:
-*       
-*
-* AUTHOR:          Danijel Camdzic     
-*
-*   
-* DATE:            19 Aug 21
-*
-*
-* CHANGES:
-*
-* VERSION:         DATE:          WHO:         DETAIL:
-* 0.00.0           19 Aug 21      DC           Initial state of the file
-*
-*/
+/**
+ * @file MQTT311_Driver.c
+ * @brief Contains freeRTOS implementation of the MQTT 3.1.1 Client.
+ *
+ * @author Danijel Camdzic
+ * @date 10 Apr 2023
+ */
 
 /* Included libraries */
 #include "MQTT311/MQTT311_Driver.h"    
@@ -36,23 +22,26 @@ SemaphoreHandle_t xMQTTSemaphore = NULL;
 static void prvMQTTQueueSendTask( void *pvParameters );
 static void prvMQTTCheckSubMesTask( void *pvParameters );
 
-/*
- * Function: prvMQTTQueueSendTask
- * ----------------------------
- *   Tasks that sends "send" type MQTT packets and with the correct response within.
+/**
+ * @brief Sends "send" type MQTT packets with the correct response.
  *
- *   returns: no return value
+ * This function is a task that sends "send" type MQTT packets with the correct response within.
+ *
+ * @param pvParameters pointer to task parameters.
+ *
+ * @return None.
  */
 static void prvMQTTQueueSendTask( void *pvParameters )
 {
+    /* Remove compiler warning about unused parameter. */
+	( void ) pvParameters;
+
     TickType_t xNextWakeTime;
     BaseType_t xStatus;
 
     /* Variable that receives MQTT "send" packet types */
     struct MQTTPacket mqtt_packet;
- 
-	/* Remove compiler warning about unused parameter. */
-	( void ) pvParameters;
+
     xNextWakeTime = xTaskGetTickCount();
 
     for( ;; )
@@ -62,8 +51,8 @@ static void prvMQTTQueueSendTask( void *pvParameters )
             /* Try to take the sempahore */
             if( xSemaphoreTake( xMQTTSemaphore, ( TickType_t ) 10 ) == pdTRUE )
             {
-                /* Wait until something is received from the queue */
-                xStatus = xQueueReceive(xMQTTQueue, &mqtt_packet, pdMS_TO_TICKS(1000));
+                /* Wait 1000ms for something to be received from the queue */
+                xStatus = xQueueReceive(xMQTTQueue, &mqtt_packet, pdMS_TO_TICKS(100));
                 if (xStatus == pdTRUE)
                 {
                     /* Send appropriate packet */
@@ -77,25 +66,31 @@ static void prvMQTTQueueSendTask( void *pvParameters )
         }
         else
         {
+            /* Do nothing */
         }
     }
 }
 
-/*
- * Function: prvMQTTCheckSubMesTask
- * ----------------------------
- *   Checks if any messages that need to be read from the socket exist and reads
- *   the correct ammount of bytes if there are. If not, a defined number of bytes is read
- *   in case the byte notification system lagged or didn't deliver correct information 
+/**
+ * @brief Checks for pending MQTT messages on the socket and reads the required bytes.
  *
- *   returns: no return value
+ * This function checks if there are any messages that need to be read from the socket and reads the correct
+ * amount of bytes if any messages are available. If no messages are available, a defined number of bytes is read
+ * in case the byte notification system lagged or didn't deliver correct information.
+ *
+ * @param pvParameters pointer to task parameters.
+ *
+ * @return None.
  */
 static void prvMQTTCheckSubMesTask( void *pvParameters )
 {
-    TickType_t xNextWakeTime;
- 
-	/* Remove compiler warning about unused parameter. */
+    /* Remove compiler warning about unused parameter. */
 	( void ) pvParameters;
+
+    /* Use TAG for debugging */
+    char* TAG = "prvMQTTCheckSubMesTask";
+
+    TickType_t xNextWakeTime;
     xNextWakeTime = xTaskGetTickCount();
 
     for( ;; )
@@ -106,14 +101,16 @@ static void prvMQTTCheckSubMesTask( void *pvParameters )
             if( xSemaphoreTake( xMQTTSemaphore, portMAX_DELAY ) == pdTRUE )
             {
                 MQTT311_ReceiveFromMQTTBroker();
-                if (number_of_bytes_received > 50) 
+                /*-------------------TODO---------------------*/
+                if (number_of_bytes_received > 20) 
                 {
                     for (int i = 0; i < number_of_bytes_received; i++)
                     {
-                        ESP_LOGI("MESSAGE", "%c ", bytes_to_receive[i]);
+                        ESP_LOGI(TAG, "%c ", bytes_to_receive[i]);
                     }
                     number_of_bytes_received = 0;
                 }
+                /*-------------------TODO---------------------*/
                 /* Give back the semaphore (unlock) */
                 xSemaphoreGive( xMQTTSemaphore );
                 /* Delay the task */
@@ -122,6 +119,7 @@ static void prvMQTTCheckSubMesTask( void *pvParameters )
         }
         else
         {
+            /* Do nothing */
         }
     }
 }

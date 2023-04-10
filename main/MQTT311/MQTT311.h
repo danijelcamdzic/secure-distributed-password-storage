@@ -1,25 +1,11 @@
-/***********************************************************************
-* FILENAME:        MQTT311.h             
-*
-* DESCRIPTION:
-*                  Contains definitions necessary for the proper functioning of the 
-*                  MQTT 3.1.1 implementation. Combines all the MQTT 3.1.1 packets and utilities.
-*
-* NOTES:
-*       
-*
-* AUTHOR:          Danijel Camdzic     
-*
-*   
-* DATE:            19 Aug 21
-*
-*
-* CHANGES:
-*
-* VERSION:         DATE:          WHO:         DETAIL:
-* 0.00.0           19 Aug 21      DC           Initial state of the file
-*
-*/
+/**
+ * @file MQTT311.h
+ * @brief Contains definitions necessary for the proper functioning of the
+ * MQTT 3.1.1 implementation. Combines all the MQTT 3.1.1 packets and utilities.
+ *
+ * @author Danijel Camdzic
+ * @date 10 Apr 2023
+ */
 
 #ifndef MQTT311_H
 #define MQTT311_H
@@ -55,7 +41,7 @@
 #include "MQTT311/MQTT311_Pingresp.h"
 #include "MQTT311/MQTT311_Disconnect.h"
 
-/* DELETE THIS WHEN LIBRARY IS STANDALONE */
+/* TO DELETE */
 #include <string.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -66,6 +52,7 @@
 #include "esp_log.h"
 #include "nvs_flash.h"
 #include <netdb.h>
+#include <fcntl.h>
 
 #include "lwip/err.h"
 #include "lwip/sys.h"
@@ -89,17 +76,4 @@
 /* MQTT Protocol Constants */
 #define REMAINING_LENGTH_MAX            127         /* Maximum number for 1 byte representation of remaining length */
 
-/* Bytes to read when the notification system displays 0 available bytes to read */
-/* This is a precaution in case the system failed */
-// #define MAX_BYTES_TO_READ                   (500)
-
-/* Uses macro to replace the pointer to the variable which holds the number of available bytes to read */
-/* It is flexible - any variable which retrieves the number of bytes to read can be written here */
-// #define AVAILABLE_BYTES                     (*bytes_to_read)
-/* Uses macro to replace the pointer to the variable which holds the value of the signal quality */
-// #define SIGNAL_MONITORING_VARIABLE          (*signal_monitoring_variable)
-
-/* Signal strenght limit - 31 is the best quality, 99 is undetectable */
-// #define HARD_RESET_LIMIT                    (2)     /* Restart is required and re-connection is required */
-
-#endif
+#endif /* MQTT311_H */

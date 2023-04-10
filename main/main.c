@@ -330,8 +330,8 @@ void app_main(void)
     MQTT311_Subscribe(0x02, "/topic/mihajlo", 0x00);
 
     /* ----- Unsubscribe to some topic ----- */
-    vTaskDelay(pdMS_TO_TICKS(1000));
-    MQTT311_Unsubscribe(0x02, "/topic/mihajlo");
+    // vTaskDelay(pdMS_TO_TICKS(1000));
+    // MQTT311_Unsubscribe(0x02, "/topic/mihajlo");
 
     /* ----- Test pinging ------ */
     MQTT311_Pingreq();
