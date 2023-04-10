@@ -325,7 +325,7 @@ void app_main(void)
     /* ----- Publish some messages ------*/
     MQTT311_Publish(0x00, "/topic/nikola", 0x00, "123test");
     MQTT311_Publish(0x00, "/topic/danijel", 0x00, "Test123");
-
+   
     /* ------ Subscribe to some topic ------ */
     MQTT311_Subscribe(0x02, "/topic/mihajlo", 0x00);
 

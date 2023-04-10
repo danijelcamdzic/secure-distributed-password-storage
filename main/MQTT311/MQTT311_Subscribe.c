@@ -39,10 +39,7 @@ static void MQTT311_SubscribeWithStruct(struct SUBSCRIBE_MESSAGE *subscribe_mess
     bytes_to_send[current_index++] = subscribe_message_data->requested_qos;
 
     /* Encode remaining length if larger than 127 */
-    subscribe_message_data->remaining_length = MQTT311_CheckRemainingLength();
-
-    /* Append remaining size */
-    bytes_to_send[1] = subscribe_message_data->remaining_length;
+    MQTT311_CheckRemainingLength();
 
     /* Send data to server */
     MQTT311_SendToMQTTBroker(current_index);

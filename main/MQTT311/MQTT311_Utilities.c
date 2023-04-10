@@ -321,75 +321,76 @@ void MQTT311_ReceiveFromMQTTBroker(void)
 /**
  * @brief Encodes the remaining length if larger than 127.
  *
- * This function is used to encode the remaining length if it is larger than 127. It takes the remaining
- * length of the message as a uint16_t input and returns the remaining byte as a uint8_t.
+ * This function is used to encode the remaining length according to the MQTT 3.1.1 specification. 
+ * It takes the remaining length of the message as a uint32_t input and encodes it into an array of bytes.
  * 
  * @param length The remaining length of the message.
- *
- * @return The remaining byte as a uint8_t.
+ * @param encoded_bytes The encoded bytes as an array of uint8_t.
+ * @return The number of bytes used for encoding.
  */ 
-uint8_t MQTT311_EncodeRemainingLength(uint16_t length) 
+uint8_t MQTT311_EncodeRemainingLength(uint32_t length, uint8_t *encoded_bytes) 
 {
-    /* Encoded byte */
-    uint16_t encodedByte = 0x0000;
+    uint8_t byte_index = 0;
 
-    /* Finding the encoded byte */
-    while(length > 0)
+    do
     {
-        encodedByte = length % 128;
+        encoded_bytes[byte_index] = length % 128;
         length = length / 128;
-        if (length > 0) 
+
+        if (length > 0)
         {
-        encodedByte = encodedByte | 128;
+            encoded_bytes[byte_index] |= 128;
         }
-    }
-    return encodedByte;
+        byte_index++;
+    } while (length > 0);
+
+    return byte_index;
 }
 
 /**
- * @brief Checks if the remaining length value needs to be encoded.
+ * @brief Checks if the remaining length value needs to be encoded and updates the bytes_to_send array.
  *
- * This function is used to check if the remaining length value needs to be encoded. It returns the 
- * remaining length value as a uint8_t.
- * 
- * @return The remaining length value as a uint8_t.
- */ 
-
-uint8_t MQTT311_CheckRemainingLength(void)
-{
-    uint8_t remaining_length;
-
-    /* Check if remaining length value is greater than 127 */
-    if ((current_index - 2) > REMAINING_LENGTH_MAX)
-    {
-        uint8_t encodedByte = MQTT311_EncodeRemainingLength(current_index);
-        uint8_t remainder = current_index - encodedByte*128;
-        remaining_length = remainder + 128;
-        MQTT311_MoveByteArrayToLeft();
-        bytes_to_send[2] = encodedByte;
-    }
-    else 
-    {
-        remaining_length = current_index - 2;
-    }
-
-    return remaining_length;
-}
-
-/**
- * @brief Moves the entire byte array to the left by one block.
- *
- * This function is used to move the entire byte array to the left by one block. It does not return 
- * any value.
+ * This function is used to check if the remaining length value needs to be encoded according to the MQTT 3.1.1 specification.
+ * It encodes the remaining length value and updates the bytes_to_send array accordingly.
  * 
  * @return None.
  */ 
-void MQTT311_MoveByteArrayToLeft(void)
+void MQTT311_CheckRemainingLength(void)
+{
+    uint32_t remaining_length = current_index - 2;
+    uint8_t encoded_bytes[4];
+
+    uint8_t num_encoded_bytes = MQTT311_EncodeRemainingLength(remaining_length, encoded_bytes);
+
+    if (num_encoded_bytes > 1) {
+        MQTT311_MoveByteArrayToRight(num_encoded_bytes);
+
+        for (uint8_t i = 0; i < num_encoded_bytes; i++)
+        {
+            bytes_to_send[i + 1] = encoded_bytes[i];
+        }
+    }
+    else {
+        remaining_length = current_index - 2;
+        bytes_to_send[1] = remaining_length;
+    }
+}
+
+/**
+ * @brief Moves the entire byte array to the right by the specified number of positions.
+ *
+ * This function is used to move the entire byte array to the right by the specified number of positions. 
+ * It does not return any value.
+ * 
+ * @param shift The number of positions to shift the array to the right.
+ * @return None.
+ */ 
+void MQTT311_MoveByteArrayToRight(uint8_t shift)
 {
     /* Moving the array */
-    for (int i = current_index; i > 1; i--)
+    for (int i = current_index - 1; i >= 1; i--)
     {
-        bytes_to_send[i] = bytes_to_send[i+1];
+        bytes_to_send[i + shift] = bytes_to_send[i];
     }
 }
 

@@ -114,9 +114,9 @@ void MQTT311_AppendData(const char* data, uint16_t data_length, bool append_data
 void MQTT311_AppendTopicName(const char* topic_name);
 void MQTT311_SendToMQTTBroker(uint16_t size);
 void MQTT311_ReceiveFromMQTTBroker(void);
-uint8_t MQTT311_EncodeRemainingLength(uint16_t length);
-uint8_t MQTT311_CheckRemainingLength(void);
-void MQTT311_MoveByteArrayToLeft(void);
+uint8_t MQTT311_EncodeRemainingLength(uint32_t length, uint8_t *encoded_bytes);
+void MQTT311_CheckRemainingLength(void);
+void MQTT311_MoveByteArrayToRight(uint8_t shift);
 bool MQTT311_CheckResponseHeader(uint8_t packet_type, uint16_t remaining_length, uint8_t offset);
 uint16_t MQTT311_GetPacketIdentifier(uint8_t offset);
 bool MQTT311_GetPubPacketInfo(uint16_t packetIdentifier, uint8_t packet_type, uint16_t remaining_length, uint16_t offset);

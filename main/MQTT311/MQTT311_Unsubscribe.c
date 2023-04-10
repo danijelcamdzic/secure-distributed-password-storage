@@ -44,10 +44,7 @@ static void MQTT311_UnsubscribeWithStruct(struct UNSUBSCRIBE_MESSAGE *unsubscrib
     MQTT311_AppendTopicName(unsubscribe_message_data->topic_name);
 
     /* Encode remaining length if larger than 127 */
-    unsubscribe_message_data->remaining_length = MQTT311_CheckRemainingLength();
-
-    /* Append remaining size */
-    bytes_to_send[1] = unsubscribe_message_data->remaining_length;
+    MQTT311_CheckRemainingLength();
 
     /* Send data to server */
     MQTT311_SendToMQTTBroker(current_index);

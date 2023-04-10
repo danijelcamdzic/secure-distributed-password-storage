@@ -69,10 +69,7 @@ static void MQTT311_PublishWithStruct(struct PUBLISH_MESSAGE *publish_message_da
     }
     
     /* Encode remaining length if larger than 127 */
-    publish_message_data->remaining_length = MQTT311_CheckRemainingLength();
-
-    /* Append remaining size */
-    bytes_to_send[1] = publish_message_data->remaining_length;
+    MQTT311_CheckRemainingLength();
 
     bool redelivery_flag = false;
 
