@@ -1,25 +1,13 @@
-/***********************************************************************
-* FILENAME:        MQTT311_Disconnect.h             
-*
-* DESCRIPTION:
-*                  Contains definitions, structure and function declarations
-*                  for the MQTT 3.1.1 DISCONNECT package.
-*
-* NOTES:
-*       
-*
-* AUTHOR:          Danijel Camdzic     
-*
-*   
-* DATE:            19 Aug 21
-*
-*
-* CHANGES:
-*
-* VERSION:         DATE:          WHO:         DETAIL:
-* 0.00.0           19 Aug 21      DC           Initial state of the file
-*
-*/
+/**
+ * @file MQTT311_Disconnect.h
+ * @brief Contains definitions, structures, and function declarations for the MQTT 3.1.1 DISCONNECT package.
+ *
+ * This header file contains the definitions, structures, and function declarations required for implementing
+ * the MQTT 3.1.1 DISCONNECT package. The DISCONNECT package is used to gracefully terminate an MQTT connection.
+ *
+ * @author Danijel Camdzic
+ * @date 10 Apr 2023
+ */
 
 #ifndef MQTT311_DISCONNECT_H
 #define MQTT311_DISCONNECT_H
@@ -49,4 +37,4 @@ struct DISCONNECT_MESSAGE
 /* Function declarations */
 void MQTT311_Disconnect(void);
 
-#endif
+#endif /* MQTT311_DISCONNECT_H */

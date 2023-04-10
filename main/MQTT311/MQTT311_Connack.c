@@ -1,35 +1,25 @@
-/***********************************************************************
-* FILENAME:        MQTT311_Connack.c             
-*
-* DESCRIPTION:
-*                  Contains variables and function definitions for the 
-*                  MQTT 3.1.1 CONNACK package.
-*
-* NOTES:
-*       
-*
-* AUTHOR:          Danijel Camdzic     
-*
-*   
-* DATE:            19 Aug 21
-*
-*
-* CHANGES:
-*
-* VERSION:         DATE:          WHO:         DETAIL:
-* 0.00.0           19 Aug 21      DC           Initial state of the file
-*
-*/
+/**
+ * @file MQTT311_Connack.c
+ * @brief Contains variable and function definitions for the MQTT 3.1.1 CONNACK package.
+ *
+ * This file contains the variable and function definitions required for implementing the MQTT 3.1.1 CONNACK package.
+ * The CONNACK package is used to acknowledge receipt and acceptance of a connection request from an MQTT client to an
+ * MQTT broker.
+ *
+ * @author Danijel Camdzic
+ * @date 10 Apr 2023
+ */
 
 /* Included libraries */
 #include "MQTT311/MQTT311.h"
 
-/*
- * Function: MQTT311_Connack
- * ----------------------------
- *   Reads back the acknowledgement message from the server.
+/**
+ * @brief Reads the acknowledgement message from the MQTT broker.
  *
- *   returns: bool (true if acknowledged)
+ * This function reads the acknowledgement message from the MQTT broker after a connection request has been made.
+ * It returns a boolean value indicating whether the connection was acknowledged (true) or not (false).
+ *
+ * @return bool True if the connection was acknowledged, false otherwise.
  */
 bool MQTT311_Connack(void) 
 {

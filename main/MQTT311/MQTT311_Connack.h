@@ -1,25 +1,14 @@
-/***********************************************************************
-* FILENAME:        MQTT311_Connack.h             
-*
-* DESCRIPTION:
-*                  Contains definitions, structure and function declarations
-*                  for the MQTT 3.1.1 CONNACK package.
-*
-* NOTES:
-*       
-*
-* AUTHOR:          Danijel Camdzic     
-*
-*   
-* DATE:            19 Aug 21
-*
-*
-* CHANGES:
-*
-* VERSION:         DATE:          WHO:         DETAIL:
-* 0.00.0           19 Aug 21      DC           Initial state of the file
-*
-*/
+/**
+ * @file MQTT311_Connack.c
+ * @brief Contains definitions, structures, and function declarations for the MQTT 3.1.1 CONNACK package.
+ *
+ * This header file contains the definitions, structures, and function declarations required for implementing
+ * the MQTT 3.1.1 CONNACK package. The CONNACK package is used to acknowledge receipt and acceptance of a
+ * connection request from an MQTT client to an MQTT broker.
+ *
+ * @author Danijel Camdzic
+ * @date 10 Apr 2023
+ */
 
 #ifndef MQTT311_CONNACK_H
 #define MQTT311_CONNACK_H
@@ -78,4 +67,5 @@ struct CONNACK_MESSAGE
 
 /* Function declarations */
 bool MQTT311_Connack(void);
-#endif
+
+#endif /* MQTT311_CONNACK_H */

@@ -124,12 +124,12 @@ static void prvMQTTCheckSubMesTask( void *pvParameters )
     }
 }
 
-/*
- * Function: MQTT311_CreateMQTTFreeRTOSTasks
- * ----------------------------
- *   Creates MQTT tasks and other freeRTOS objects.
+/**
+ * @brief Creates MQTT tasks and other FreeRTOS objects.
  *
- *   returns: no return value
+ * This function creates MQTT tasks and other FreeRTOS objects required for MQTT operation.
+ *
+ * @return None.
  */
 void MQTT311_CreateMQTTFreeRTOSTasks(void)
 {

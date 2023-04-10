@@ -1,25 +1,14 @@
-/***********************************************************************
-* FILENAME:        MQTT311_Connect.h             
-*
-* DESCRIPTION:
-*                  Contains definitions, structure and function declarations
-*                  for the MQTT 3.1.1 CONNECT package.
-*
-* NOTES:
-*       
-*
-* AUTHOR:          Danijel Camdzic     
-*
-*   
-* DATE:            19 Aug 21
-*
-*
-* CHANGES:
-*
-* VERSION:         DATE:          WHO:         DETAIL:
-* 0.00.0           19 Aug 21      DC           Initial state of the file
-*
-*/
+/**
+ * @file MQTT311_Connect.h
+ * @brief Contains definitions, structures, and function declarations for the MQTT 3.1.1 CONNECT package.
+ *
+ * This header file contains the definitions, structures, and function declarations required for implementing
+ * the MQTT 3.1.1 CONNECT package. The CONNECT package is used to establish a connection between an MQTT client
+ * and an MQTT broker.
+ *
+ * @author Danijel Camdzic
+ * @date 10 Apr 2023
+ */
 
 #ifndef MQTT311_CONNECT_H
 #define MQTT311_CONNECT_H
@@ -89,4 +78,4 @@ struct CONNECT_MESSAGE
 /* Function declarations */
 void MQTT311_Connect(uint8_t connect_flags, uint16_t keepalive, const char* will_topic, const char* will_message);
 
-#endif
+#endif /* MQTT311_CONNECT_H */

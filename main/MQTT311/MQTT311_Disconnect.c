@@ -1,25 +1,13 @@
-/***********************************************************************
-* FILENAME:        MQTT311_Disconnect.c             
-*
-* DESCRIPTION:
-*                  Contains variables and function definitions for the 
-*                  MQTT 3.1.1 DISCONNECT package.
-*
-* NOTES:
-*       
-*
-* AUTHOR:          Danijel Camdzic     
-*
-*   
-* DATE:            19 Aug 21
-*
-*
-* CHANGES:
-*
-* VERSION:         DATE:          WHO:         DETAIL:
-* 0.00.0           19 Aug 21      DC           Initial state of the file
-*
-*/
+/**
+ * @file MQTT311_Disconnect.c
+ * @brief Contains variables and function definitions for the MQTT 3.1.1 DISCONNECT package.
+ *
+ * This file contains the variables and function definitions required for implementing the MQTT 3.1.1 DISCONNECT package.
+ * The DISCONNECT package is used to gracefully terminate an MQTT connection.
+ *
+ * @author Danijel Camdzic
+ * @date 10 Apr 2023
+ */
 
 /* Included libraries */
 #include "MQTT311/MQTT311.h"
@@ -27,14 +15,15 @@
 /* Private function declaration */
 static void MQTT311_DisconnectWithStruct(struct DISCONNECT_MESSAGE *disconnect_message_data);
 
-/*
- * Function: MQTT311_DisconnectWithStruct
- * ----------------------------
- *   Disconnects from the server.
+/**
+ * @brief Disconnects from the MQTT broker using the provided disconnect message.
  *
- *   disconnect_message_data: disconnect message structure
+ * This function gracefully terminates the MQTT connection with the broker using the provided disconnect message.
+ * The disconnect message is passed in as a pointer to a `DISCONNECT_MESSAGE` structure.
  *
- *   returns: no return value
+ * @param disconnect_message_data Pointer to a `DISCONNECT_MESSAGE` structure containing the disconnect message.
+ *
+ * @return None.
  */
 static void MQTT311_DisconnectWithStruct(struct DISCONNECT_MESSAGE *disconnect_message_data)
 {
@@ -54,17 +43,15 @@ static void MQTT311_DisconnectWithStruct(struct DISCONNECT_MESSAGE *disconnect_m
     MQTT311_SendToMQTTBroker(current_index);
 }
 
-/*
- * Function: MQTT311_Disconnect
- * ----------------------------
- *   Disconnect from the server
+/**
+ * @brief Disconnects from the MQTT broker.
  *
- * 
- *   returns: no return value
+ * This function gracefully terminates the MQTT connection with the broker.
+ *
+ * @return None.
  */
 void MQTT311_Disconnect(void)
 {
-
     /* Creating a PINGREQ_MESSAGE structure */
     struct DISCONNECT_MESSAGE* disconnect_message_data = (struct DISCONNECT_MESSAGE*) pvPortMalloc(sizeof *disconnect_message_data);
     NULL_CHECK(disconnect_message_data)
@@ -87,5 +74,4 @@ void MQTT311_Disconnect(void)
     
     /* Send to queue for the sending task to receive */
     xQueueSend( xMQTTQueue, mqtt_packet, portMAX_DELAY );
-
 }

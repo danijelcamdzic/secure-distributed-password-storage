@@ -1,25 +1,13 @@
-/***********************************************************************
-* FILENAME:        MQTT311_Connect.c             
-*
-* DESCRIPTION:
-*                  Contains variables and function definitions for the 
-*                  MQTT 3.1.1 CONNECT package.
-*
-* NOTES:
-*       
-*
-* AUTHOR:          Danijel Camdzic     
-*
-*   
-* DATE:            19 Aug 21
-*
-*
-* CHANGES:
-*
-* VERSION:         DATE:          WHO:         DETAIL:
-* 0.00.0           19 Aug 21      DC           Initial state of the file
-*
-*/
+/**
+ * @file MQTT311_Connect.c
+ * @brief Contains variable and function definitions for the MQTT 3.1.1 CONNECT package.
+ *
+ * This file contains the variable and function definitions required for implementing the MQTT 3.1.1 CONNECT package.
+ * The CONNECT package is used to establish a connection between an MQTT client and an MQTT broker.
+ *
+ * @author Danijel Camdzic
+ * @date 10 Apr 2023
+ */
 
 /* Included libraries */
 #include "MQTT311/MQTT311.h"
@@ -32,49 +20,50 @@ static void MQTT311_AppendWillTopic(const char* will_topic);
 static void MQTT311_AppendWillMessage(const char* will_message);
 static void MQTT311_ConnectWithStruct(struct CONNECT_MESSAGE *connect_message_data);
 
-/*
- * Function: MQTT311_SetKeepAlive
- * ----------------------------
- *   Sets the keep alive value for connection timeouts.
+/**
+ * @brief Sets the keep-alive value for connection timeouts.
  *
- *   keepalive: value after which the client disconnects if no messages
- *              have been transmitted.
+ * This function sets the keep-alive value for the MQTT connection timeouts. The keep-alive value specifies the maximum
+ * number of seconds that can elapse between the transmission of any two packets from the client to the broker. If no
+ * packets are transmitted within this period, the broker assumes that the client has disconnected and terminates the
+ * connection.
  *
- *   returns: no return value
+ * @param keepalive The keep-alive value in seconds.
+ *
+ * @return None.
  */
 static void MQTT311_SetKeepAlive(uint16_t keepalive) 
 {
     userdata.keepAlive = keepalive;
 }
 
-/*
- * Function: MQTT311_AppendClientID
- * ----------------------------
- *   Appends client ID to the byte array.
+/**
+ * @brief Appends the client ID to the byte array.
  *
- *   client_id: id of the device
+ * This function appends the client ID to the byte array used in MQTT communication. The client ID identifies the device
+ * that is connected to the MQTT broker and is used to maintain a persistent connection between the two.
  *
- *   returns: no return value
+ * @param client_id The client ID to append to the byte array.
+ *
+ * @return None.
  */
 static void MQTT311_AppendClientID(const char* client_id) 
 {
-
     uint16_t deviceIDLength = strlen(client_id);
 
     MQTT311_AppendData(client_id, deviceIDLength, true);
-
 }
 
-/*
- * Function: MQTT311_AppendUsernameAndPassword
- * ----------------------------
- *   Appends username and password to the byte array.
+/**
+ * @brief Appends the username and password to the byte array.
  *
- *   returns: no return value
+ * This function appends the username and password to the byte array used in MQTT communication. The username and password
+ * are optional and can be used to provide authentication and access control to the MQTT broker.
+ *
+ * @return None.
  */
 static void MQTT311_AppendUsernameAndPassword(void) 
 {
-
     uint16_t usernameLength = strlen(userdata.username);
     uint16_t passwordLength = strlen(userdata.password);
 
@@ -83,34 +72,34 @@ static void MQTT311_AppendUsernameAndPassword(void)
 
     /* Append password to byte array */
     MQTT311_AppendData(userdata.password, passwordLength, true);
-
 }
 
-/*
- * Function: MQTT311_AppendWillTopic
- * ----------------------------
- *   Appends will topic to the byte array
+/**
+ * @brief Appends the will topic to the byte array.
  *
- *   will_topic: will topic of the connect message
+ * This function appends the will topic to the byte array used in MQTT communication. The will topic is the topic on which
+ * the last will and testament message will be published in case the client unexpectedly disconnects from the MQTT broker.
  *
- *   returns: no return value
+ * @param will_topic The will topic to append to the byte array.
+ *
+ * @return None.
  */
 static void MQTT311_AppendWillTopic(const char* will_topic) 
 {
     uint16_t willTopicLength = strlen(will_topic);
 
     MQTT311_AppendData(will_topic, willTopicLength, true);
-
 }
 
-/*
- * Function: MQTT311_AppendWillMessage
- * ----------------------------
- *   Appends will message to the byte array
+/**
+ * @brief Appends the will message to the byte array.
  *
- *   will_message: will message of the connect message
+ * This function appends the will message to the byte array used in MQTT communication. The will message is the message that
+ * will be published on the will topic in case the client unexpectedly disconnects from the MQTT broker.
  *
- *   returns: no return value
+ * @param will_message The will message to append to the byte array.
+ *
+ * @return None.
  */
 static void MQTT311_AppendWillMessage(const char* will_message) 
 {
@@ -121,14 +110,15 @@ static void MQTT311_AppendWillMessage(const char* will_message)
 
 }
 
-/*
- * Function: MQTT311_ConnectWithStruct
- * ----------------------------
- *   Connects to Cumulocity tenant by providing user's username and password
+/**
+ * @brief Connects to a MQTT Broker using the provided username and password.
  *
- *   connect_message_data: connect message structure 
+ * This function establishes a connection to a MQTT Broker using the provided username and password.
+ * The connection details are passed in as a pointer to a `CONNECT_MESSAGE` structure.
  *
- *   returns: no return value
+ * @param connect_message_data Pointer to a `CONNECT_MESSAGE` structure containing the connection details.
+ *
+ * @return None.
  */
 static void MQTT311_ConnectWithStruct(struct CONNECT_MESSAGE *connect_message_data) 
 {
@@ -211,18 +201,18 @@ static void MQTT311_ConnectWithStruct(struct CONNECT_MESSAGE *connect_message_da
     vPortFree(connect_message_data);
 }
 
-/*
- * Function: MQTT311_Connect
- * ----------------------------
- *   Connects to Cumulocity tenant by providing user's username and password
+/**
+ * @brief Connects to an MQTT broker using the provided connection details.
  *
- *   connect_flags: value of connect flags for connect message
- *   keep_alive: value after which the client disconnects if no messages
- *              have been transmitted. 
- *   will_topic: message sent depending on the flag value
- *   will_message: message sent depending on the flag value 
+ * This function establishes a connection to an MQTT broker using the provided connection details.
+ * The connection details include the connect flags, keep-alive value, will topic, and will message.
  *
- *   returns: no return value
+ * @param connect_flags The connect flags for the connect message.
+ * @param keepalive The keep-alive value in seconds.
+ * @param will_topic The will topic for the last will and testament message (can be NULL if not used).
+ * @param will_message The will message for the last will and testament message (can be NULL if not used).
+ *
+ * @return None.
  */
 void MQTT311_Connect(uint8_t connect_flags, uint16_t keepalive, const char* will_topic, const char* will_message) 
 {
