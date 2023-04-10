@@ -37,5 +37,4 @@ u6Q7HQr8fm+k0nt7SxEqNl068hJVwawuzoZgpZ1QnAxPtCAKFwresguhrXAKwFDy\n\
 Bl5LMMZaHcZQ8s0thOGRXFGWExuBgB/EEf8st7WWBgxnWS5MwMV6gibAjeyWavpb\n\
 z38UfamjjIyQ\n\
 =f5t7\n\
------END PGP PUBLIC KEY BLOCK-----\n\
-"
+-----END PGP PUBLIC KEY BLOCK-----"

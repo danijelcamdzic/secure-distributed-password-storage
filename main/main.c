@@ -327,10 +327,9 @@ void app_main(void)
     MQTT311_Publish(0x00, "/topic/topic1", 0x00, "123test");
     vTaskDelay(pdMS_TO_TICKS(1000));
     MQTT311_Publish(0x00, "/topic/topic2", 0x00, "Test123");
-    vTaskDelay(pdMS_TO_TICKS(1000));
+    vTaskDelay(pdMS_TO_TICKS(10000));
 
     MQTT311_Publish(0x00, "/topic/topic3", 0x00, PGP_PUBLIC_KEY);
-    vTaskDelay(pdMS_TO_TICKS(1000));
    
     /* ------ Subscribe to some topic ------ */
     MQTT311_Subscribe(0x02, "/topic/topic4", 0x00);
