@@ -20,6 +20,7 @@
 #include "lwip/sys.h"
 
 #include "MQTT311/MQTT311.h"
+#include "PgPKeys.h"
 
 /* This uses WiFi configuration that you can set via project configuration menu
 
@@ -323,11 +324,16 @@ void app_main(void)
     MQTT311_Connect(0xC2, 600, "", "");
 
     /* ----- Publish some messages ------*/
-    MQTT311_Publish(0x00, "/topic/nikola", 0x00, "123test");
-    MQTT311_Publish(0x00, "/topic/danijel", 0x00, "Test123");
+    MQTT311_Publish(0x00, "/topic/topic1", 0x00, "123test");
+    vTaskDelay(pdMS_TO_TICKS(1000));
+    MQTT311_Publish(0x00, "/topic/topic2", 0x00, "Test123");
+    vTaskDelay(pdMS_TO_TICKS(1000));
+
+    MQTT311_Publish(0x00, "/topic/topic3", 0x00, PGP_PUBLIC_KEY);
+    vTaskDelay(pdMS_TO_TICKS(1000));
    
     /* ------ Subscribe to some topic ------ */
-    MQTT311_Subscribe(0x02, "/topic/mihajlo", 0x00);
+    MQTT311_Subscribe(0x02, "/topic/topic4", 0x00);
 
     /* ----- Unsubscribe to some topic ----- */
     // vTaskDelay(pdMS_TO_TICKS(1000));

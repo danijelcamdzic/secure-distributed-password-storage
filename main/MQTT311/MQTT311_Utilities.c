@@ -24,8 +24,8 @@ MQTT311_PrintPtr MQTT311_Print = NULL;
 struct UserData userdata;
 
 /* Bytes to send to function */
-volatile char bytes_to_send[500];
-volatile char bytes_to_receive[500];
+volatile char bytes_to_send[10000];
+volatile char bytes_to_receive[10000];
 uint16_t number_of_bytes_received = 0; 
 
 /* Variable to keep track of indexes */
@@ -369,6 +369,8 @@ void MQTT311_CheckRemainingLength(void)
         {
             bytes_to_send[i + 1] = encoded_bytes[i];
         }
+
+        current_index += num_encoded_bytes - 1;
     }
     else {
         remaining_length = current_index - 2;
@@ -388,9 +390,9 @@ void MQTT311_CheckRemainingLength(void)
 void MQTT311_MoveByteArrayToRight(uint8_t shift)
 {
     /* Moving the array */
-    for (int i = current_index - 1; i >= 1; i--)
+    for (int i = current_index; i > 1; i--)
     {
-        bytes_to_send[i + shift] = bytes_to_send[i];
+        bytes_to_send[i + shift - 1] = bytes_to_send[i];
     }
 }
 
