@@ -1,25 +1,14 @@
-/***********************************************************************
-* FILENAME:        MQTT311_Unsubscribe.c             
-*
-* DESCRIPTION:
-*                  Contains variables and function definitions for the 
-*                  MQTT 3.1.1 UNSUBSCRIBE package.
-*
-* NOTES:
-*       
-*
-* AUTHOR:          Danijel Camdzic     
-*
-*   
-* DATE:            19 Aug 21
-*
-*
-* CHANGES:
-*
-* VERSION:         DATE:          WHO:         DETAIL:
-* 0.00.0           19 Aug 21      DC           Initial state of the file
-*
-*/
+/**
+ * @file MQTT311_Unsubscribe.c
+ * @brief Contains variables and function definitions for the MQTT 3.1.1 UNSUBSCRIBE package.
+ * 
+ * @details This file contains the implementation of the MQTT 3.1.1 UNSUBSCRIBE package. 
+ * It includes the definition of the UNSUBSCRIBE packet structure, as well as functions 
+ * for encoding and decoding UNSUBSCRIBE packets.
+ * 
+ * @author Danijel Camdzic
+ * @date 10 Apr 2023
+ */
 
 /* Included libraries */
 #include "MQTT311/MQTT311.h"
@@ -27,15 +16,17 @@
 /* Private function declaration */
 static void MQTT311_UnsubscribeWithStruct(struct UNSUBSCRIBE_MESSAGE *unsubscribe_message_data);
 
-/*
- * Function: MQTT311_UnsubscribeWithStruct
- * ----------------------------
- *   Unsubscribes from a topic.
+/**
+ * @brief Unsubscribes from a topic using the provided unsubscribe message structure.
  *
- *   unsubscribe_message_data: unsubscribe message structure
+ * This function is used to unsubscribe from a topic by sending an unsubscribe message with the 
+ * provided unsubscribe message structure. The function takes the structure as input and does not 
+ * return any value.
+ * 
+ * @param unsubscribe_message_data The unsubscribe message structure.
  *
- *   returns: no return value
- */
+ * @return None.
+ */ 
 static void MQTT311_UnsubscribeWithStruct(struct UNSUBSCRIBE_MESSAGE *unsubscribe_message_data)
 {
     current_index = 0;
@@ -75,16 +66,17 @@ static void MQTT311_UnsubscribeWithStruct(struct UNSUBSCRIBE_MESSAGE *unsubscrib
     vPortFree(unsubscribe_message_data);
 }
 
-/*
- * Function: MQTT311_Unsubscribe
- * ----------------------------
- *   Unsubscribes from topic
+/**
+ * @brief Unsubscribes from a topic with the given name and packet ID.
  *
- *   packet_id: packet identifier (2 bytes)
- *   topicName: name of the topic that will be unsubscribed from
+ * This function is used to unsubscribe from a topic with the given name and packet ID. The function
+ * does not return any value.
+ * 
+ * @param packet_id The packet identifier (2 bytes).
+ * @param topicName The name of the topic that will be unsubscribed from.
  *
- *   returns: no return value
- */
+ * @return None.
+ */ 
 void MQTT311_Unsubscribe(uint16_t packet_id, const char* topicName)
 {
     
@@ -115,3 +107,4 @@ void MQTT311_Unsubscribe(uint16_t packet_id, const char* topicName)
     /* Send to queue for the sending task to receive */
     xQueueSend( xMQTTQueue, mqtt_packet, portMAX_DELAY );
 }
+

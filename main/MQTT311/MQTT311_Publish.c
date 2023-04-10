@@ -28,7 +28,7 @@ static void MQTT311_AppendMessagePayload(const char* message_payload)
 }
 
 /**
- * @brief Publishes message to Cumulocity using data from the structure of publish message.
+ * @brief Publishes message to MQTT Broker using data from the structure of publish message.
  *
  * @param publish_message_data Pointer to the publish message structure
  *

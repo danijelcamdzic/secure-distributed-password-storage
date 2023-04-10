@@ -1,25 +1,11 @@
-/***********************************************************************
-* FILENAME:        MQTT311_Unsuback.h             
-*
-* DESCRIPTION:
-*                  Contains definitions, structure and function declarations
-*                  for the MQTT 3.1.1 UNSUBACK package.
-*
-* NOTES:
-*       
-*
-* AUTHOR:          Danijel Camdzic     
-*
-*   
-* DATE:            19 Aug 21
-*
-*
-* CHANGES:
-*
-* VERSION:         DATE:          WHO:         DETAIL:
-* 0.00.0           19 Aug 21      DC           Initial state of the file
-*
-*/
+/**
+ * @file MQTT311_Unsuback.h
+ * @brief Contains definitions, structure and function declarations
+ * for the MQTT 3.1.1 UNSUBACK package.
+ *
+ * @author Danijel Camdzic
+ * @date 10 Apr 2023
+ */
 
 #ifndef MQTT311_UNSUBACK_H
 #define MQTT311_UNSUBACK_H
@@ -52,4 +38,5 @@ struct UNSUBACK_MESSAGE
 /* Function declarations */
 bool MQTT311_Unsuback(uint16_t packetIdentifier);
 
-#endif
+#endif /* MQTT311_UNSUBACK_H */
+

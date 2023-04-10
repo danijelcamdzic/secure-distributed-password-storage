@@ -1,65 +1,37 @@
-/***********************************************************************
-* FILENAME:        MQTT311_Utilities.h             
-*
-* DESCRIPTION:
-*                  Contains definitions, structure and function declarations
-*                  which other MQTT 3.1.1 packets use in the implementation.
-*
-* NOTES:
-*       
-*
-* AUTHOR:          Danijel Camdzic     
-*
-*   
-* DATE:            19 Aug 21
-*
-*
-* CHANGES:
-*
-* VERSION:         DATE:          WHO:         DETAIL:
-* 0.00.0           19 Aug 21      DC           Initial state of the file
-*
-*/
+/**
+ * @file MQTT311_Utilities.h
+ * @brief Contains definitions, structures, and function declarations used by other MQTT 3.1.1 packets.
+ * 
+ * This file contains various definitions, structures, and function declarations used by other
+ * MQTT 3.1.1 packets in the implementation. 
+ *
+ * @author Danijel Camdzic
+ * @date 10 Apr 2023
+ */
 
 #ifndef MQTT311_UTILITIES_H
 #define MQTT311_UTILITIES_H
 
-/* Necessary inclusion */
 #include "MQTT311/MQTT311.h"
-
-/* Function macros */
-#define NULL_CHECK(pointer)             if (pointer == NULL){/* printf("\r\nFailed to allocate memory for the connect_message_data\r\n")*/;}
-
-/* The number of items the queue can hold.  */
-#define mqttQUEUE_LENGTH			    128
 
 /* External Function */
 typedef void (*MQTT311_ConnectTCPSocketPtr)(const char*, uint16_t);
+typedef void (*MQTT311_CloseTCPSocketPtr)(void);
 typedef void (*MQTT311_SendToTCPSocketPtr)(const char*, uint16_t);
 typedef void (*MQTT311_ReadFromTCPSocketPtr)(char*, uint16_t*);
 typedef void (*MQTT311_PrintPtr)(char*);
 
 extern MQTT311_ConnectTCPSocketPtr MQTT311_ConnectTCPSocket;
+extern MQTT311_CloseTCPSocketPtr MQTT311_CloseTCPSocket;
 extern MQTT311_SendToTCPSocketPtr MQTT311_SendToTCPSocket;
 extern MQTT311_ReadFromTCPSocketPtr MQTT311_ReadFromTCPSocket;
 extern MQTT311_PrintPtr MQTT311_Print;
 
-/* Define statement that is used in AT command socket opening */
-// #define OPEN_SOCKET_CODE                "6"
+/* Function macros */
+#define NULL_CHECK(pointer)             if (pointer == NULL){ MQTT311_Print("Pointer NULL Error"); }
 
-/* Structure that contains functions for socket communication */
-// struct MQTTExtFunctions 
-// {
-//     /* Functions */
-//     void (*close_socket)(char*);                           /* Function that closes a socket - not necessary in some implementations */
-//     void (*open_socket)(char*, char*);                     /* Function that open a socket - not necessary in some implementations */
-//     void (*connect_socket)(char*, char*, char*);           /* Function that connects socket */
-//     void (*send_data_to_socket)(char*, char*, char*, int); /* Write data to socket */
-//     void (*send_char_to_socket)(char);                     /* Function that sends char */
-//     void (*read_data_from_socket)(char*, char*);           /* Function that reads the response from the server */
-//     uint16_t (*get_response_byte)(uint8_t);                /* Function that gets a byte from the response */
-//     void (*monitor_connection)(void);                      /* Monitors the connection the module has with the internet */
-// };
+/* The number of items the queue can hold.  */
+#define mqttQUEUE_LENGTH			    128
 
 /* Structure to keep user data */
 struct UserData 
@@ -114,9 +86,6 @@ struct MQTTPacket
 
 /* Variable declarations */
 
-/* Function structure */
-// extern struct MQTTExtFunctions mqtt_ext_functions;
-
 /* UserData structure */
 extern struct UserData userdata;
 
@@ -131,38 +100,13 @@ extern uint16_t current_index;
 /* Queue Handler */
 extern QueueHandle_t xMQTTQueue;
 
-/* Pointer to variable that keep the value of bytes left to read from socket */
-// extern uint16_t* bytes_to_read;
-/* Pointer to variable that monitors the connectivity */
-// extern uint8_t* signal_monitoring_variable;
-
 /* Function declarations */
 void MQTT311_SetConnectTCPSocket(MQTT311_ConnectTCPSocketPtr connect_tcp_socket);
+void MQTT311_SetCloseTCPSocket(MQTT311_CloseTCPSocketPtr close_tcp_socket);
 void MQTT311_SetSendToTCPSocket(MQTT311_SendToTCPSocketPtr send_to_tcp_socket);
 void MQTT311_SetReadFromTCPSocket(MQTT311_ReadFromTCPSocketPtr read_from_tcp_socket);
 void MQTT311_SetPrint(MQTT311_PrintPtr print);
-// void set_mqtt_external_functions(
-//     void (*close_socket)(const char*),
-//     void (*open_socket)(const char*, const char*),
-//     void (*connect_socket)(const char*, const char*, const char*),
-//     void (*send_data_to_socket)(const char*, const char*, const char*, int),
-//     void (*send_char_to_socket)(char),
-//     void (*read_data_from_socket)(const char*, const char*),
-//     uint16_t (*get_response_byte)(uint8_t),
-//     void (*monitor_connection)(void)
-// );
-// void set_close_socket_function(void (*close_socket)(const char*));
-// void set_open_socket_function(void (*open_socket)(const char*, const char*));
-// void set_connect_socket_function(void (*connect_socket)(const char*, const char*, const char*));
-// void set_send_data_to_socket_function(void (*send_data_to_socket)(const char*, const char*, const char*, int));
-// void set_send_char_to_socket_function(void (*send_char_to_socket)(char));
-// void set_read_data_from_socket_function(void (*read_data_from_socket)(const char*, const char*));
-// void set_get_response_byte_function(uint16_t (*get_response_byte)(uint8_t));
-// void set_monitor_connection_function(void (*monitor_connection)(void));
-// void reconnection_sequence(void);
 void MQTT311_SendMQTTPacket(struct MQTTPacket *mqtt_packet);
-// void set_bytes_to_read_variable(uint16_t* bytesToRead);
-// void set_connection_monitoring_variable(uint16_t* monitoring_variable);
 void MQTT311_CreateClient(const char* deviceID);
 void MQTT311_SetUsernameAndPassword(const char* username, const char* password);
 void MQTT311_EstablishConnectionToMQTTBroker(const char* brokerName, uint16_t port);
@@ -177,4 +121,4 @@ bool MQTT311_CheckResponseHeader(uint8_t packet_type, uint16_t remaining_length,
 uint16_t MQTT311_GetPacketIdentifier(uint8_t offset);
 bool MQTT311_GetPubPacketInfo(uint16_t packetIdentifier, uint8_t packet_type, uint16_t remaining_length, uint16_t offset);
 
-#endif
+#endif /* MQTT311_UTILITIES_H */

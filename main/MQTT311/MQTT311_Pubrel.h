@@ -1,25 +1,11 @@
-/***********************************************************************
-* FILENAME:        MQTT311_Pubrel.h             
-*
-* DESCRIPTION:
-*                  Contains definitions, structure and function declarations
-*                  for the MQTT 3.1.1 PUBREL package.
-*
-* NOTES:
-*       
-*
-* AUTHOR:          Danijel Camdzic     
-*
-*   
-* DATE:            19 Aug 21
-*
-*
-* CHANGES:
-*
-* VERSION:         DATE:          WHO:         DETAIL:
-* 0.00.0           19 Aug 21      DC           Initial state of the file
-*
-*/
+/**
+ * @file MQTT311_Pubrel.h
+ * @brief Contains definitions, structure and function declarations
+ * for the MQTT 3.1.1 PUBREL package.
+ *
+ * @author Danijel Camdzic
+ * @date 10 Apr 2023
+ */
 
 #ifndef MQTT311_PUBREL_H
 #define MQTT311_PUBREL_H
@@ -54,4 +40,5 @@ struct PUBREL_MESSAGE
 /* Function declarations */
 bool MQTT311_Pubrel(uint16_t packetIdentifier);
 
-#endif
+#endif /* MQTT311_PUBREL_H */
+

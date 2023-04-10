@@ -1,25 +1,10 @@
-/***********************************************************************
-* FILENAME:        MQTT311_Subscribe.c             
-*
-* DESCRIPTION:
-*                  Contains variables and function definitions for the 
-*                  MQTT 3.1.1 SUBSCRIBE package.
-*
-* NOTES:
-*       
-*
-* AUTHOR:          Danijel Camdzic     
-*
-*   
-* DATE:            19 Aug 21
-*
-*
-* CHANGES:
-*
-* VERSION:         DATE:          WHO:         DETAIL:
-* 0.00.0           19 Aug 21      DC           Initial state of the file
-*
-*/
+/**
+ * @file MQTT311_Subscribe.c
+ * @brief Contains variables and function definitions for the MQTT 3.1.1 SUBSCRIBE package.
+ *
+ * @author Danijel Camdzic
+ * @date 10 Apr 2023
+ */
 
 /* Included libraries */
 #include "MQTT311/MQTT311.h"
@@ -27,14 +12,12 @@
 /* Private functions */
 static void MQTT311_SubscribeWithStruct(struct SUBSCRIBE_MESSAGE *subscribe_message_data);
 
-/*
- * Function: MQTT311_SubscribeWithStruct
- * ----------------------------
- *   Subscribes to topic.
+/**
+ * @brief Subscribes to topic using data from the structure of subscribe message.
  *
- *   subscribe_message_data: subscribe message structure
+ * @param subscribe_message_data Subscribe message structure
  *
- *   returns: no return value
+ * @return None
  */
 static void MQTT311_SubscribeWithStruct(struct SUBSCRIBE_MESSAGE *subscribe_message_data)
 {
@@ -78,16 +61,14 @@ static void MQTT311_SubscribeWithStruct(struct SUBSCRIBE_MESSAGE *subscribe_mess
     vPortFree(subscribe_message_data);
 }
 
-/*
- * Function: MQTT311_Subscribe
- * ----------------------------
- *   Subscribes to topic
+/**
+ * @brief Subscribes to a topic.
  *
- *   packet_id: packet identifier (2 bytes)
- *   topic_name: name of the topics that get subscribed to
- *   requested_qos: requested qoses
+ * @param packet_id Packet identifier (2 bytes)
+ * @param topic_name Name of the topic(s) to subscribe to
+ * @param requested_qos Requested QoS level
  *
- *   returns: no return value
+ * @return None
  */
 void MQTT311_Subscribe(uint16_t packet_id, const char* topic_name, uint8_t requested_qos)
 {
@@ -121,3 +102,4 @@ void MQTT311_Subscribe(uint16_t packet_id, const char* topic_name, uint8_t reque
     /* Send to queue for the sending task to receive */
     xQueueSend( xMQTTQueue, mqtt_packet, portMAX_DELAY );
 }
+

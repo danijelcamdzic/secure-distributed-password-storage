@@ -1,25 +1,11 @@
-/***********************************************************************
-* FILENAME:        MQTT311_Subscribe.h             
-*
-* DESCRIPTION:
-*                  Contains definitions, structure and function declarations
-*                  for the MQTT 3.1.1 SUBSCRIBE package.
-*
-* NOTES:
-*       
-*
-* AUTHOR:          Danijel Camdzic     
-*
-*   
-* DATE:            19 Aug 21
-*
-*
-* CHANGES:
-*
-* VERSION:         DATE:          WHO:         DETAIL:
-* 0.00.0           19 Aug 21      DC           Initial state of the file
-*
-*/
+/**
+ * @file MQTT311_Subscribe.h
+ * @brief Contains definitions, structure and function declarations
+ * for the MQTT 3.1.1 SUBSCRIBE package.
+ *
+ * @author Danijel Camdzic
+ * @date 10 Apr 2023
+ */
 
 #ifndef MQTT311_SUBSCRIBE_H
 #define MQTT311_SUBSCRIBE_H
@@ -61,4 +47,5 @@ struct SUBSCRIBE_MESSAGE
 /* Function declarations */
 void MQTT311_Subscribe(uint16_t packet_id, const char* topicName, uint8_t requested_qos);
 
-#endif
+#endif /* MQTT311_SUBSCRIBE_H */
+

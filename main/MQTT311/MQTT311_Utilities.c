@@ -1,25 +1,12 @@
-/***********************************************************************
-* FILENAME:        MQTT311_Utilities.c             
-*
-* DESCRIPTION:
-*                  Contains helper functions that other MQTT 3.1.1 packets use
-*                  in the implementation.
-*       
-* NOTES:
-*       
-*
-* AUTHOR:          Danijel Camdzic     
-*
-*   
-* DATE:            19 Aug 21
-*
-*
-* CHANGES:
-*
-* VERSION:         DATE:          WHO:         DETAIL:
-* 0.00.0           19 Aug 21      DC           Initial state of the file
-*
-*/
+/**
+ * @file MQTT311_Utilities.c
+ * @brief Contains helper functions that other MQTT 3.1.1 packets use in the implementation.
+ * 
+ * This file contains various helper functions used by other MQTT 3.1.1 packets in the implementation. 
+ *
+ * @author Danijel Camdzic
+ * @date 10 Apr 2023
+ */
 
 /* Included libraries */
 #include "MQTT311/MQTT311.h"
@@ -27,8 +14,8 @@
 /* Variable definitions */
 
 /* Structure that keeps external functions that connect to the server */
-// struct MQTTExtFunctions mqtt_ext_functions;
 MQTT311_ConnectTCPSocketPtr MQTT311_ConnectTCPSocket = NULL;
+MQTT311_CloseTCPSocketPtr MQTT311_CloseTCPSocket = NULL;
 MQTT311_SendToTCPSocketPtr MQTT311_SendToTCPSocket = NULL;
 MQTT311_ReadFromTCPSocketPtr MQTT311_ReadFromTCPSocket = NULL;
 MQTT311_PrintPtr MQTT311_Print = NULL;
@@ -47,210 +34,66 @@ uint16_t current_index;
 /* Queue used to hold MQTT packets */
 QueueHandle_t xMQTTQueue = NULL;
 
-/* Pointer to variable that keep the value of bytes left to read from socket */
-// uint16_t* bytes_to_read = NULL;
-
-/* Pointer to variable that monitors the connectivity */
-// uint8_t* signal_monitoring_variable = NULL;
-
 /* Private function declarations */
+static void MQTT311_SetBrokerAddress(const char* brokerAddress);
+static void MQTT311_SetPortNumber(uint16_t port);
+
+/* Setting the external functions */
+/**
+ * @brief Sets the MQTT 3.1.1 Connect TCP Socket function.
+ * @param connect_tcp_socket Function pointer to the user-defined MQTT 3.1.1 Connect TCP Socket function.
+ */
 void MQTT311_SetConnectTCPSocket(MQTT311_ConnectTCPSocketPtr connect_tcp_socket)
 {
     MQTT311_ConnectTCPSocket = connect_tcp_socket;
 }
+
+/**
+ * @brief Sets the MQTT 3.1.1 Close TCP Socket function.
+ * @param close_tcp_socket Function pointer to the user-defined MQTT 3.1.1 Close TCP Socket function.
+ */
+void MQTT311_SetCloseTCPSocket(MQTT311_CloseTCPSocketPtr close_tcp_socket)
+{
+    MQTT311_CloseTCPSocket = close_tcp_socket;
+}
+
+/**
+ * @brief Sets the MQTT 3.1.1 Send to TCP Socket function.
+ * @param send_to_tcp_socket Function pointer to the user-defined MQTT 3.1.1 Send to TCP Socket function.
+ */
 void MQTT311_SetSendToTCPSocket(MQTT311_SendToTCPSocketPtr send_to_tcp_socket)
 {
     MQTT311_SendToTCPSocket = send_to_tcp_socket;
 }
+
+/**
+ * @brief Sets the MQTT 3.1.1 Read from TCP Socket function.
+ * @param read_from_tcp_socket Function pointer to the user-defined MQTT 3.1.1 Read from TCP Socket function.
+ */
 void MQTT311_SetReadFromTCPSocket(MQTT311_ReadFromTCPSocketPtr read_from_tcp_socket)
 {
     MQTT311_ReadFromTCPSocket = read_from_tcp_socket;
 }
-void MQTT311_SetPrint(MQTT311_PrintPtr print) {
+
+/**
+ * @brief Sets the MQTT 3.1.1 Print function.
+ * @param print Function pointer to the user-defined MQTT 3.1.1 Print function.
+ */
+void MQTT311_SetPrint(MQTT311_PrintPtr print) 
+{
     MQTT311_Print = print;
 }
-// static void set_broker_address(const char* brokerAddress);
-// static void set_port_number(uint16_t port);
 
-/*
- * Function: set_close_socket_function
- * ----------------------------
- *   Sets the functions that closes a socket if necessary.
+/**
+ * @brief Sends the received MQTT packet into the appropriate function from the structure.
  *
- *   close_socket: function that closes a socket
+ * This function is used to send the received MQTT packet into the appropriate function from the 
+ * structure. It takes a pointer to an MQTT packet structure as input and does not return any value.
+ * 
+ * @param mqtt_packet The MQTT packet that is to be sent.
  *
- *   returns: no return value
- */
-// void set_close_socket_function(void (*close_socket)(const char*))
-// {
-//     mqtt_ext_functions.close_socket = close_socket;
-// }
-
-/*
- * Function: set_open_socket_function
- * ----------------------------
- *   Sets the functions that opens a socket if necessary.
- *
- *   open_socket: function that opens a socket
- *
- *   returns: no return value
- */
-// void set_open_socket_function(void (*open_socket)(const char*, const char*))
-// {
-//     mqtt_ext_functions.open_socket = open_socket;
-// }
-
-/*
- * Function: set_connect_socket_function
- * ----------------------------
- *   Sets the functions that connects sockets.
- *
- *   connect_socket: function that connects a socket
- *
- *   returns: no return value
- */
-// void set_connect_socket_function(void (*connect_socket)(const char*, const char*, const char*))
-// {
-//     mqtt_ext_functions.connect_socket = connect_socket;
-// }
-
-/*
- * Function: set_send_data_to_socket_function
- * ----------------------------
- *   Sets the functions that sends data over socket connection.
- *
- *   send_data_to_socket: function that sends data to socket
- *
- *   returns: no return value
- */
-// void set_send_data_to_socket_function(void (*send_data_to_socket)(const char*, const char*, const char*, int))
-// {
-//     mqtt_ext_functions.send_data_to_socket = send_data_to_socket;
-// }
-
-/*
- * Function: set_send_char_to_socket_function
- * ----------------------------
- *   Sets the functions that sends char over socket connection.
- *
- *   set_send_char_to_socket_function: function that sends char to socket
- *
- *   returns: no return value
- */
-// void set_send_char_to_socket_function(void (*send_char_to_socket)(char))
-// {
-//     mqtt_ext_functions.send_char_to_socket = send_char_to_socket;
-// }
-
-/*
- * Function: set_read_data_from_socket_function
- * ----------------------------
- *   Sets the functions that reads data from socket.
- *
- *   set_read_data_from_socket_function: function that reads data from socket
- *
- *   returns: no return value
- */
-// void set_read_data_from_socket_function(void (*read_data_from_socket)(const char*, const char*))
-// {
-//     mqtt_ext_functions.read_data_from_socket = read_data_from_socket;
-// }
-
-/*
- * Function: set_get_response_byte_function
- * ----------------------------
- *   Sets the functions that retrieves a byte from the server response.
- *
- *   get_response_byte: function that fetches byte from the response data
- *
- *   returns: no return value
- */
-// void set_get_response_byte_function(uint16_t (*get_response_byte)(uint8_t))
-// {
-//     mqtt_ext_functions.get_response_byte = get_response_byte;
-// }
-
-/*
- * Function: set_monitor_connection_function
- * ----------------------------
- *   Monitors connection that the module has.
- *
- *
- *   returns: no return value
- */
-// void set_monitor_connection_function(void (*monitor_connection)(void))
-// {
-//     mqtt_ext_functions.monitor_connection = monitor_connection;
-// }
-
-/*
- * Function: set_mqtt_external_functions
- * ----------------------------
- *   Sets all the functions that the mqtt protocol needs to communicate with the server.
- *
- *   close_socket: function that closes a socket
- *   connect_socket: function that connects a socket
- *   send_data_to_socket: function that sends data to socket
- *   set_send_char_to_socket_function: function that sends char to socket
- *   set_read_data_from_socket_function: function that reads data from socket
- *   get_response_byte: function that fetches byte from the response data
- *
- *   returns: no return value
- */
-// void set_mqtt_external_functions(
-//     void (*close_socket)(const char*),
-//     void (*open_socket)(const char*, const char*),
-//     void (*connect_socket)(const char*, const char*, const char*),
-//     void (*send_data_to_socket)(const char*, const char*, const char*, int),
-//     void (*send_char_to_socket)(char),
-//     void (*read_data_from_socket)(const char*, const char*),
-//     uint16_t (*get_response_byte)(uint8_t),
-//     void (*monitor_connection)(void)
-// )
-// {
-//     /* Call functions specific to input parameter */
-//     set_close_socket_function(close_socket);
-//     set_open_socket_function(open_socket);
-//     set_connect_socket_function(connect_socket);
-//     set_send_data_to_socket_function(send_data_to_socket);
-//     set_send_char_to_socket_function(send_char_to_socket);
-//     set_read_data_from_socket_function(read_data_from_socket);
-//     set_get_response_byte_function(get_response_byte);
-//     mqtt_ext_functions.monitor_connection = monitor_connection;
-
-// }
-
-/*
- * Function: reconnection_sequence
- * ----------------------------
- *   Tries to reconnect to broker by closing and opening the socket and reconnecting.
- *
- *   returns: no return value
- */
-// void reconnection_sequence()
-// {
-//     /* Close socket */
-//     mqtt_ext_functions.close_socket(userdata.socketID);
-
-//     /* Open socket */
-//     mqtt_ext_functions.open_socket(OPEN_SOCKET_CODE, userdata.local_port);
-
-//     /* Connect to broker */
-//     connect_to_broker(userdata.socketID, userdata.brokerAddress, userdata.port, userdata.local_port);
-
-//     /* Send connect message */
-//     connect(userdata.connect_flags, userdata.keepAlive, "", "");
-// }
-
-/*
- * Function: MQTT311_SendMQTTPacket
- * ----------------------------
- *   Sends the received mqtt packet into the appropriate function from the structure.
- *
- *   mqtt_packet: mqtt packet that is to be sent.
- *
- *   returns: no return value
- */
+ * @return None.
+ */ 
 void MQTT311_SendMQTTPacket(struct MQTTPacket *mqtt_packet)
 {
     /* Checks type of packet and sends using appropriate structure */
@@ -287,83 +130,56 @@ void MQTT311_SendMQTTPacket(struct MQTTPacket *mqtt_packet)
             break;
         default:
             break;
-
     }
 }
 
-/*
- * Function: set_bytes_to_read_variable
- * ----------------------------
- *   Keeps the memory address of the variable that keeps remaining bytes to read from socket.
+/**
+ * @brief Sets the MQTT Broker broker address.
  *
- *   bytesToRead: pointer to address of the variable that keeps information
- *                on the ammount of bytes left to read.
+ * This function is used to set the MQTT Broker broker address. It takes the address as a 
+ * string input and does not return any value.
+ * 
+ * @param brokerAddress The MQTT Broker broker address.
  *
- *   returns: no return value
- */
-// void set_bytes_to_read_variable(uint16_t* bytesToRead)
-// {
-//     bytes_to_read = bytesToRead;
-// }
+ * @return None.
+ */ 
+static void MQTT311_SetBrokerAddress(const char* brokerAddress)
+{
+    /* If already allocated free the memory */
+    if (userdata.brokerAddress != NULL) {
+        return;
+    }
 
-/*
- * Function: set_connection_monitoring_variable
- * ----------------------------
- *   Keeps the memory address of the variable that monitors connectivity.
- *
- *   monitoring_variable: Sets the variable which is used to monitor the connectivity.
- *
- *   returns: no return value
- */
-// void set_connection_monitoring_variable(uint16_t* monitoring_variable)
-// {
-//     signal_monitoring_variable = monitoring_variable;
-// }
+    userdata.brokerAddress = (char*) pvPortMalloc(strlen(brokerAddress)+1);
+    NULL_CHECK(userdata.brokerAddress)
+    memcpy(userdata.brokerAddress, brokerAddress, strlen(brokerAddress)+1);
+}
 
-/*
- * Function: set_broker_address
- * ----------------------------
- *   Sets the Cumulocity broker address.
+/**
+ * @brief Sets the port number to connect to MQTT Broker.
  *
- *   brokerAddress: Cumulocity broker address
+ * This function is used to set the port number to connect to MQTT Broker. It takes the port number as 
+ * input and does not return any value.
+ * 
+ * @param port The port number.
  *
- *   returns: no return value
- */
-// static void set_broker_address(const char* brokerAddress)
-// {
-//     /* If already allocated free the memory */
-//     if (userdata.brokerAddress != NULL) {
-//         return;
-//     }
+ * @return None.
+ */ 
+static void MQTT311_SetPortNumber(uint16_t port) 
+{
+    userdata.port = port;
+}
 
-//     userdata.brokerAddress = (char*) pvPortMalloc(strlen(brokerAddress)+1);
-//     NULL_CHECK(userdata.brokerAddress)
-//     memcpy(userdata.brokerAddress, brokerAddress, strlen(brokerAddress)+1);
-// }
-
-/*
- * Function: set_port_number
- * ----------------------------
- *   Sets the port number to connect to Cumulocity.
+/**
+ * @brief Creates a client by giving it a device ID.
  *
- *   port: port number
+ * This function is used to create a client by giving it a device ID. It takes the device ID as a string 
+ * input and does not return any value.
+ * 
+ * @param deviceID The device ID of the client.
  *
- *   returns: no return value
- */
-// static void set_port_number(uint16_t port) 
-// {
-//     userdata.port = port;
-// }
-
-/*
- * Function: MQTT311_CreateClient
- * ----------------------------
- *   Creates client by giving it device id.
- *
- *   deviceID: device id of the client
- *
- *   returns: no return value
- */
+ * @return None.
+ */ 
 void MQTT311_CreateClient(const char* deviceID) 
 {
     /* If already allocated free the memory */
@@ -376,16 +192,17 @@ void MQTT311_CreateClient(const char* deviceID)
     memcpy(userdata.deviceID, deviceID, strlen(deviceID)+1);
 }
 
-/*
- * Function: MQTT311_SetUsernameAndPassword
- * ----------------------------
- *   Sets the username and password into the userdata structure.
+/**
+ * @brief Sets the username and password into the userdata structure.
  *
- *   username: client's username
- *   password: client's password
+ * This function is used to set the username and password into the userdata structure. It takes the 
+ * client's username and password as string inputs and does not return any value.
+ * 
+ * @param username The client's username.
+ * @param password The client's password.
  *
- *   returns: no return value
- */
+ * @return None.
+ */ 
 void MQTT311_SetUsernameAndPassword(const char* username, const char* password) 
 {
     /* If already allocated free the memory */
@@ -407,75 +224,38 @@ void MQTT311_SetUsernameAndPassword(const char* username, const char* password)
     memcpy(userdata.password, password, strlen(password)+1);
 }
 
-/*
- * Function: set_local_port_number
- * ----------------------------
- *   Sets the home port number
+/**
+ * @brief Establishes a TCP connection to the MQTT broker over a TCP port.
  *
- *   local_port: port number of the local pc
+ * This function is used to establish a TCP connection to the MQTT broker over a TCP port.
+ * It takes the broker address as a string input, the port number as a uint16_t input, and
+ * does not return any value.
+ * 
+ * @param brokerName The broker address of the MQTT broker.
+ * @param port The port number over which the TCP connection is to be established.
  *
- *   returns: no return value
- */
-// void set_local_port_number(const char* local_port) 
-// {
-//     /* If already allocated free the memory */
-//     if (userdata.local_port != NULL) {
-//         return;
-//     }
-
-//     userdata.local_port = (char*) pvPortMalloc(strlen(local_port)+1);
-//     NULL_CHECK(userdata.local_port)
-//     memcpy(userdata.local_port, local_port, strlen(local_port)+1);
-// }
-
-/*
- * Function: set_socket_identifier
- * ----------------------------
- *   Sets the socket identifier
- *
- *   socketID: socket identifier
- *
- *   returns: no return value
- */
-// void set_socket_identifier(const char* socketIdentifier) 
-// {
-//     /* If already allocated free the memory */
-//     if (userdata.socketID != NULL) {
-//         return;
-//     }
-
-//     userdata.socketID = (char*) pvPortMalloc(strlen(socketIdentifier)+1);
-//     NULL_CHECK(userdata.socketID)
-//     memcpy(userdata.socketID, socketIdentifier, strlen(socketIdentifier)+1);
-// }
-
-/*
- * Function: MQTT311_EstablishConnectionToMQTTBroker
- * ----------------------------
- *   Establishes a TCP connection to the broker over a tcp port given.
- *
- *   socketIdentifier: socket identifier
- *   brokerAddress: broker address of Cumulocity
- *   port: port number over which the TCP connection is to be established
- *
- *   returns: no return value
- */
+ * @return None.
+ */ 
 void MQTT311_EstablishConnectionToMQTTBroker(const char* brokerName, uint16_t port) 
 {
+    MQTT311_SetBrokerAddress(brokerName);
+    MQTT311_SetPortNumber(port);
     MQTT311_ConnectTCPSocket(brokerName, port);
 }
 
-/*
- * Function: MQTT311_AppendData
- * ----------------------------
- *   Appends data and data length to byte array.
+/**
+ * @brief Appends the data and data length to the byte array.
  *
- *   data: data to be appended
- *   data_length: data length to be appended
- *   append_data_length: information on whether to append data length or not
+ * This function is used to append the data and data length to the byte array. It takes the data to be 
+ * appended and its length as inputs, as well as a bool indicating whether to append the data length or 
+ * not. The function does not return any value.
+ * 
+ * @param data The data to be appended.
+ * @param data_length The length of the data to be appended.
+ * @param append_data_length A bool indicating whether to append the data length or not.
  *
- *   returns: no return value
- */
+ * @return None.
+ */ 
 void MQTT311_AppendData(const char* data, uint16_t data_length, bool append_data_length)
 {
 
@@ -490,15 +270,16 @@ void MQTT311_AppendData(const char* data, uint16_t data_length, bool append_data
     current_index += data_length;
 }
 
-/*
- * Function: MQTT311_AppendTopicName
- * ----------------------------
- *   Appends topic_name to the MQTT message
+/**
+ * @brief Appends the topic name to the MQTT message.
  *
- *   topic_name: name of the topic that is published
+ * This function is used to append the topic name to the MQTT message. It takes the name of the topic 
+ * that is being published as a string input and does not return any value.
+ * 
+ * @param topic_name The name of the topic that is being published.
  *
- *   returns: no return value
- */
+ * @return None.
+ */ 
 void MQTT311_AppendTopicName(const char* topic_name) 
 {
     uint16_t topicnameLength = strlen(topic_name);
@@ -507,34 +288,46 @@ void MQTT311_AppendTopicName(const char* topic_name)
 
 }
 
-/*
- * Function: MQTT311_SendToMQTTBroker
- * ----------------------------
- *   Connects to Cumulocity tenant by providing user's username and password
+/**
+ * @brief Sends a message to the MQTT Broker.
  *
- *   size: size of the message to send 
+ * This function is used to send a message to the MQTT Broker. It takes the size of the message as a 
+ * uint16_t input and does not return any value.
+ * 
+ * @param size The size of the message to send.
  *
- *   returns: no return value
- */
+ * @return None.
+ */ 
 void MQTT311_SendToMQTTBroker(uint16_t size) 
 {
     MQTT311_SendToTCPSocket((const char *)bytes_to_send, size);
 }
+
+/**
+ * @brief Receives a message from the MQTT Broker.
+ *
+ * This function is used to receive a message from the MQTT Broker. The message bytes are stored in
+ * bytes_to_receive and the number of bytes received is stored in number_of_bytes_received.
+ * 
+ * @param None
+ *
+ * @return None.
+ */ 
 void MQTT311_ReceiveFromMQTTBroker(void) 
 {
     MQTT311_ReadFromTCPSocket((char*)bytes_to_receive, &number_of_bytes_received);
 }
 
-
-/*
- * Function: MQTT311_EncodeRemainingLength
- * ----------------------------
- *   Encodes remaining length if larger than 127.
+/**
+ * @brief Encodes the remaining length if larger than 127.
  *
- *   length: remaining length of the message.
+ * This function is used to encode the remaining length if it is larger than 127. It takes the remaining
+ * length of the message as a uint16_t input and returns the remaining byte as a uint8_t.
+ * 
+ * @param length The remaining length of the message.
  *
- *   returns: uint8_t remaining byte
- */
+ * @return The remaining byte as a uint8_t.
+ */ 
 uint8_t MQTT311_EncodeRemainingLength(uint16_t length) 
 {
     /* Encoded byte */
@@ -553,13 +346,15 @@ uint8_t MQTT311_EncodeRemainingLength(uint16_t length)
     return encodedByte;
 }
 
-/*
- * Function: MQTT311_CheckRemainingLength
- * ----------------------------
- *   Checks if remaining length value needs to be encoded
+/**
+ * @brief Checks if the remaining length value needs to be encoded.
  *
- *   returns: uint8_t remaining length value
- */
+ * This function is used to check if the remaining length value needs to be encoded. It returns the 
+ * remaining length value as a uint8_t.
+ * 
+ * @return The remaining length value as a uint8_t.
+ */ 
+
 uint8_t MQTT311_CheckRemainingLength(void)
 {
     uint8_t remaining_length;
@@ -581,13 +376,14 @@ uint8_t MQTT311_CheckRemainingLength(void)
     return remaining_length;
 }
 
-/*
- * Function: move_byte_array_to_left
- * ----------------------------
- *   Moves entire bytearray to the left by one block.
+/**
+ * @brief Moves the entire byte array to the left by one block.
  *
- *   returns: no return value
- */
+ * This function is used to move the entire byte array to the left by one block. It does not return 
+ * any value.
+ * 
+ * @return None.
+ */ 
 void MQTT311_MoveByteArrayToLeft(void)
 {
     /* Moving the array */
@@ -597,17 +393,20 @@ void MQTT311_MoveByteArrayToLeft(void)
     }
 }
 
-/*
- * Function: MQTT311_CheckResponseHeader
- * ----------------------------
- *   Checks whether the appropriate response was received.
+/**
+ * @brief Checks whether the appropriate response was received.
  *
- *   packet_type: type of MQTT packet
- *   remainingLength: remaining length of the MQTT packet
- *   offset: starting index from which the response is read
+ * This function is used to check whether the appropriate response was received. It takes the type 
+ * of MQTT packet, the remaining length of the MQTT packet, and the starting index from which the 
+ * response is read as inputs. The function returns a bool indicating whether the proper response 
+ * was received or not.
  * 
- *   returns: information on whether the proper response was received
- */
+ * @param packet_type The type of MQTT packet.
+ * @param remainingLength The remaining length of the MQTT packet.
+ * @param offset The starting index from which the response is read.
+ *
+ * @return A bool indicating whether the proper response was received or not.
+ */ 
 bool MQTT311_CheckResponseHeader(uint8_t packet_type, uint16_t remainingLength, uint8_t offset)
 {
     uint8_t server_response_header;
@@ -633,15 +432,16 @@ bool MQTT311_CheckResponseHeader(uint8_t packet_type, uint16_t remainingLength, 
     return true;
 }
 
-/*
- * Function: MQTT311_GetPacketIdentifier
- * ----------------------------
- *  Gets the packet_identifier
+/**
+ * @brief Gets the packet identifier.
  *
- *  offset: starting index from which the response is read
+ * This function is used to get the packet identifier. It takes the starting index from which the 
+ * response is read as input and returns the packet identifier.
  * 
- *  returns: packet_identifier
- */
+ * @param offset The starting index from which the response is read.
+ *
+ * @return The packet identifier.
+ */ 
 uint16_t MQTT311_GetPacketIdentifier(uint8_t offset)
 {
 
@@ -651,18 +451,21 @@ uint16_t MQTT311_GetPacketIdentifier(uint8_t offset)
     return packet_identifier;
 }
 
-/*
- * Function: MQTT311_GetPubPacketInfo
- * ----------------------------
- *  Checks whether the pub receive packet parts indicate a succesfull response
+/**
+ * @brief Checks whether the pub receive packet parts indicate a successful response.
  *
- *  packetIdentifier: packet ID of the publish packet
- *  packet_type: type of receive packet
- *  remaining_length: remaining length of the packet
- *  offset: starting index from which the response is read
+ * This function is used to check whether the received pub packet parts indicate a successful response.
+ * It takes the packet ID of the publish packet, the type of receive packet, the remaining length of the packet, 
+ * and the starting index from which the response is read as inputs. The function returns a bool indicating 
+ * whether the response was successful or not.
  * 
- *  returns: bool
- */
+ * @param packetIdentifier The packet ID of the publish packet.
+ * @param packet_type The type of receive packet.
+ * @param remaining_length The remaining length of the packet.
+ * @param offset The starting index from which the response is read.
+ *
+ * @return bool indicating whether the response was successful or not.
+ */ 
 bool MQTT311_GetPubPacketInfo(uint16_t packetIdentifier, uint8_t packet_type, uint16_t remaining_length, uint16_t offset) 
 {
     /* Useful flag for keeping track of sucess of response message */
