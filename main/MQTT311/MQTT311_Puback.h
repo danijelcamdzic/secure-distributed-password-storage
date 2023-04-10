@@ -1,25 +1,11 @@
-/***********************************************************************
-* FILENAME:        MQTT311_Puback.h             
-*
-* DESCRIPTION:
-*                  Contains definitions, structure and function declarations
-*                  for the MQTT 3.1.1 PUBACK package.
-*
-* NOTES:
-*       
-*
-* AUTHOR:          Danijel Camdzic     
-*
-*   
-* DATE:            19 Aug 21
-*
-*
-* CHANGES:
-*
-* VERSION:         DATE:          WHO:         DETAIL:
-* 0.00.0           19 Aug 21      DC           Initial state of the file
-*
-*/
+/**
+ * @file MQTT311_Puback.h
+ * @brief Contains definitions, structure and function declarations
+ * for the MQTT 3.1.1 PUBACK package.
+ *
+ * @author Danijel Camdzic
+ * @date 10 Apr 2023
+ */
 
 #ifndef MQTT311_PUBACK_H
 #define MQTT311_PUBACK_H
@@ -52,4 +38,5 @@ struct PUBACK_MESSAGE
 /* Function declarations */
 bool MQTT311_Puback(uint16_t packetIdentifier);
 
-#endif
+#endif /* MQTT311_PUBACK_H */
+

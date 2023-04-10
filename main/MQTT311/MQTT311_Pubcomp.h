@@ -1,25 +1,11 @@
-/***********************************************************************
-* FILENAME:        MQTT311_Pubcomp.h             
-*
-* DESCRIPTION:
-*                  Contains definitions, structure and function declarations
-*                  for the MQTT 3.1.1 PUBCOMP package.
-*
-* NOTES:
-*       
-*
-* AUTHOR:          Danijel Camdzic     
-*
-*   
-* DATE:            19 Aug 21
-*
-*
-* CHANGES:
-*
-* VERSION:         DATE:          WHO:         DETAIL:
-* 0.00.0           19 Aug 21      DC           Initial state of the file
-*
-*/
+/**
+ * @file MQTT311_Pubcomp.h
+ * @brief Contains definitions, structure and function declarations
+ * for the MQTT 3.1.1 PUBCOMP package.
+ *
+ * @author Danijel Camdzic
+ * @date 10 Apr 2023
+ */
 
 #ifndef MQTT311_PUBCOMP_H
 #define MQTT311_PUBCOMP_H
@@ -51,4 +37,5 @@ struct PUBCOMP_MESSAGE
 /* Function declarations */
 bool MQTT311_Pubcomp(uint16_t packetIdentifier);
 
-#endif
+#endif /* MQTT311_PUBCOMP_H */
+

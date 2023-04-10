@@ -1,39 +1,28 @@
-/***********************************************************************
-* FILENAME:        MQTT311_Pingresp.c             
-*
-* DESCRIPTION:
-*                  Contains variables and function definitions for the 
-*                  MQTT 3.1.1 PINGRESP package.
-*
-* NOTES:
-*       
-*
-* AUTHOR:          Danijel Camdzic     
-*
-*   
-* DATE:            19 Aug 21
-*
-*
-* CHANGES:
-*
-* VERSION:         DATE:          WHO:         DETAIL:
-* 0.00.0           19 Aug 21      DC           Initial state of the file
-*
-*/
+/**
+ * @file MQTT311_Pingresp.c
+ * @brief Contains variables and function definitions for the MQTT 3.1.1 PINGRESP package.
+ *
+ * This file contains the variables and function definitions required for implementing
+ * the MQTT 3.1.1 PINGRESP package. The PINGRESP package is used to respond to a PINGREQ message from an MQTT client.
+ *
+ * @author Danijel Camdzic
+ * @date 10 Apr 2023
+ */
 
 /* Included libraries */
 #include "MQTT311/MQTT311.h"
 
-/*
- * Function: get_pingresp
- * ----------------------------
- *   Reads back the ping response message from the server.
+/**
+ * @brief Reads back the ping response message from the MQTT broker.
  *
- *   returns: bool (true if acknowledged)
+ * This function is used to read back the PINGRESP message from the MQTT broker, indicating that the broker has
+ * received and processed a PINGREQ message sent by the client. The function returns true if the response is received
+ * successfully, and false otherwise.
+ *
+ * @return A boolean value indicating whether the PINGRESP message was received successfully (true) or not (false).
  */
 bool MQTT311_Pingresp(void) 
 {
-
     /* Creating a connack message */
     struct PINGRESP_MESSAGE pingresp_message_data = {0};
 

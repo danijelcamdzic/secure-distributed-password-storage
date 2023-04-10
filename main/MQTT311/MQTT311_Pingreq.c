@@ -1,25 +1,13 @@
-/***********************************************************************
-* FILENAME:        MQTT311_Pingreq.c             
-*
-* DESCRIPTION:
-*                  Contains variables and function definitions for the 
-*                  MQTT 3.1.1 PINGREQ package.
-*
-* NOTES:
-*       
-*
-* AUTHOR:          Danijel Camdzic     
-*
-*   
-* DATE:            19 Aug 21
-*
-*
-* CHANGES:
-*
-* VERSION:         DATE:          WHO:         DETAIL:
-* 0.00.0           19 Aug 21      DC           Initial state of the file
-*
-*/
+/**
+ * @file MQTT311_Pingreq.c
+ * @brief Contains variables and function definitions for the MQTT 3.1.1 PINGREQ package.
+ *
+ * This file contains the variables and function definitions required for implementing the MQTT 3.1.1 PINGREQ package.
+ * The PINGREQ package is used to keep the MQTT connection alive by periodically sending a ping request to the broker.
+ *
+ * @author Danijel Camdzic
+ * @date 10 Apr 2023
+ */
 
 /* Included libraries */
 #include "MQTT311/MQTT311.h"
@@ -27,14 +15,15 @@
 /* Private function declaration */
 static void MQTT311_PingreqWithStruct(struct PINGREQ_MESSAGE *pingreq_message_data);
 
-/*
- * Function: MQTT311_PingreqWithStruct
- * ----------------------------
- *   Pings the server.
+/**
+ * @brief Sends a PINGREQ message to the MQTT broker using the provided message structure.
  *
- *   pingreq_message_data: pingreq message structure
+ * This function sends a PINGREQ message to the MQTT broker using the provided message structure.
+ * The message structure is passed in as a pointer to a `PINGREQ_MESSAGE` structure.
  *
- *   returns: no return value
+ * @param pingreq_message_data Pointer to a `PINGREQ_MESSAGE` structure containing the PINGREQ message.
+ *
+ * @return None.
  */
 static void MQTT311_PingreqWithStruct(struct PINGREQ_MESSAGE *pingreq_message_data)
 {
@@ -66,16 +55,16 @@ static void MQTT311_PingreqWithStruct(struct PINGREQ_MESSAGE *pingreq_message_da
     }
 }
 
-/*
- * Function: MQTT311_Pingreq
- * ----------------------------
- *   Used to ping the server
- * 
- *   returns: no return value
+/**
+ * @brief Sends a PINGREQ message to the MQTT broker.
+ *
+ * This function sends a PINGREQ message to the MQTT broker. The PINGREQ message is used to keep the MQTT connection
+ * alive by periodically sending a ping request to the broker.
+ *
+ * @return None.
  */
 void MQTT311_Pingreq(void)
 {
-    
     /* Creating a PINGREQ_MESSAGE structure */
     struct PINGREQ_MESSAGE* pingreq_message_data = (struct PINGREQ_MESSAGE*) pvPortMalloc(sizeof *pingreq_message_data);
     NULL_CHECK(pingreq_message_data)
@@ -98,5 +87,4 @@ void MQTT311_Pingreq(void)
     
     /* Send to queue for the sending task to receive */
     xQueueSend( xMQTTQueue, mqtt_packet, portMAX_DELAY );
-
 }

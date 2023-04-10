@@ -1,25 +1,10 @@
-/***********************************************************************
-* FILENAME:        MQTT311_Publish.c             
-*
-* DESCRIPTION:
-*                  Contains variables and function definitions for the 
-*                  MQTT 3.1.1 PUBLISH package.
-*
-* NOTES:
-*       
-*
-* AUTHOR:          Danijel Camdzic     
-*
-*   
-* DATE:            19 Aug 21
-*
-*
-* CHANGES:
-*
-* VERSION:         DATE:          WHO:         DETAIL:
-* 0.00.0           19 Aug 21      DC           Initial state of the file
-*
-*/
+/**
+ * @file MQTT311_Publish.c
+ * @brief Contains variables and function definitions for the MQTT 3.1.1 PUBLISH package.
+ *
+ * @author Danijel Camdzic
+ * @date 10 Apr 2023
+ */
 
 /* Included libraries */
 #include "MQTT311/MQTT311.h"
@@ -28,31 +13,26 @@
 static void MQTT311_AppendMessagePayload(const char* message_payload);
 static void MQTT311_PublishWithStruct(struct PUBLISH_MESSAGE *publish_message_data);
 
-/*
- * Function: MQTT311_AppendMessagePayload
- * ----------------------------
- *   Appends data payload to the message
+/**
+ * @brief Appends data payload to the message
  *
- *   message_payload: message payload - data
+ * @param message_payload Message payload - data
  *
- *   returns: no return value
+ * @return None
  */
 static void MQTT311_AppendMessagePayload(const char* message_payload) 
 {
     uint16_t messagePayloadLength = strlen(message_payload);
 
     MQTT311_AppendData(message_payload, messagePayloadLength, false);
-
 }
 
-/*
- * Function: MQTT311_PublishWithStruct
- * ----------------------------
- *   Publishes message to Cumulocity using data from the structure of publish message.
+/**
+ * @brief Publishes message to Cumulocity using data from the structure of publish message.
  *
- *   publish_message_data: publish message structure
+ * @param publish_message_data Pointer to the publish message structure
  *
- *   returns: no return value
+ * @return None
  */
 static void MQTT311_PublishWithStruct(struct PUBLISH_MESSAGE *publish_message_data) 
 {
@@ -168,17 +148,15 @@ static void MQTT311_PublishWithStruct(struct PUBLISH_MESSAGE *publish_message_da
     vPortFree(publish_message_data);
 }
 
-/*
- * Function: publish
- * ----------------------------
- *   Publishes message to Cumulocity.
+/**
+ * @brief Publishes message to MQTT Broker.
  *
- *   header_flags: bits 0-3 of the header byte that can be configured
- *   topicName: name of the topic that gets published
- *   packetIdentifier: identifier of the packet. Possible only when QoS == 1 or QoS == 2
- *   payload: data that gets published
+ * @param header_flags Bits 0-3 of the header byte that can be configured
+ * @param topicName Name of the topic that gets published
+ * @param packetIdentifier Identifier of the packet. Possible only when QoS == 1 or QoS == 2
+ * @param payload Data that gets published
  *
- *   returns: no return value
+ * @return None
  */
 void MQTT311_Publish(uint8_t header_flags, const char* topicName, uint16_t packetIdentifier, const char* payload)
 {
@@ -231,3 +209,4 @@ void MQTT311_Publish(uint8_t header_flags, const char* topicName, uint16_t packe
     /* Send to queue for the sending task to receive */
     xQueueSend( xMQTTQueue, mqtt_packet, portMAX_DELAY );
 }
+

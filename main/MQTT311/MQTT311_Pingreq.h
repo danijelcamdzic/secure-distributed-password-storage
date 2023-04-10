@@ -1,25 +1,14 @@
-/***********************************************************************
-* FILENAME:        MQTT311_Pingreq.h             
-*
-* DESCRIPTION:
-*                  Contains definitions, structure and function declarations
-*                  for the MQTT 3.1.1 PINGREQ package.
-*
-* NOTES:
-*       
-*
-* AUTHOR:          Danijel Camdzic     
-*
-*   
-* DATE:            19 Aug 21
-*
-*
-* CHANGES:
-*
-* VERSION:         DATE:          WHO:         DETAIL:
-* 0.00.0           19 Aug 21      DC           Initial state of the file
-*
-*/
+/**
+ * @file MQTT311_Pingreq.h
+ * @brief Contains definitions, structures, and function declarations for the MQTT 3.1.1 PINGREQ package.
+ *
+ * This header file contains the definitions, structures, and function declarations required for implementing
+ * the MQTT 3.1.1 PINGREQ package. The PINGREQ package is used to keep the MQTT connection alive by periodically
+ * sending a ping request to the broker.
+ *
+ * @author Danijel Camdzic
+ * @date 10 Apr 2023
+ */
 
 #ifndef MQTT311_PINGREQ_H
 #define MQTT311_PINGREQ_H
@@ -46,4 +35,4 @@ struct PINGREQ_MESSAGE
 /* Function declarations */
 void MQTT311_Pingreq(void);
 
-#endif
+#endif /* MQTT311_PINGREQ_H */

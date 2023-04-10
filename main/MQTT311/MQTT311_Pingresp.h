@@ -1,25 +1,13 @@
-/***********************************************************************
-* FILENAME:        MQTT311_Pingresp.h             
-*
-* DESCRIPTION:
-*                  Contains definitions, structure and function declarations
-*                  for the MQTT 3.1.1 PINGRESP package.
-*
-* NOTES:
-*       
-*
-* AUTHOR:          Danijel Camdzic     
-*
-*   
-* DATE:            19 Aug 21
-*
-*
-* CHANGES:
-*
-* VERSION:         DATE:          WHO:         DETAIL:
-* 0.00.0           19 Aug 21      DC           Initial state of the file
-*
-*/
+/**
+ * @file MQTT311_Pingresp.h
+ * @brief Contains definitions, structures, and function declarations for the MQTT 3.1.1 PINGRESP package.
+ *
+ * This header file contains the definitions, structures, and function declarations required for implementing
+ * the MQTT 3.1.1 PINGRESP package. The PINGRESP package is used to respond to a PINGREQ message from an MQTT client.
+ *
+ * @author Danijel Camdzic
+ * @date 10 Apr 2023
+ */
 
 #ifndef MQTT311_PINGRESP_H
 #define MQTT311_PINGRESP_H
@@ -50,4 +38,4 @@ struct PINGRESP_MESSAGE
 /* Function declarations */
 bool MQTT311_Pingresp(void);
 
-#endif
+#endif /* MQTT311_PINGRESP_H */
