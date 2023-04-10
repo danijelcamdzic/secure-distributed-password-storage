@@ -90,8 +90,8 @@ struct MQTTPacket
 extern struct UserData userdata;
 
 /* Bytes to send to function */
-extern volatile char bytes_to_send[100];
-extern volatile char bytes_to_receive[100];
+extern volatile char bytes_to_send[500];
+extern volatile char bytes_to_receive[500];
 extern uint16_t number_of_bytes_received; 
 
 /* Variable used to keep track of indexes */

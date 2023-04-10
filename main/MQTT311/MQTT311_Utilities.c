@@ -24,8 +24,8 @@ MQTT311_PrintPtr MQTT311_Print = NULL;
 struct UserData userdata;
 
 /* Bytes to send to function */
-volatile char bytes_to_send[100];
-volatile char bytes_to_receive[100];
+volatile char bytes_to_send[500];
+volatile char bytes_to_receive[500];
 uint16_t number_of_bytes_received = 0; 
 
 /* Variable to keep track of indexes */
