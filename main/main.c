@@ -66,6 +66,7 @@
 
 /* FreeRTOS event group to signal when we are connected*/
 static EventGroupHandle_t s_wifi_event_group;
+int sock;
 
 /* The event group allows multiple bits for each event, but we only care about two events:
  * - we are connected to the AP with an IP
@@ -102,6 +103,8 @@ static void event_handler(void* arg, esp_event_base_t event_base,
 
 void wifi_init_sta(void)
 {
+    char* TAG = "wifi_init_sta"; // Declare and initialize TAG for logging purposes
+
     s_wifi_event_group = xEventGroupCreate();
 
     ESP_ERROR_CHECK(esp_netif_init());
@@ -162,101 +165,113 @@ void wifi_init_sta(void)
         ESP_LOGI(TAG, "Failed to connect to SSID:%s, password:%s",
                  EXAMPLE_ESP_WIFI_SSID, EXAMPLE_ESP_WIFI_PASS);
     } else {
-        ESP_LOGE(TAG, "UNEXPECTED EVENT");
+        ESP_LOGE(TAG, "Unexpected event!");
     }
 }
 
-int sock;
-
 void connect_tcp_socket(const char* brokerAddress, uint16_t port) 
 {
+    /* Connect to a TCP socket */
+    char* TAG = "send_tcp_data"; // Declare and initialize TAG for logging purposes
+
     int addr_family = 0;
     int ip_protocol = 0;
     struct sockaddr_in dest_addr;
 
+    /* Configure for IPv4 */
 #if defined(CONFIG_EXAMPLE_IPV4)
     struct addrinfo hints;
     struct addrinfo *res;
-    memset(&hints, 0, sizeof(hints));
-    hints.ai_family = AF_INET;
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_protocol = IPPROTO_IP;
+    memset(&hints, 0, sizeof(hints));   // Initialize hints structure with zeroes
+    hints.ai_family = AF_INET;          // Specify address family as IPv4
+    hints.ai_socktype = SOCK_STREAM;    // Specify socket type as stream
+    hints.ai_protocol = IPPROTO_IP;     // Specify IP protocol
 
     char port_str[6];
-    snprintf(port_str, sizeof(port_str), "%d", port);
+    snprintf(port_str, sizeof(port_str), "%d", port); // Convert port to string
 
-    int result = getaddrinfo(brokerAddress, port_str, &hints, &res);
+    /* Resolve DNS name */
+    int result = getaddrinfo(brokerAddress, port_str, &hints, &res); // Get address info of the broker
     if (result != 0) {
-        ESP_LOGI(TAG, "ERROR HAPPENED IN getaddrinfo");
+        ESP_LOGI(TAG, "Could not resolve DNS name..."); // Log if DNS name resolution failed
         return;
     }
 
-    memcpy(&dest_addr, res->ai_addr, res->ai_addrlen);
-    addr_family = AF_INET;
-    ip_protocol = IPPROTO_IP;
-    freeaddrinfo(res);
+    memcpy(&dest_addr, res->ai_addr, res->ai_addrlen); // Copy resolved address to destination address structure
+    addr_family = AF_INET; // Set address family to IPv4
+    ip_protocol = IPPROTO_IP; // Set IP protocol
+    freeaddrinfo(res); // Free the memory allocated for address info
 #endif
 
-    sock =  socket(addr_family, SOCK_STREAM, ip_protocol);
+    /* Create the socket */
+    sock = socket(addr_family, SOCK_STREAM, ip_protocol);
     if (sock < 0) {
-        ESP_LOGI(TAG, "Unable to create socket: errno %d", errno);
+        ESP_LOGI(TAG, "Unable to create socket: errno %d", errno); // Log if socket creation failed
         return;
     }
-    ESP_LOGI(TAG, "Socket created, connecting to %s:%d", brokerAddress, port);
+    ESP_LOGI(TAG, "Socket created, connecting to %s:%d", brokerAddress, port); // Log socket creation success
 
+    /* Connect to the socket */
     int err = connect(sock, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
     if (err != 0) {
-        ESP_LOGI(TAG, "Socket unable to connect: errno %d", errno);
-        close(sock);
+        ESP_LOGI(TAG, "Socket unable to connect: errno %d", errno); // Log if socket connection failed
+        close(sock); // Close the socket
         return;
     }
-    ESP_LOGI(TAG, "Successfully connected");
+    ESP_LOGI(TAG, "Socket successfully connected"); // Log socket connection success
 }
+
 
 void send_tcp_data(const char* data, uint16_t size)
 {
-    int err = send(sock, data, size, 0);
-    if (err < 0)
-    {
-        ESP_LOGI(TAG, "FAILED TO SEND DATA OVER TCP");
-    }
-    else {
-        ESP_LOGI(TAG, "SUCCEEDED SENDING DATA OVER TCP");
+    /* Send data over TCP connection */
+    char* TAG = "send_tcp_data";                            // Declare and initialize TAG for logging purposes
+
+    int err = send(sock, data, size, 0);                    // Send data through the socket
+
+    // Check if data was sent successfully
+    if (err < 0) {
+        ESP_LOGI(TAG, "Failed to send data...");      // Log if data sending failed
+    } else {
+        ESP_LOGI(TAG, "Succeeded sending data..");   // Log if data sending succeeded
     }
 }
 
-void receive_tcp_data(char* rx_buffer, uint16_t* number_of_bytes_received)
+
+void receive_tcp_data(char* rx_buffer, uint16_t* number_of_bytes_received) 
 {
+    char* TAG = "receive_tcp_data"; // Declare and initialize TAG for logging purposes                                                         
+
+    /* Set socket to non-blocking mode */
     if (fcntl(sock, F_SETFL, fcntl(sock, F_GETFL) | O_NONBLOCK) < 0) {
-        ESP_LOGI(TAG, "CANNOT PUT IN NON BLOCKING MODE");
+        ESP_LOGI(TAG, "Cannot put socket in non-blocking mode");        // Log error if unable to set non-blocking mode
     }
 
+    /* Receive data from the socket */
     int len = recv(sock, &rx_buffer[*number_of_bytes_received], sizeof(rx_buffer) - 1, 0);
 
-    // No data available to read
     if (len < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
-        ESP_LOGI(TAG, "No data to read");
-    }
-    // Error occurred during receiving
-    else if (len < 0) {
-        ESP_LOGI(TAG, "ERROR DURING RECEIVING");
-    }
-    // Data received
-    else {
-        *number_of_bytes_received += len;
-        ESP_LOGI(TAG, "Received %d bytes:", *number_of_bytes_received);
+        ESP_LOGI(TAG, "No data to read");                               // Log if no data is available to read
+    } else if (len < 0) {
+        ESP_LOGI(TAG, "Error during reception");                        // Log if an error occurred during receiving
+    } else {
+        *number_of_bytes_received += len;                               // Increment the number of bytes received
+        ESP_LOGI(TAG, "Received %d bytes", *number_of_bytes_received);  // Log the number of bytes received
     }
 }
 
-void debug_print(char* message)
+void debug_print(char* message) 
 {
-    ESP_LOGI(TAG, "%s\r\n", message);
+    /* Send debugging information */
+    char* TAG = "debug_print";                  // Declare and initialize TAG for logging purposes
+    ESP_LOGI(TAG, "%s", message);               // Log the input message with ESP_LOGI function
 }
-
 
 void app_main(void)
 {
-    //Initialize NVS
+    char* TAG = "app_main";  // Declare and initialize TAG for logging purposes
+
+    /* ------ Initialize NVS ------- */
     esp_err_t ret = nvs_flash_init();
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
       ESP_ERROR_CHECK(nvs_flash_erase());
@@ -264,49 +279,39 @@ void app_main(void)
     }
     ESP_ERROR_CHECK(ret);
 
-    ESP_LOGI(TAG, "ESP_WIFI_MODE_STA");
+    /* ------ Initialize Wifi ------- */
+    ESP_LOGI(TAG, "Initializing device as station and connecting to wifi...");
     wifi_init_sta();
 
+    /* --- Set External Functions --- */
     MQTT311_SetPrint(debug_print);
-
-    /* Part 1: */
-    /*
-    create_client("client_id");
-    connect_to_broker("0", "mqtt.eu-latest.cumulocity.com", 1883, "117");
-    set_username_pass("env782595/danijelcamdzic@gmail.com", "123");
-    */
-    MQTT311_CreateMQTTFreeRTOSTasks();
-    MQTT311_CreateClient("client_id_dado123");
     MQTT311_SetConnectTCPSocket(connect_tcp_socket);
-    MQTT311_EstablishConnectionToMQTTBroker("mqtt.eclipseprojects.io", 1883);
-    MQTT311_SetUsernameAndPassword("", ""); // No username and password necessary
-
-    /* Part 2: */
-    /*
-    connect(0xC2, 600, "", "");
-    */
     MQTT311_SetSendToTCPSocket(send_tcp_data);
     MQTT311_SetReadFromTCPSocket(receive_tcp_data);
+
+    /* ---- Start FreeRTOS Tasks ---- */
+    MQTT311_CreateMQTTFreeRTOSTasks();
+
+    /* ---- Connect to MQTT Broker ---- */
+    MQTT311_CreateClient("client_id_dado");
+    MQTT311_EstablishConnectionToMQTTBroker("mqtt.eclipseprojects.io", 1883);
+    MQTT311_SetUsernameAndPassword("", "");
     MQTT311_Connect(0xC2, 600, "", "");
-    vTaskDelay(pdMS_TO_TICKS(2000));
 
-    /* Part 3: */
-    /*
-    publish(0x00, "s/us", 0x00, "100,My MQTT Device,c8y_MQTTDevice");
-    */
-    MQTT311_Publish(0x00, "/topic/qos0", 0x00, "Hello, my name is Danijel");
-    vTaskDelay(pdMS_TO_TICKS(2000));
-    MQTT311_Publish(0x00, "/topic/qos1", 0x00, "Yes, indeed, my name is Danijel");
-    vTaskDelay(pdMS_TO_TICKS(2000));
+    /* ----- Publish some messages ------*/
+    MQTT311_Publish(0x00, "/topic/nikola", 0x00, "123test");
+    MQTT311_Publish(0x00, "/topic/danijel", 0x00, "Test123");
 
-    /* Part 4: */
-    /*
-    subscribe(0x02, "s/e", 0x00);
-    */
-    MQTT311_Subscribe(0x02, "/topic/qos1", 0x00);
-    MQTT311_Unsubscribe(0x02, "/topic/qos1");
+    /* ------ Subscribe to some topic ------ */
+    MQTT311_Subscribe(0x02, "/topic/mihajlo", 0x00);
+
+    /* ----- Unsubscribe to some topic ----- */
+    vTaskDelay(pdMS_TO_TICKS(1000));
+    MQTT311_Unsubscribe(0x02, "/topic/mihajlo");
+
+    /* ----- Test pinging ------ */
     MQTT311_Pingreq();
-    MQTT311_Disconnect();
 
-    ESP_LOGI(TAG, "HELLO FROM THE END OF THE MAIN\r\n");
+    /* ---- Test disconnecting ---- */
+    // MQTT311_Disconnect();
 }
