@@ -20,7 +20,12 @@
 #include "lwip/sys.h"
 
 #include "MQTT311/MQTT311.h"
-#include "PgPKeys.h"
+
+#include "mbedtls/pk.h"
+#include "mbedtls/entropy.h"
+#include "mbedtls/ctr_drbg.h"
+#include "mbedtls/platform.h"
+#include "mbedtls/base64.h"
 
 /* This uses WiFi configuration that you can set via project configuration menu
 
@@ -75,6 +80,47 @@ static EventGroupHandle_t s_wifi_event_group;
 
 /* TCP Socket */
 int sock;
+unsigned char buf[MBEDTLS_MPI_MAX_SIZE] = {0};
+    const unsigned char *private_key = (const unsigned char *)"-----BEGIN PRIVATE KEY-----\n"
+                                                            "MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQC240GJf9WuE/vW\n"
+                                                            "z7JMinulBsOQZ8JBgmxrZPDRDg/8JpeINU5r58p/0rEfrQv4xTbiMa4/zeAoDv0M\n"
+                                                            "X4eLT3yAuoKjnPxPPiWI1XgjvzNsJQ330RlIWSvSVIXb/yRFOh4GMhDxE7FlDciQ\n"
+                                                            "1tCov4Q4aDAPf2mt84UEeIg2G1g/TUe7Pyp4a01RepzaWjvS9DGbp9EX7P7orYJd\n"
+                                                            "d/XHpzw8wu+sTlp1EzfPf5kPAu5DeJgZYh1x1zTzVezpQzMaA1/WyzybpknPESVi\n"
+                                                            "rJewIjp5TflWvn7tAiY5gNecmL7UiIQeNoGITKkmHd0mTubWgYvNHcUDaFW6OhNc\n"
+                                                            "xayqOZanAgMBAAECggEAGLcm2NwhFmtg8gC+NGsqlny5hRRgmNXKrSDGYponPYjs\n"
+                                                            "RYi0AQ/MD/DQkFqkbt7IB1LLckKc87eYKZ88rsOegbmy2fA8hhZR9ZH+WxEFyVb1\n"
+                                                            "8khHGxM3QYS7/6UVU72s57gbDgP+nzd4+V9Dx5T022KedsRd6xd+dxeK4N+v0gNM\n"
+                                                            "aqaSyzCxWwHkUN1g8nZgIqe/UM0N/cpGsiF4tUZSb+m8oUtXVz4Phz6ismaQv0yH\n"
+                                                            "B/nRJkpjdI7VAeSnQOoBQy1EvO37cs5gk2+T+FaHM3qQlXGYzPoyG1+mLs/Zarpd\n"
+                                                            "vgNNWEfRhVkEpysI7dqbbv56bnEKn5cVH3m6j5YeAQKBgQDf17VAdL+YTnkI7GQu\n"
+                                                            "uK1jz/+ESCcdlSFVIFryBuCEPra3E57J6vkzwg41Us6tW3qOsikqgLiGZAUIDReH\n"
+                                                            "PgXQqvoVpygCSpux8LTMVvrAwOi/qO/hIPVGIg5wx6L5Ot58rqnAI1j879O0apRA\n"
+                                                            "cCJT1eWFRAefUnMxNxnfZi3EJwKBgQDRKVgUPc2u7l7h/TZhH7EUQT7WRFNbFmCX\n"
+                                                            "8YNLR8ojR7YbkMRH1jJBGafAZKnJJeOH+OqkbvIx8+9S8m/kWg5WlHm6MLXD/0VG\n"
+                                                            "YN8C3fx1jsxuzkCXK8EOQV2pLxWPfjrsvGz1oLF8ixSqfbpM4o9u4IW6/X/v/BYP\n"
+                                                            "1tBCY3SpgQKBgQDRTYHNo10DrVy/W0rR5R08F2F074Kjxq5ESty/Mm79OSbgSRhQ\n"
+                                                            "9cXO/8UJV0SqFL+kbjLP60yfXSbXQGafrv8A/t6ZIJPokJrE564m463UTo1TqUOj\n"
+                                                            "3o155p5aFlHteX5QV4Gih2rOF/J84Kt/FVsDyR20XshB0XakrkEjAwgIQQKBgQCk\n"
+                                                            "ZB9TAWRIihdO/UohOdxetA0kMN1m6QaQRYTQxSLNac5qifSLFYG4AucC4ttDOiFD\n"
+                                                            "vFMHXB/FPRkrk1p4GoPMbrPhr+kcm+ShtP9ybHDBILPynu7LIduBTcTEdTo35pl/\n"
+                                                            "eXUV9O+qmFFs0pZ7WVIsbhENb7J/Nx1L46UZmLuXgQKBgQDfMuU4K1jb8PCno5Uk\n"
+                                                            "Dsrpp60GPyflskervoSqENy5yWNY7D2VEdFHRkz1BIRyTBXmsccrjPt+Co73aea2\n"
+                                                            "n4CPCoQir7jkVTeKnZB8mZyZKOBYPGYeo46Bx4yTRvTZ9SuGmdtmvaTC6z1475Wx\n"
+                                                            "zOnlXq5SzkJViJXh2CtNAthK4Q==\n"
+                                                            "-----END PRIVATE KEY-----\n";
+
+const unsigned char *key = (const unsigned char *)"-----BEGIN PUBLIC KEY-----\n"
+                                                "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtuNBiX/VrhP71s+yTIp7\n"
+                                                "pQbDkGfCQYJsa2Tw0Q4P/CaXiDVOa+fKf9KxH60L+MU24jGuP83gKA79DF+Hi098\n"
+                                                "gLqCo5z8Tz4liNV4I78zbCUN99EZSFkr0lSF2/8kRToeBjIQ8ROxZQ3IkNbQqL+E\n"
+                                                "OGgwD39prfOFBHiINhtYP01Huz8qeGtNUXqc2lo70vQxm6fRF+z+6K2CXXf1x6c8\n"
+                                                "PMLvrE5adRM3z3+ZDwLuQ3iYGWIdcdc081Xs6UMzGgNf1ss8m6ZJzxElYqyXsCI6\n"
+                                                "eU35Vr5+7QImOYDXnJi+1IiEHjaBiEypJh3dJk7m1oGLzR3FA2hVujoTXMWsqjmW\n"
+                                                "pwIDAQAB\n"
+                                                "-----END PUBLIC KEY-----\n";
+
+#define MAIN_TASK_STACK_SIZE 8192
 
 /* Number of retries for connection */
 static int s_retry_num = 0;
@@ -292,6 +338,144 @@ void debug_print(char* message)
     ESP_LOGI(TAG, "%s", message);               // Log the input message with ESP_LOGI function
 }
 
+size_t rsa2048_encrypt(const char *text)
+{
+    char* TAG = "rsa2048_encrypt";              // Declare and initialize TAG for logging purposes
+    // RNG (Random number generator init)
+    int ret = 0;
+    mbedtls_entropy_context entropy;
+    mbedtls_entropy_init(&entropy);
+    mbedtls_ctr_drbg_context ctr_drbg;
+    const char *personalization = "mgkegneljgnjlwgnjefdcmeg12313123dsggsd";
+
+    mbedtls_ctr_drbg_init(&ctr_drbg);
+
+    ret = mbedtls_ctr_drbg_seed(&ctr_drbg, mbedtls_entropy_func, &entropy,
+                                (const unsigned char *)personalization,
+                                strlen(personalization));
+    if (ret != 0)
+    {
+        // ERROR HANDLING CODE FOR YOUR APP
+    }
+
+    // Creating rsa context + Importing pub key
+    ret = 0;
+    mbedtls_pk_context pk;
+    mbedtls_pk_init(&pk);
+
+    /*
+     * Read the RSA public key
+     */
+
+    if ((ret = mbedtls_pk_parse_public_key(&pk, key, strlen((const char *)key) + 1)) != 0)
+    {
+
+        ESP_LOGI(TAG," failed\n  ! mbedtls_pk_parse_public_key returned -0x%04x\n", -ret);
+    };
+    // Encrypting data
+    const unsigned char *to_encrypt = (const unsigned char *)text;
+    size_t to_encrypt_len = strlen((const char *)to_encrypt);
+
+    // unsigned char buf[MBEDTLS_MPI_MAX_SIZE];
+    size_t olen = 0;
+
+    /*
+     * Calculate the RSA encryption of the data.
+     */
+    ESP_LOGI(TAG,"\n  . Generating the encrypted value: \n");
+    fflush(stdout);
+
+    if ((ret = mbedtls_pk_encrypt(&pk, to_encrypt, to_encrypt_len,
+                                  buf, &olen, sizeof(buf),
+                                  mbedtls_ctr_drbg_random, &ctr_drbg)) != 0)
+    {
+        ESP_LOGI(TAG, " failed\n  ! mbedtls_pk_encrypt returned -0x%04x\n", -ret);
+    }
+
+    for (size_t i = 0; i < olen; i++)
+    {
+        mbedtls_printf("%02X%s", buf[i],
+                       (i + 1) % 16 == 0 ? "\r\n" : " ");
+    }
+
+    mbedtls_pk_free(&pk);
+    mbedtls_entropy_free(&entropy);
+    mbedtls_ctr_drbg_free(&ctr_drbg);
+
+    return olen;
+}
+
+void decrypt_test(char* text, size_t length)
+{
+    char* TAG = "decrypt_test";              // Declare and initialize TAG for logging purposes
+
+    // RNG (Random number generator init)
+    int ret = 0;
+    mbedtls_entropy_context entropy;
+    mbedtls_entropy_init(&entropy);
+    mbedtls_ctr_drbg_context ctr_drbg;
+    const char *personalization = "mgkegneljgnjlwgnjefdcmeg12313123dsggsd";
+
+    mbedtls_ctr_drbg_init(&ctr_drbg);
+
+    ret = mbedtls_ctr_drbg_seed(&ctr_drbg, mbedtls_entropy_func, &entropy,
+                                (const unsigned char *)personalization,
+                                strlen(personalization));
+    if (ret != 0)
+    {
+        // ERROR HANDLING CODE FOR YOUR APP
+    }
+    ret = 0;
+    mbedtls_pk_context pk;
+
+    mbedtls_pk_init(&pk);
+
+    /*
+     * Read the RSA private key
+     */
+    if ((ret = mbedtls_pk_parse_key(&pk, private_key, strlen((const char *)private_key) + 1, NULL, 0, mbedtls_ctr_drbg_random, &ctr_drbg)) != 0)
+    {
+        ESP_LOGI(TAG, " failed\n  ! mbedtls_pk_parse_key returned -0x%04x\n", -ret);
+    }
+
+    unsigned char result[MBEDTLS_MPI_MAX_SIZE];
+    size_t olen = 0;
+
+    /*
+     * Calculate the RSA encryption of the data.
+     */
+
+    ESP_LOGI(TAG, "\n  . Generating the decrypted value");
+    fflush(stdout);
+    // const char *text = "fnianPxs/09bx75ufVLWPeFF9kbGEIL3+TQqW2+ZoeMpdvVnkifFToAii92ODVBPOL0RzQPfxlJcN/nVY3K5fWNSGHM8TTwTgCqvUc0ia5L5YHI1YSgDKzx2QPZlu7tEd06sjW7txRacnhilRfjFPp0CYeLwxYVBlPmKIE7oqQHrc8sal3X9NSqgwO7+03TBeH3beNanMCqQBRk9t+Z80XApEBMcZQHZ0lb+Z0C6DOuY0elH/fOp1SGlXuzf+tgcv7+TzL5uVVFCBNyMonTwMEp+zbLjX2Ck1IHhp8JXi3ovVi8HNcKCOQx/fxX1qTSt2NulHTwP2urCQSZbGjnYuw==";
+    const unsigned char *to_decrypt = (unsigned char *)text;
+    if ((ret = mbedtls_pk_decrypt(&pk, to_decrypt, length, result, &olen, sizeof(result),
+                                  mbedtls_ctr_drbg_random, &ctr_drbg)) != 0)
+    {
+        ESP_LOGI(TAG, " failed\n  ! mbedtls_pk_decrypt returned -0x%04x\n", -ret);
+    }
+
+    ESP_LOGI(TAG, " SUCESS WITH DECRYPTING");
+
+    if (olen < sizeof(result)) {
+        result[olen] = '\0';
+    } else {
+        ESP_LOGI(TAG, "Decrypted data is too large for the result buffer");
+        // Handle this error case as needed
+    }
+
+    ESP_LOGI(TAG, "Decrypted string: %s", (char *)result);
+}
+
+// Function prototype for the new main task
+void new_main_task(void *pvParameter);
+void new_main_task(void *pvParameter)
+{
+    size_t length = rsa2048_encrypt("HELLO");
+    decrypt_test((char*)buf, length);
+    vTaskDelete(NULL);
+}
+
 void app_main(void)
 {
     char* TAG = "app_main";  // Declare and initialize TAG for logging purposes
@@ -328,8 +512,6 @@ void app_main(void)
     vTaskDelay(pdMS_TO_TICKS(1000));
     MQTT311_Publish(0x00, "/topic/topic2", 0x00, "Test123");
     vTaskDelay(pdMS_TO_TICKS(10000));
-
-    MQTT311_Publish(0x00, "/topic/topic3", 0x00, PGP_PUBLIC_KEY);
    
     /* ------ Subscribe to some topic ------ */
     MQTT311_Subscribe(0x02, "/topic/topic4", 0x00);
@@ -343,4 +525,7 @@ void app_main(void)
 
     /* ---- Test disconnecting ---- */
     // MQTT311_Disconnect();
+
+    // Create the new main task with the custom stack size
+    xTaskCreate(new_main_task, "new_main_task", MAIN_TASK_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
 }
