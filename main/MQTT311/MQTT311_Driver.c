@@ -87,9 +87,6 @@ static void prvMQTTCheckSubMesTask( void *pvParameters )
     /* Remove compiler warning about unused parameter. */
 	( void ) pvParameters;
 
-    /* Use TAG for debugging */
-    char* TAG = "prvMQTTCheckSubMesTask";
-
     TickType_t xNextWakeTime;
     xNextWakeTime = xTaskGetTickCount();
 
@@ -102,14 +99,7 @@ static void prvMQTTCheckSubMesTask( void *pvParameters )
             {
                 MQTT311_ReceiveFromMQTTBroker();
                 /*-------------------TODO---------------------*/
-                if (number_of_bytes_received > 20) 
-                {
-                    for (int i = 0; i < number_of_bytes_received; i++)
-                    {
-                        ESP_LOGI(TAG, "%c ", bytes_to_receive[i]);
-                    }
-                    number_of_bytes_received = 0;
-                }
+                MQTT311_ProcessBufferData();
                 /*-------------------TODO---------------------*/
                 /* Give back the semaphore (unlock) */
                 xSemaphoreGive( xMQTTSemaphore );

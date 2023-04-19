@@ -14,18 +14,23 @@
 
 #include "MQTT311/MQTT311.h"
 
-/* External Function */
+/* External functions for socket connection */
 typedef void (*MQTT311_ConnectTCPSocketPtr)(const char*, uint16_t);
 typedef void (*MQTT311_CloseTCPSocketPtr)(void);
 typedef void (*MQTT311_SendToTCPSocketPtr)(const char*, uint16_t);
 typedef void (*MQTT311_ReadFromTCPSocketPtr)(char*, uint16_t*);
-typedef void (*MQTT311_PrintPtr)(char*);
-
 extern MQTT311_ConnectTCPSocketPtr MQTT311_ConnectTCPSocket;
 extern MQTT311_CloseTCPSocketPtr MQTT311_CloseTCPSocket;
 extern MQTT311_SendToTCPSocketPtr MQTT311_SendToTCPSocket;
 extern MQTT311_ReadFromTCPSocketPtr MQTT311_ReadFromTCPSocket;
+
+/* External functions for debugging */
+typedef void (*MQTT311_PrintPtr)(char*);
 extern MQTT311_PrintPtr MQTT311_Print;
+
+/* External functions for data processing */
+typedef void (*MQTT311_ProcessBufferDataPtr)(void);
+extern MQTT311_ProcessBufferDataPtr MQTT311_ProcessBufferData;
 
 /* Function macros */
 #define NULL_CHECK(pointer)             if (pointer == NULL){ MQTT311_Print("Pointer NULL Error"); }
@@ -106,6 +111,7 @@ void MQTT311_SetCloseTCPSocket(MQTT311_CloseTCPSocketPtr close_tcp_socket);
 void MQTT311_SetSendToTCPSocket(MQTT311_SendToTCPSocketPtr send_to_tcp_socket);
 void MQTT311_SetReadFromTCPSocket(MQTT311_ReadFromTCPSocketPtr read_from_tcp_socket);
 void MQTT311_SetPrint(MQTT311_PrintPtr print);
+void MQTT311_SetProcessBufferData(MQTT311_ProcessBufferDataPtr process_buffer_data);
 void MQTT311_SendMQTTPacket(struct MQTTPacket *mqtt_packet);
 void MQTT311_CreateClient(const char* deviceID);
 void MQTT311_SetUsernameAndPassword(const char* username, const char* password);

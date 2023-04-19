@@ -19,6 +19,7 @@ MQTT311_CloseTCPSocketPtr MQTT311_CloseTCPSocket = NULL;
 MQTT311_SendToTCPSocketPtr MQTT311_SendToTCPSocket = NULL;
 MQTT311_ReadFromTCPSocketPtr MQTT311_ReadFromTCPSocket = NULL;
 MQTT311_PrintPtr MQTT311_Print = NULL;
+MQTT311_ProcessBufferDataPtr MQTT311_ProcessBufferData = NULL;
 
 /* UserData structure */
 struct UserData userdata;
@@ -82,6 +83,15 @@ void MQTT311_SetReadFromTCPSocket(MQTT311_ReadFromTCPSocketPtr read_from_tcp_soc
 void MQTT311_SetPrint(MQTT311_PrintPtr print) 
 {
     MQTT311_Print = print;
+}
+
+/**
+ * @brief Sets the MQTT 3.1.1 process buffer data function.
+ * @param print Function pointer to the user-defined MQTT 3.1.1 process buffer data function.
+ */
+void MQTT311_SetProcessBufferData(MQTT311_ProcessBufferDataPtr process_buffer_data)
+{
+    MQTT311_ProcessBufferData = process_buffer_data;
 }
 
 /**

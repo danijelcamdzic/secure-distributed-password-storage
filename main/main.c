@@ -263,7 +263,7 @@ void send_tcp_data(const char* data, uint16_t size)
 }
 
 
-void receive_tcp_data(char* rx_buffer, uint16_t* number_of_bytes_received) 
+void receive_tcp_data(char* rx_buffer, uint16_t* number_of_bytes_received)
 {
     char* TAG = "receive_tcp_data"; // Declare and initialize TAG for logging purposes                                                         
 
@@ -292,6 +292,21 @@ void debug_print(char* message)
     ESP_LOGI(TAG, "%s", message);               // Log the input message with ESP_LOGI function
 }
 
+void process_buffer_data(void) 
+{
+    /* Send debugging information */
+    if (number_of_bytes_received > 20) 
+    {
+        for (int i = 0; i < number_of_bytes_received; i++)
+        {
+            printf("%c ", bytes_to_receive[i]);
+        }
+        printf("\n");
+
+        number_of_bytes_received = 0;
+    }
+}
+
 void app_main(void)
 {
     char* TAG = "app_main";  // Declare and initialize TAG for logging purposes
@@ -309,10 +324,11 @@ void app_main(void)
     wifi_init_sta();
 
     /* --- Set External Functions --- */
-    MQTT311_SetPrint(debug_print);
     MQTT311_SetConnectTCPSocket(connect_tcp_socket);
     MQTT311_SetSendToTCPSocket(send_tcp_data);
     MQTT311_SetReadFromTCPSocket(receive_tcp_data);
+    MQTT311_SetPrint(debug_print);
+    MQTT311_SetProcessBufferData(process_buffer_data);
 
     /* ---- Start FreeRTOS Tasks ---- */
     MQTT311_CreateMQTTFreeRTOSTasks();
