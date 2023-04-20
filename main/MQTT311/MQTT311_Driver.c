@@ -87,9 +87,6 @@ static void prvMQTTCheckSubMesTask( void *pvParameters )
     /* Remove compiler warning about unused parameter. */
 	( void ) pvParameters;
 
-    /* Use TAG for debugging */
-    char* TAG = "prvMQTTCheckSubMesTask";
-
     TickType_t xNextWakeTime;
     xNextWakeTime = xTaskGetTickCount();
 
@@ -101,16 +98,8 @@ static void prvMQTTCheckSubMesTask( void *pvParameters )
             if( xSemaphoreTake( xMQTTSemaphore, portMAX_DELAY ) == pdTRUE )
             {
                 MQTT311_ReceiveFromMQTTBroker();
-                /*-------------------TODO---------------------*/
-                if (number_of_bytes_received > 20) 
-                {
-                    for (int i = 0; i < number_of_bytes_received; i++)
-                    {
-                        ESP_LOGI(TAG, "%c ", bytes_to_receive[i]);
-                    }
-                    number_of_bytes_received = 0;
-                }
-                /*-------------------TODO---------------------*/
+                /* Process the buffer data */
+                MQTT311_ProcessBufferData();
                 /* Give back the semaphore (unlock) */
                 xSemaphoreGive( xMQTTSemaphore );
                 /* Delay the task */
@@ -150,7 +139,7 @@ void MQTT311_CreateMQTTFreeRTOSTasks(void)
     NULL_CHECK(xMQTTSemaphore)
 
     /* Creating a task */
-    xTaskCreate( prvMQTTQueueSendTask, "MQTTTx", 4*configMINIMAL_STACK_SIZE, NULL, mqttQUEUE_SEND_TASK_PRIORITY, &xMQTTSendTask );
-    xTaskCreate( prvMQTTCheckSubMesTask, "MQTTSubMes", 4*configMINIMAL_STACK_SIZE, NULL, mqttCHECK_SUB_MES_TASK_PRIORITY, &xMQTTCheckSubMesTask );
+    xTaskCreate( prvMQTTQueueSendTask, "MQTTTx", 8*configMINIMAL_STACK_SIZE, NULL, mqttQUEUE_SEND_TASK_PRIORITY, &xMQTTSendTask );
+    xTaskCreate( prvMQTTCheckSubMesTask, "MQTTSubMes", 8*configMINIMAL_STACK_SIZE, NULL, mqttCHECK_SUB_MES_TASK_PRIORITY, &xMQTTCheckSubMesTask );
 }
 
