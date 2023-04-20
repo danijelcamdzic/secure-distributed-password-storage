@@ -81,35 +81,6 @@ static EventGroupHandle_t s_wifi_event_group;
 /* TCP Socket */
 int sock;
 unsigned char buf[MBEDTLS_MPI_MAX_SIZE] = {0};
-    const unsigned char *private_key = (const unsigned char *)"-----BEGIN PRIVATE KEY-----\n"
-                                                            "MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQC240GJf9WuE/vW\n"
-                                                            "z7JMinulBsOQZ8JBgmxrZPDRDg/8JpeINU5r58p/0rEfrQv4xTbiMa4/zeAoDv0M\n"
-                                                            "X4eLT3yAuoKjnPxPPiWI1XgjvzNsJQ330RlIWSvSVIXb/yRFOh4GMhDxE7FlDciQ\n"
-                                                            "1tCov4Q4aDAPf2mt84UEeIg2G1g/TUe7Pyp4a01RepzaWjvS9DGbp9EX7P7orYJd\n"
-                                                            "d/XHpzw8wu+sTlp1EzfPf5kPAu5DeJgZYh1x1zTzVezpQzMaA1/WyzybpknPESVi\n"
-                                                            "rJewIjp5TflWvn7tAiY5gNecmL7UiIQeNoGITKkmHd0mTubWgYvNHcUDaFW6OhNc\n"
-                                                            "xayqOZanAgMBAAECggEAGLcm2NwhFmtg8gC+NGsqlny5hRRgmNXKrSDGYponPYjs\n"
-                                                            "RYi0AQ/MD/DQkFqkbt7IB1LLckKc87eYKZ88rsOegbmy2fA8hhZR9ZH+WxEFyVb1\n"
-                                                            "8khHGxM3QYS7/6UVU72s57gbDgP+nzd4+V9Dx5T022KedsRd6xd+dxeK4N+v0gNM\n"
-                                                            "aqaSyzCxWwHkUN1g8nZgIqe/UM0N/cpGsiF4tUZSb+m8oUtXVz4Phz6ismaQv0yH\n"
-                                                            "B/nRJkpjdI7VAeSnQOoBQy1EvO37cs5gk2+T+FaHM3qQlXGYzPoyG1+mLs/Zarpd\n"
-                                                            "vgNNWEfRhVkEpysI7dqbbv56bnEKn5cVH3m6j5YeAQKBgQDf17VAdL+YTnkI7GQu\n"
-                                                            "uK1jz/+ESCcdlSFVIFryBuCEPra3E57J6vkzwg41Us6tW3qOsikqgLiGZAUIDReH\n"
-                                                            "PgXQqvoVpygCSpux8LTMVvrAwOi/qO/hIPVGIg5wx6L5Ot58rqnAI1j879O0apRA\n"
-                                                            "cCJT1eWFRAefUnMxNxnfZi3EJwKBgQDRKVgUPc2u7l7h/TZhH7EUQT7WRFNbFmCX\n"
-                                                            "8YNLR8ojR7YbkMRH1jJBGafAZKnJJeOH+OqkbvIx8+9S8m/kWg5WlHm6MLXD/0VG\n"
-                                                            "YN8C3fx1jsxuzkCXK8EOQV2pLxWPfjrsvGz1oLF8ixSqfbpM4o9u4IW6/X/v/BYP\n"
-                                                            "1tBCY3SpgQKBgQDRTYHNo10DrVy/W0rR5R08F2F074Kjxq5ESty/Mm79OSbgSRhQ\n"
-                                                            "9cXO/8UJV0SqFL+kbjLP60yfXSbXQGafrv8A/t6ZIJPokJrE564m463UTo1TqUOj\n"
-                                                            "3o155p5aFlHteX5QV4Gih2rOF/J84Kt/FVsDyR20XshB0XakrkEjAwgIQQKBgQCk\n"
-                                                            "ZB9TAWRIihdO/UohOdxetA0kMN1m6QaQRYTQxSLNac5qifSLFYG4AucC4ttDOiFD\n"
-                                                            "vFMHXB/FPRkrk1p4GoPMbrPhr+kcm+ShtP9ybHDBILPynu7LIduBTcTEdTo35pl/\n"
-                                                            "eXUV9O+qmFFs0pZ7WVIsbhENb7J/Nx1L46UZmLuXgQKBgQDfMuU4K1jb8PCno5Uk\n"
-                                                            "Dsrpp60GPyflskervoSqENy5yWNY7D2VEdFHRkz1BIRyTBXmsccrjPt+Co73aea2\n"
-                                                            "n4CPCoQir7jkVTeKnZB8mZyZKOBYPGYeo46Bx4yTRvTZ9SuGmdtmvaTC6z1475Wx\n"
-                                                            "zOnlXq5SzkJViJXh2CtNAthK4Q==\n"
-                                                            "-----END PRIVATE KEY-----\n";
-
 const unsigned char *key = (const unsigned char *)"-----BEGIN PUBLIC KEY-----\n"
                                                 "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtuNBiX/VrhP71s+yTIp7\n"
                                                 "pQbDkGfCQYJsa2Tw0Q4P/CaXiDVOa+fKf9KxH60L+MU24jGuP83gKA79DF+Hi098\n"
@@ -119,6 +90,34 @@ const unsigned char *key = (const unsigned char *)"-----BEGIN PUBLIC KEY-----\n"
                                                 "eU35Vr5+7QImOYDXnJi+1IiEHjaBiEypJh3dJk7m1oGLzR3FA2hVujoTXMWsqjmW\n"
                                                 "pwIDAQAB\n"
                                                 "-----END PUBLIC KEY-----\n";
+const unsigned char *private_key = (const unsigned char *)"-----BEGIN PRIVATE KEY-----\n"
+                                                        "MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQC240GJf9WuE/vW\n"
+                                                        "z7JMinulBsOQZ8JBgmxrZPDRDg/8JpeINU5r58p/0rEfrQv4xTbiMa4/zeAoDv0M\n"
+                                                        "X4eLT3yAuoKjnPxPPiWI1XgjvzNsJQ330RlIWSvSVIXb/yRFOh4GMhDxE7FlDciQ\n"
+                                                        "1tCov4Q4aDAPf2mt84UEeIg2G1g/TUe7Pyp4a01RepzaWjvS9DGbp9EX7P7orYJd\n"
+                                                        "d/XHpzw8wu+sTlp1EzfPf5kPAu5DeJgZYh1x1zTzVezpQzMaA1/WyzybpknPESVi\n"
+                                                        "rJewIjp5TflWvn7tAiY5gNecmL7UiIQeNoGITKkmHd0mTubWgYvNHcUDaFW6OhNc\n"
+                                                        "xayqOZanAgMBAAECggEAGLcm2NwhFmtg8gC+NGsqlny5hRRgmNXKrSDGYponPYjs\n"
+                                                        "RYi0AQ/MD/DQkFqkbt7IB1LLckKc87eYKZ88rsOegbmy2fA8hhZR9ZH+WxEFyVb1\n"
+                                                        "8khHGxM3QYS7/6UVU72s57gbDgP+nzd4+V9Dx5T022KedsRd6xd+dxeK4N+v0gNM\n"
+                                                        "aqaSyzCxWwHkUN1g8nZgIqe/UM0N/cpGsiF4tUZSb+m8oUtXVz4Phz6ismaQv0yH\n"
+                                                        "B/nRJkpjdI7VAeSnQOoBQy1EvO37cs5gk2+T+FaHM3qQlXGYzPoyG1+mLs/Zarpd\n"
+                                                        "vgNNWEfRhVkEpysI7dqbbv56bnEKn5cVH3m6j5YeAQKBgQDf17VAdL+YTnkI7GQu\n"
+                                                        "uK1jz/+ESCcdlSFVIFryBuCEPra3E57J6vkzwg41Us6tW3qOsikqgLiGZAUIDReH\n"
+                                                        "PgXQqvoVpygCSpux8LTMVvrAwOi/qO/hIPVGIg5wx6L5Ot58rqnAI1j879O0apRA\n"
+                                                        "cCJT1eWFRAefUnMxNxnfZi3EJwKBgQDRKVgUPc2u7l7h/TZhH7EUQT7WRFNbFmCX\n"
+                                                        "8YNLR8ojR7YbkMRH1jJBGafAZKnJJeOH+OqkbvIx8+9S8m/kWg5WlHm6MLXD/0VG\n"
+                                                        "YN8C3fx1jsxuzkCXK8EOQV2pLxWPfjrsvGz1oLF8ixSqfbpM4o9u4IW6/X/v/BYP\n"
+                                                        "1tBCY3SpgQKBgQDRTYHNo10DrVy/W0rR5R08F2F074Kjxq5ESty/Mm79OSbgSRhQ\n"
+                                                        "9cXO/8UJV0SqFL+kbjLP60yfXSbXQGafrv8A/t6ZIJPokJrE564m463UTo1TqUOj\n"
+                                                        "3o155p5aFlHteX5QV4Gih2rOF/J84Kt/FVsDyR20XshB0XakrkEjAwgIQQKBgQCk\n"
+                                                        "ZB9TAWRIihdO/UohOdxetA0kMN1m6QaQRYTQxSLNac5qifSLFYG4AucC4ttDOiFD\n"
+                                                        "vFMHXB/FPRkrk1p4GoPMbrPhr+kcm+ShtP9ybHDBILPynu7LIduBTcTEdTo35pl/\n"
+                                                        "eXUV9O+qmFFs0pZ7WVIsbhENb7J/Nx1L46UZmLuXgQKBgQDfMuU4K1jb8PCno5Uk\n"
+                                                        "Dsrpp60GPyflskervoSqENy5yWNY7D2VEdFHRkz1BIRyTBXmsccrjPt+Co73aea2\n"
+                                                        "n4CPCoQir7jkVTeKnZB8mZyZKOBYPGYeo46Bx4yTRvTZ9SuGmdtmvaTC6z1475Wx\n"
+                                                        "zOnlXq5SzkJViJXh2CtNAthK4Q==\n"
+                                                        "-----END PRIVATE KEY-----\n";
 
 #define MAIN_TASK_STACK_SIZE 8192
 
@@ -319,7 +318,7 @@ void receive_tcp_data(void)
     }
 
     while(1) {
-        char temp_buffer[10]; // Define a temporary buffer of length 10
+        char temp_buffer[15]; // Define a temporary buffer of length 10
 
         /* Receive data from the socket */
         int len = recv(sock, temp_buffer, sizeof(temp_buffer) - 1, 0);
@@ -357,7 +356,7 @@ size_t rsa2048_encrypt(const char *text)
     mbedtls_entropy_context entropy;
     mbedtls_entropy_init(&entropy);
     mbedtls_ctr_drbg_context ctr_drbg;
-    const char *personalization = "mgkegneljgnjlwgnjefdcmeg12313123dsggsd";
+    const char *personalization = "ewkjfhiuercuieabkuaeuwrhukf";
 
     mbedtls_ctr_drbg_init(&ctr_drbg);
 
@@ -425,7 +424,7 @@ void decrypt_test(char* text, size_t length)
     mbedtls_entropy_context entropy;
     mbedtls_entropy_init(&entropy);
     mbedtls_ctr_drbg_context ctr_drbg;
-    const char *personalization = "mgkegneljgnjlwgnjefdcmeg12313123dsggsd";
+    const char *personalization = "wefoierncniuerhfiowenjfkwebufu";
 
     mbedtls_ctr_drbg_init(&ctr_drbg);
 
@@ -466,7 +465,7 @@ void decrypt_test(char* text, size_t length)
         ESP_LOGI(TAG, " failed\n  ! mbedtls_pk_decrypt returned -0x%04x\n", -ret);
     }
 
-    ESP_LOGI(TAG, " SUCESS WITH DECRYPTING");
+    ESP_LOGI(TAG, " SUCCESS WITH DECRYPTING");
 
     if (olen < sizeof(result)) {
         result[olen] = '\0';
@@ -482,7 +481,7 @@ void decrypt_test(char* text, size_t length)
 void new_main_task(void *pvParameter);
 void new_main_task(void *pvParameter)
 {
-    size_t length = rsa2048_encrypt("HELLO");
+    size_t length = rsa2048_encrypt("Hello, my name is Danijel. Nice to meet you!");
     decrypt_test((char*)buf, length);
     vTaskDelete(NULL);
 }
@@ -527,8 +526,8 @@ void process_buffer_data(void)
     int index2 = find_substring_index(str2, strlen(str2));
 
     if ((index1 != -1) && (index2 != -1)) {
-        printf("Index of str1: %d\n", index1);
-        printf("Index of str2: %d\n", index2);
+        // printf("Index of str1: %d\n", index1);
+        // printf("Index of str2: %d\n", index2);
 
         for (int i = index1 + strlen(str1); i < index2; i++)
         {
