@@ -18,7 +18,7 @@
 typedef void (*MQTT311_ConnectTCPSocketPtr)(const char*, uint16_t);
 typedef void (*MQTT311_CloseTCPSocketPtr)(void);
 typedef void (*MQTT311_SendToTCPSocketPtr)(const char*, uint16_t);
-typedef void (*MQTT311_ReadFromTCPSocketPtr)(char*, uint16_t*);
+typedef void (*MQTT311_ReadFromTCPSocketPtr)(void);
 extern MQTT311_ConnectTCPSocketPtr MQTT311_ConnectTCPSocket;
 extern MQTT311_CloseTCPSocketPtr MQTT311_CloseTCPSocket;
 extern MQTT311_SendToTCPSocketPtr MQTT311_SendToTCPSocket;
@@ -97,7 +97,7 @@ extern struct UserData userdata;
 /* Bytes to send to function */
 extern volatile char bytes_to_send[10000];
 extern volatile char bytes_to_receive[10000];
-extern uint16_t number_of_bytes_received; 
+extern volatile uint16_t number_of_bytes_received; 
 
 /* Variable used to keep track of indexes */
 extern uint16_t current_index;

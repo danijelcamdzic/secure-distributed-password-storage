@@ -18,8 +18,8 @@
 #define mqttCHECK_SUB_MES_TASK_PRIORITY	    ( tskIDLE_PRIORITY + 2 )
 
 /* Time definitions */
-#define mainMQTT_SEND_FREQUENCY_MS          (100/portTICK_PERIOD_MS)
-#define mainMQTT_SUB_MES_FREQUENCY_MS       (100/portTICK_PERIOD_MS)
+#define mainMQTT_SEND_FREQUENCY_MS          (1000/portTICK_PERIOD_MS)
+#define mainMQTT_SUB_MES_FREQUENCY_MS       (1000/portTICK_PERIOD_MS)
 
 /* Task Handle */
 extern TaskHandle_t xMQTTSendTask;

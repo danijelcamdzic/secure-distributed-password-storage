@@ -263,25 +263,36 @@ void send_tcp_data(const char* data, uint16_t size)
 }
 
 
-void receive_tcp_data(char* rx_buffer, uint16_t* number_of_bytes_received)
+void receive_tcp_data(void)
 {
-    char* TAG = "receive_tcp_data"; // Declare and initialize TAG for logging purposes                                                         
+    char* TAG = "receive_tcp_data"; // Declare and initialize TAG for logging purposes                                                  
 
     /* Set socket to non-blocking mode */
     if (fcntl(sock, F_SETFL, fcntl(sock, F_GETFL) | O_NONBLOCK) < 0) {
         ESP_LOGI(TAG, "Cannot put socket in non-blocking mode");        // Log error if unable to set non-blocking mode
     }
 
-    /* Receive data from the socket */
-    int len = recv(sock, &rx_buffer[*number_of_bytes_received], sizeof(rx_buffer) - 1, 0);
+    while(1) {
+        char temp_buffer[10]; // Define a temporary buffer of length 10
 
-    if (len < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
-        ESP_LOGI(TAG, "No data to read");                               // Log if no data is available to read
-    } else if (len < 0) {
-        ESP_LOGI(TAG, "Error during reception");                        // Log if an error occurred during receiving
-    } else {
-        *number_of_bytes_received += len;                               // Increment the number of bytes received
-        ESP_LOGI(TAG, "Received %d bytes", *number_of_bytes_received);  // Log the number of bytes received
+        /* Receive data from the socket */
+        int len = recv(sock, temp_buffer, sizeof(temp_buffer) - 1, 0);
+
+        if (len < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
+            ESP_LOGI(TAG, "No data to read");                               // Log if no data is available to read
+            break;
+        } else if (len < 0) {
+            ESP_LOGI(TAG, "Error during reception");                        // Log if an error occurred during receiving
+            break;
+        } else {
+            /* Concatenate the received data to the existing data in the bytes_to_receive */
+            memcpy((void *)(bytes_to_receive + number_of_bytes_received), (const void *) temp_buffer, len);
+
+            number_of_bytes_received += len;                                // Increment the number of bytes received
+
+            ESP_LOGI(TAG, "Received bytes: %d ", len);
+        }
+        vTaskDelay(pdMS_TO_TICKS(50));
     }
 }
 
@@ -292,19 +303,57 @@ void debug_print(char* message)
     ESP_LOGI(TAG, "%s", message);               // Log the input message with ESP_LOGI function
 }
 
+int find_substring_index(const char *substr, size_t substr_len) {
+    if (substr_len > number_of_bytes_received) {
+        return -1;
+    }
+
+    for (size_t i = 0; i <= number_of_bytes_received - substr_len; ++i) {
+        bool match = true;
+        for (size_t j = 0; j < substr_len; ++j) {
+            if (bytes_to_receive[i + j] != substr[j]) {
+                match = false;
+                break;
+            }
+        }
+        if (match) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 void process_buffer_data(void) 
 {
+    char* TAG = "process_buffer_data"; // Declare and initialize TAG for logging purposes  
+
+    ESP_LOGI(TAG, "Here is the total length of the buffer so far: %d ", number_of_bytes_received);
+
     /* Send debugging information */
-    if (number_of_bytes_received > 20) 
-    {
-        for (int i = 0; i < number_of_bytes_received; i++)
+    // for (int i = 0; i < number_of_bytes_received; i++)
+    // {
+    //     printf("%c ", bytes_to_receive[i]);
+    // }
+    // printf("\n");
+
+    char* str1 = "/topic/topic3";
+    char* str2 = "END_MESSAGE";
+
+    int index1 = find_substring_index(str1, strlen(str1));
+    int index2 = find_substring_index(str2, strlen(str2));
+
+    if ((index1 != -1) && (index2 != -1)) {
+        printf("Index of str1: %d\n", index1);
+        printf("Index of str2: %d\n", index2);
+
+        for (int i = index1 + strlen(str1); i < index2; i++)
         {
             printf("%c ", bytes_to_receive[i]);
         }
         printf("\n");
-
-        number_of_bytes_received = 0;
     }
+
+    number_of_bytes_received = 0;
 }
 
 void app_main(void)
@@ -344,11 +393,11 @@ void app_main(void)
     vTaskDelay(pdMS_TO_TICKS(1000));
     MQTT311_Publish(0x00, "/topic/topic2", 0x00, "Test123");
     vTaskDelay(pdMS_TO_TICKS(10000));
-
-    MQTT311_Publish(0x00, "/topic/topic3", 0x00, PGP_PUBLIC_KEY);
    
     /* ------ Subscribe to some topic ------ */
-    MQTT311_Subscribe(0x02, "/topic/topic4", 0x00);
+    MQTT311_Subscribe(0x02, "/topic/topic3", 0x00);
+    vTaskDelay(pdMS_TO_TICKS(5000));
+    // MQTT311_Publish(0x00, "/topic/topic3", 0x00, PGP_PUBLIC_KEY);
 
     /* ----- Unsubscribe to some topic ----- */
     // vTaskDelay(pdMS_TO_TICKS(1000));

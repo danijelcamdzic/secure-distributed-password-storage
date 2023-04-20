@@ -25,9 +25,9 @@ MQTT311_ProcessBufferDataPtr MQTT311_ProcessBufferData = NULL;
 struct UserData userdata;
 
 /* Bytes to send to function */
-volatile char bytes_to_send[10000];
-volatile char bytes_to_receive[10000];
-uint16_t number_of_bytes_received = 0; 
+volatile char bytes_to_send[10000] = {0};
+volatile char bytes_to_receive[10000] = {0};
+volatile uint16_t number_of_bytes_received = 0; 
 
 /* Variable to keep track of indexes */
 uint16_t current_index;
@@ -325,7 +325,7 @@ void MQTT311_SendToMQTTBroker(uint16_t size)
  */ 
 void MQTT311_ReceiveFromMQTTBroker(void) 
 {
-    MQTT311_ReadFromTCPSocket((char*)bytes_to_receive, &number_of_bytes_received);
+    MQTT311_ReadFromTCPSocket();
 }
 
 /**
