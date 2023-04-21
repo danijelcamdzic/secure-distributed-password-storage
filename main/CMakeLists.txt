@@ -15,4 +15,7 @@ idf_component_register(SRCS "main.c"
                             "MQTT311/MQTT311_Pingreq.c"
                             "MQTT311/MQTT311_Pingresp.c"
                             "MQTT311/MQTT311_Disconnect.c"
-                    INCLUDE_DIRS "." "MQTT311")
+                            "RSA/RSA.c"
+                            "RSA/RSA_Encrypt.c"
+                            "RSA/RSA_Decrypt.c"
+                    INCLUDE_DIRS "." "MQTT311" "RSA")
