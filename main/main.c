@@ -4,22 +4,8 @@
    software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
    CONDITIONS OF ANY KIND, either express or implied.
 */
-#include <string.h>
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/event_groups.h"
-#include "esp_system.h"
-#include "esp_wifi.h"
-#include "esp_event.h"
-#include "esp_log.h"
-#include "nvs_flash.h"
-#include <netdb.h>
-#include <fcntl.h>
-
-#include "lwip/err.h"
-#include "lwip/sys.h"
-
-#include "MQTT311/MQTT311.h"
+#include "main.h"
+#include "MQTT311Client/MQTT311Client.h"
 #include "RSA/RSA.h"
 
 /* This uses WiFi configuration that you can set via project configuration menu
@@ -59,11 +45,6 @@
 #define ESP_WIFI_SCAN_AUTH_MODE_THRESHOLD WIFI_AUTH_WAPI_PSK
 #endif
 
-/* Defines for configuring the TCP Socket for IPv4 */
-#ifndef CONFIG_EXAMPLE_IPV4
-#define CONFIG_EXAMPLE_IPV4
-#endif
-
 /* The event group allows multiple bits for each event, but we only care about two events:
  * - we are connected to the AP with an IP
  * - we failed to connect after the maximum amount of retries */
@@ -72,9 +53,6 @@
 
 /* FreeRTOS event group to signal when we are connected*/
 static EventGroupHandle_t s_wifi_event_group;
-
-/* TCP Socket */
-int sock;
 
 /* Number of retries for connection */
 static int s_retry_num = 0;
@@ -193,176 +171,6 @@ void wifi_init_sta(void)
     }
 }
 
-void connect_tcp_socket(const char* brokerAddress, uint16_t port) 
-{
-    /* Connect to a TCP socket */
-    char* TAG = "send_tcp_data"; // Declare and initialize TAG for logging purposes
-
-    int addr_family = 0;
-    int ip_protocol = 0;
-    struct sockaddr_in dest_addr;
-
-    /* Configure for IPv4 */
-#if defined(CONFIG_EXAMPLE_IPV4)
-    struct addrinfo hints;
-    struct addrinfo *res;
-    memset(&hints, 0, sizeof(hints));   // Initialize hints structure with zeroes
-    hints.ai_family = AF_INET;          // Specify address family as IPv4
-    hints.ai_socktype = SOCK_STREAM;    // Specify socket type as stream
-    hints.ai_protocol = IPPROTO_IP;     // Specify IP protocol
-
-    char port_str[6];
-    snprintf(port_str, sizeof(port_str), "%d", port); // Convert port to string
-
-    /* Resolve DNS name */
-    int result = getaddrinfo(brokerAddress, port_str, &hints, &res); // Get address info of the broker
-    if (result != 0) {
-        ESP_LOGI(TAG, "Could not resolve DNS name..."); // Log if DNS name resolution failed
-        return;
-    }
-
-    memcpy(&dest_addr, res->ai_addr, res->ai_addrlen); // Copy resolved address to destination address structure
-    addr_family = AF_INET; // Set address family to IPv4
-    ip_protocol = IPPROTO_IP; // Set IP protocol
-    freeaddrinfo(res); // Free the memory allocated for address info
-#endif
-
-    /* Create the socket */
-    sock = socket(addr_family, SOCK_STREAM, ip_protocol);
-    if (sock < 0) {
-        ESP_LOGI(TAG, "Unable to create socket: errno %d", errno); // Log if socket creation failed
-        return;
-    }
-    ESP_LOGI(TAG, "Socket created, connecting to %s:%d", brokerAddress, port); // Log socket creation success
-
-    /* Connect to the socket */
-    int err = connect(sock, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
-    if (err != 0) {
-        ESP_LOGI(TAG, "Socket unable to connect: errno %d", errno); // Log if socket connection failed
-        close(sock); // Close the socket
-        return;
-    }
-    ESP_LOGI(TAG, "Socket successfully connected"); // Log socket connection success
-}
-
-void send_tcp_data(const char* data, uint16_t size)
-{
-    /* Send data over TCP connection */
-    char* TAG = "send_tcp_data";                            // Declare and initialize TAG for logging purposes
-
-    int err = send(sock, data, size, 0);                    // Send data through the socket
-
-    // Check if data was sent successfully
-    if (err < 0) {
-        ESP_LOGI(TAG, "Failed to send data...");      // Log if data sending failed
-    } else {
-        ESP_LOGI(TAG, "Succeeded sending data..");   // Log if data sending succeeded
-    }
-}
-
-void receive_tcp_data(void)
-{
-    char* TAG = "receive_tcp_data"; // Declare and initialize TAG for logging purposes                                                  
-
-    /* Set socket to non-blocking mode */
-    if (fcntl(sock, F_SETFL, fcntl(sock, F_GETFL) | O_NONBLOCK) < 0) {
-        ESP_LOGI(TAG, "Cannot put socket in non-blocking mode");        // Log error if unable to set non-blocking mode
-    }
-
-    while(1) {
-        char temp_buffer[15]; // Define a temporary buffer of length 10
-
-        /* Receive data from the socket */
-        int len = recv(sock, temp_buffer, sizeof(temp_buffer) - 1, 0);
-
-        if (len < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
-            ESP_LOGI(TAG, "No data to read");                               // Log if no data is available to read
-            break;
-        } else if (len < 0) {
-            ESP_LOGI(TAG, "Error during reception");                        // Log if an error occurred during receiving
-            break;
-        } else {
-            /* Concatenate the received data to the existing data in the bytes_to_receive */
-            memcpy((void *)(bytes_to_receive + number_of_bytes_received), (const void *) temp_buffer, len);
-
-            number_of_bytes_received += len;                                // Increment the number of bytes received
-
-            ESP_LOGI(TAG, "Received bytes: %d ", len);
-        }
-        vTaskDelay(pdMS_TO_TICKS(50));
-    }
-}
-
-void debug_print(char* message) 
-{
-    /* Send debugging information */
-    char* TAG = "debug_print";                  // Declare and initialize TAG for logging purposes
-    ESP_LOGI(TAG, "%s", message);               // Log the input message with ESP_LOGI function
-}
-
-int find_substring_index(const char *substr, size_t substr_len) {
-    if (substr_len > number_of_bytes_received) {
-        return -1;
-    }
-
-    for (size_t i = 0; i <= number_of_bytes_received - substr_len; ++i) {
-        bool match = true;
-        for (size_t j = 0; j < substr_len; ++j) {
-            if (bytes_to_receive[i + j] != substr[j]) {
-                match = false;
-                break;
-            }
-        }
-        if (match) {
-            return i;
-        }
-    }
-    return -1;
-}
-
-void process_buffer_data(void) 
-{
-    char* TAG = "process_buffer_data"; // Declare and initialize TAG for logging purposes  
-
-    ESP_LOGI(TAG, "Here is the total length of the buffer so far: %d ", number_of_bytes_received);
-
-    char* str1 = "/topic/topic3";
-    char* str2 = "END_MESSAGE";
-
-    int index1 = find_substring_index(str1, strlen(str1));
-    int index2 = find_substring_index(str2, strlen(str2));
-
-    if ((index1 != -1) && (index2 != -1)) {
-        int i = 0;
-
-        for (i = index1 + strlen(str1); i < index2; i++)
-        {
-            printf("%c ", bytes_to_receive[i]);
-            buf[i - index1 - strlen(str1)] = bytes_to_receive[i];
-        }
-        printf("\n");
-
-        length = index2-index1-strlen(str1);
-
-        printf("Received: %d bytes", length);
-
-        // text_to_encrypt = (char*) pvPortMalloc(index2-index1-strlen(str1));
-        // memcpy(text_to_encrypt, (void*)&bytes_to_receive[index1 + strlen(str1)], index2-index1-strlen(str1));
-
-        // // Null-terminate the copied string
-        // text_to_encrypt[index2-index1-strlen(str1)] = '\0';
-
-        ESP_LOGI(TAG, "Begin encryption and decryption");
-
-        // Encrypt and decrypt text
-        // RSA_StartEncryptionTask();
-        // vTaskDelay(pdMS_TO_TICKS(3000));
-        RSA_StartDecryptionTask();
-    }
-
-    number_of_bytes_received = 0;
-}
-
 void app_main(void)
 {
     char* TAG = "app_main";  // Declare and initialize TAG for logging purposes
@@ -380,39 +188,40 @@ void app_main(void)
     wifi_init_sta();
 
     /* --- Set External Functions --- */
-    MQTT311_SetConnectTCPSocket(connect_tcp_socket);
-    MQTT311_SetSendToTCPSocket(send_tcp_data);
-    MQTT311_SetReadFromTCPSocket(receive_tcp_data);
-    MQTT311_SetPrint(debug_print);
-    MQTT311_SetProcessBufferData(process_buffer_data);
+    MQTT311Client_SetConnectTCPSocket(connect_tcp_socket);
+    MQTT311Client_SetSendToTCPSocket(send_tcp_data);
+    MQTT311Client_SetReadFromTCPSocket(receive_tcp_data);
+    MQTT311Client_SetPrint(debug_print_mqtt);
+    MQTT311Client_SetProcessBufferData(process_buffer_data);
+    RSA_SetPrint(debug_print_rsa);
 
     /* ---- Start FreeRTOS Tasks ---- */
-    MQTT311_CreateMQTTFreeRTOSTasks();
+    MQTT311Client_CreateMQTTFreeRTOSTasks();
 
     /* ---- Connect to MQTT Broker ---- */
-    MQTT311_CreateClient("client_id_dado");
-    MQTT311_EstablishConnectionToMQTTBroker("mqtt.eclipseprojects.io", 1883);
-    MQTT311_SetUsernameAndPassword("", "");
-    MQTT311_Connect(0xC2, 600, "", "");
+    MQTT311Client_CreateClient("client_id_dado");
+    MQTT311Client_EstablishConnectionToMQTTBroker("mqtt.eclipseprojects.io", 1883);
+    MQTT311Client_SetUsernameAndPassword("", "");
+    MQTT311Client_Connect(0xC2, 600, "", "");
 
     /* ----- Publish some messages ------*/
-    MQTT311_Publish(0x00, "/topic/topic1", 0x00, "123test");
+    MQTT311Client_Publish(0x00, "/topic/topic1", 0x00, "123test");
     vTaskDelay(pdMS_TO_TICKS(1000));
-    MQTT311_Publish(0x00, "/topic/topic2", 0x00, "Test123");
+    MQTT311Client_Publish(0x00, "/topic/topic2", 0x00, "Test123");
     vTaskDelay(pdMS_TO_TICKS(10000));
    
     /* ------ Subscribe to some topic ------ */
-    MQTT311_Subscribe(0x02, "/topic/topic3", 0x00);
-    vTaskDelay(pdMS_TO_TICKS(5000));
-    // MQTT311_Publish(0x00, "/topic/topic3", 0x00, PGP_PUBLIC_KEY);
+    MQTT311Client_Subscribe(0x02, "/topic/topic3", 0x00);
+    // vTaskDelay(pdMS_TO_TICKS(5000));
+    // MQTT311Client_Publish(0x00, "/topic/topic3", 0x00, PGP_PUBLIC_KEY);
 
     /* ----- Unsubscribe to some topic ----- */
     // vTaskDelay(pdMS_TO_TICKS(1000));
-    // MQTT311_Unsubscribe(0x02, "/topic/mihajlo");
+    // MQTT311Client_Unsubscribe(0x02, "/topic/mihajlo");
 
     /* ----- Test pinging ------ */
-    MQTT311_Pingreq();
+    // MQTT311Client_Pingreq();
 
     /* ---- Test disconnecting ---- */
-    // MQTT311_Disconnect();
+    // MQTT311Client_Disconnect();
 }
