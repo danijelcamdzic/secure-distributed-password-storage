@@ -24,10 +24,17 @@
 
 #define UNSUB_RESERVED                      0x02    /* Reserved field of the header */
 
+/* Return Type of the Unsubscribe Message */
+typedef enum UnsubscribeMessageResult_e
+{
+    UNSUBSCRIBE_SUCCESS = 0,
+    UNSUBSCRIBE_FAIL
+} UnsubscribeMessageResult_t;
+
 /* UNSUBSCRIBE Message Structure */
 struct UNSUBSCRIBE_MESSAGE 
 {
-    void (*MQTT311Client_UnsubscribeWithStruct)(struct UNSUBSCRIBE_MESSAGE *);
+    UnsubscribeMessageResult_t (*MQTT311Client_UnsubscribeWithStruct)(struct UNSUBSCRIBE_MESSAGE *);
 
     char* topic_name;                               /* Topic name to unsubscribe from */
     

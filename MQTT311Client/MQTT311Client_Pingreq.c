@@ -13,7 +13,7 @@
 #include "MQTT311Client/MQTT311Client.h"
 
 /* Private function declaration */
-static void MQTT311Client_PingreqWithStruct(struct PINGREQ_MESSAGE *pingreq_message_data);
+static PingreqMessageResult_t MQTT311Client_PingreqWithStruct(struct PINGREQ_MESSAGE *pingreq_message_data);
 
 /**
  * @brief Sends a PINGREQ message to the MQTT broker using the provided message structure.
@@ -23,9 +23,9 @@ static void MQTT311Client_PingreqWithStruct(struct PINGREQ_MESSAGE *pingreq_mess
  *
  * @param pingreq_message_data Pointer to a `PINGREQ_MESSAGE` structure containing the PINGREQ message.
  *
- * @return None.
+ * @return PingreqMessageResult_t.
  */
-static void MQTT311Client_PingreqWithStruct(struct PINGREQ_MESSAGE *pingreq_message_data)
+static PingreqMessageResult_t MQTT311Client_PingreqWithStruct(struct PINGREQ_MESSAGE *pingreq_message_data)
 {
     current_index = 0;
 
@@ -40,19 +40,30 @@ static void MQTT311Client_PingreqWithStruct(struct PINGREQ_MESSAGE *pingreq_mess
     /* Append remaining size */
     MQTT311_SEND_BUFFER[1] = pingreq_message_data->remaining_length;
 
-    /* Send data to server */
-    MQTT311Client_SendToMQTTBroker(current_index);
+    uint32_t redelivery_attempts = 0;
 
-    /* Read the acknowledge */
-    if(MQTT311Client_Pingresp())
+    while(redelivery_attempts < REDELIVERY_ATTEMPTS_MAX)
     {
-        MQTT311Client_Print("Successfull pinging!");
+        /* Send data to server */
+        MQTT311Client_SendToMQTTBroker(current_index);
+        
+        /* Read the acknowledge */
+        if(MQTT311Client_Pingresp())
+        {
+            MQTT311Client_Print("Successfull pinging!");
+            break;
+        }
+        else 
+        {
+            MQTT311Client_Print("Unsuccesfull pinging!");
+            vTaskDelay(pdMS_TO_TICKS(2000));
+            redelivery_attempts++;
+        }
     }
-    else 
-    {
-        MQTT311Client_Print("Unsuccesfull pinging!");
-        vTaskDelay(pdMS_TO_TICKS(1000));
-    }
+
+    PingreqMessageResult_t pingreq_result = (redelivery_attempts < REDELIVERY_ATTEMPTS_MAX) ? PINGREQ_SUCCESS:PINGREQ_FAIL;
+
+    return pingreq_result;
 }
 
 /**

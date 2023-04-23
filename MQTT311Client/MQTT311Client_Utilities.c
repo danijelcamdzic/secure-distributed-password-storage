@@ -110,27 +110,42 @@ void MQTT311Client_SendMQTTPacket(struct MQTTPacket *mqtt_packet)
     switch(mqtt_packet->mqtt_packet_type) 
     {
         case eCONNECT:
-            mqtt_packet->packet_data.connect_message_structure->MQTT311Client_ConnectWithStruct(mqtt_packet->packet_data.connect_message_structure);
+            ConnectMessageResult_t connect_result = mqtt_packet->packet_data.connect_message_structure->MQTT311Client_ConnectWithStruct(mqtt_packet->packet_data.connect_message_structure);
+            if (connect_result != CONNECT_SUCCESS) {
+                MQTT311Client_Print("Error sending the CONNECT packet..");
+            }   
             vPortFree(mqtt_packet->parent);
             break;
 
         case ePUBLISH:
-            mqtt_packet->packet_data.publish_message_structure->MQTT311Client_PublishWithStruct(mqtt_packet->packet_data.publish_message_structure);
+            PublishMessageResult_t publish_result = mqtt_packet->packet_data.publish_message_structure->MQTT311Client_PublishWithStruct(mqtt_packet->packet_data.publish_message_structure);
+            if (publish_result != PUBLISH_SUCCESS) {
+                MQTT311Client_Print("Error sending the PUBLISH packet..");
+            }
             vPortFree(mqtt_packet->parent);
             break;
 
         case eSUBSCRIBE:
-            mqtt_packet->packet_data.subscribe_message_structure->MQTT311Client_SubscribeWithStruct(mqtt_packet->packet_data.subscribe_message_structure);
+            SubscribeMessageResult_t subscribe_result = mqtt_packet->packet_data.publish_message_structure->MQTT311Client_PublishWithStruct(mqtt_packet->packet_data.publish_message_structure);
+            if (subscribe_result != SUBSCRIBE_SUCCESS) {
+                MQTT311Client_Print("Error sending the SUBSCRIBE packet..");
+            }
             vPortFree(mqtt_packet->parent);
             break;
 
         case eUNSUBSCRIBE:
-            mqtt_packet->packet_data.unsubscribe_message_structure->MQTT311Client_UnsubscribeWithStruct(mqtt_packet->packet_data.unsubscribe_message_structure);
+            UnsubscribeMessageResult_t unsubscribe_result = mqtt_packet->packet_data.unsubscribe_message_structure->MQTT311Client_UnsubscribeWithStruct(mqtt_packet->packet_data.unsubscribe_message_structure);
+            if (unsubscribe_result != UNSUBSCRIBE_SUCCESS) {
+                MQTT311Client_Print("Error sending the UNSUBSCRIBE packet..");
+            }
             vPortFree(mqtt_packet->parent);
             break;
 
         case ePINGREQ:
-            mqtt_packet->packet_data.pingreq_message_structure->MQTT311Client_PingreqWithStruct(mqtt_packet->packet_data.pingreq_message_structure);
+            PingreqMessageResult_t pingreq_result = mqtt_packet->packet_data.pingreq_message_structure->MQTT311Client_PingreqWithStruct(mqtt_packet->packet_data.pingreq_message_structure);
+            if (pingreq_result != PINGREQ_SUCCESS) {
+                MQTT311Client_Print("Error sending the PINGREQ packet..");
+            }
             vPortFree(mqtt_packet->parent);
             break;
 

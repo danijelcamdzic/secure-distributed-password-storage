@@ -11,7 +11,7 @@
 
 /* Private function declaration */
 static void MQTT311Client_AppendMessagePayload(const char* message_payload);
-static void MQTT311Client_PublishWithStruct(struct PUBLISH_MESSAGE *publish_message_data);
+static PublishMessageResult_t MQTT311Client_PublishWithStruct(struct PUBLISH_MESSAGE *publish_message_data);
 
 /**
  * @brief Appends data payload to the message
@@ -34,7 +34,7 @@ static void MQTT311Client_AppendMessagePayload(const char* message_payload)
  *
  * @return None
  */
-static void MQTT311Client_PublishWithStruct(struct PUBLISH_MESSAGE *publish_message_data) 
+static PublishMessageResult_t MQTT311Client_PublishWithStruct(struct PUBLISH_MESSAGE *publish_message_data) 
 {
     current_index = 0;
 
@@ -71,78 +71,67 @@ static void MQTT311Client_PublishWithStruct(struct PUBLISH_MESSAGE *publish_mess
     /* Encode remaining length if larger than 127 */
     MQTT311Client_CheckRemainingLength();
 
-    bool redelivery_flag = false;
+    uint32_t redelivery_attempts = 0;
 
-    while(!redelivery_flag) 
+    while(redelivery_attempts < REDELIVERY_ATTEMPTS_MAX)
     {
         /* Send data to server */
         MQTT311Client_SendToMQTTBroker(current_index);
 
-        /* Check puback only if QoS == 1 */
+        /* Check response in case QoS == 1 */
         if((publish_message_data->qos1) & !(publish_message_data->qos2))
         {
-            redelivery_flag = MQTT311Client_Puback(publish_message_data->packetIdentifier);
-
-            if(!redelivery_flag)
+            if(MQTT311Client_Puback(publish_message_data->packetIdentifier))
+            {
+                MQTT311Client_Print("Successfull publishing!");
+                break;
+            }
+            else
             {
                 MQTT311Client_Print("Republishing package...");
                 vTaskDelay(pdMS_TO_TICKS(3000));
 
                 /* Setting re-delivery flag */
                 MQTT311_SEND_BUFFER[1] |= (1 << DUP_FLAG);
-            }
-            else
-            {
-                break;
+
+                redelivery_attempts++;
             }
         }
-        /* Check pubrec only if QoS == 2 */
+        /* Check response in case QoS == 2 */
         else if(!(publish_message_data->qos1) & (publish_message_data->qos2))
         {
-            redelivery_flag = MQTT311Client_Puback(publish_message_data->packetIdentifier);
-            
-            /* Get correct order of ack messages from the server */
-            /* If puback was received */
-            if(redelivery_flag)
+            if (MQTT311Client_Puback(publish_message_data->packetIdentifier) && MQTT311Client_Pubrec(publish_message_data->packetIdentifier) &&
+                MQTT311Client_Pubrel(publish_message_data->packetIdentifier) && MQTT311Client_Pubcomp(publish_message_data->packetIdentifier))
             {
-                redelivery_flag = MQTT311Client_Pubrec(publish_message_data->packetIdentifier);
+                MQTT311Client_Print("Successfull publishing!");
+                break;
             }
-            
-            /* If pubrec was received */
-            if(redelivery_flag)
-            {
-                redelivery_flag = MQTT311Client_Pubrel(publish_message_data->packetIdentifier);
-            }
-
-            /* If pubrel was received */
-            if(redelivery_flag)
-            {
-                redelivery_flag = MQTT311Client_Pubcomp(publish_message_data->packetIdentifier);
-            }
-            
-            /* If pubcomp was received */
-            if(!redelivery_flag)
+            else
             {
                 MQTT311Client_Print("Republishing package...");
                 vTaskDelay(pdMS_TO_TICKS(3000));
 
                 /* Setting re-delivery flag */
                 MQTT311_SEND_BUFFER[1] |= (1 << DUP_FLAG);
-            }
-            else
-            {
-                break;
+
+                redelivery_attempts++;
             }
         }
         else
         {
+            MQTT311Client_Print("Successfull publishing!");
             break;
         }
     }
+
     /* Free dinamically allocated memory */
     vPortFree(publish_message_data->topicName);
     vPortFree(publish_message_data->payload);
     vPortFree(publish_message_data);
+
+    PublishMessageResult_t publish_result = (redelivery_attempts < REDELIVERY_ATTEMPTS_MAX) ? PUBLISH_SUCCESS:PUBLISH_FAIL;
+
+    return publish_result;
 }
 
 /**

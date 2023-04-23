@@ -57,7 +57,7 @@
 #define PINGRESP                        0xD0        /* PING response */
 #define DISCONNECT                      0xE0        /* Client is disconnecting */
 
-/* MQTT Protocol Constants */
-#define REMAINING_LENGTH_MAX            127         /* Maximum number for 1 byte representation of remaining length */
+/* MQTT Redelivery Attempts Number */
+#define REDELIVERY_ATTEMPTS_MAX         10          /* Defines how many times to redeliver the message before announcing failed delivery */
 
 #endif /* MQTT311Client_H */

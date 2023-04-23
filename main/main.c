@@ -208,20 +208,18 @@ void app_main(void)
     MQTT311Client_Publish(0x00, "/topic/topic1", 0x00, "123test");
     vTaskDelay(pdMS_TO_TICKS(1000));
     MQTT311Client_Publish(0x00, "/topic/topic2", 0x00, "Test123");
-    vTaskDelay(pdMS_TO_TICKS(10000));
+    vTaskDelay(pdMS_TO_TICKS(1000));
    
     /* ------ Subscribe to some topic ------ */
     MQTT311Client_Subscribe(0x02, "/topic/topic3", 0x00);
-    // vTaskDelay(pdMS_TO_TICKS(5000));
-    // MQTT311Client_Publish(0x00, "/topic/topic3", 0x00, PGP_PUBLIC_KEY);
 
     /* ----- Unsubscribe to some topic ----- */
-    // vTaskDelay(pdMS_TO_TICKS(1000));
-    // MQTT311Client_Unsubscribe(0x02, "/topic/mihajlo");
+    vTaskDelay(pdMS_TO_TICKS(1000));
+    MQTT311Client_Unsubscribe(0x02, "/topic/mihajlo");
 
     /* ----- Test pinging ------ */
-    // MQTT311Client_Pingreq();
+    MQTT311Client_Pingreq();
 
     /* ---- Test disconnecting ---- */
-    // MQTT311Client_Disconnect();
+    MQTT311Client_Disconnect();
 }

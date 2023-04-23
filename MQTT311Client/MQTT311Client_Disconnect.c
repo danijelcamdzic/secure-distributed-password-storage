@@ -41,6 +41,8 @@ static void MQTT311Client_DisconnectWithStruct(struct DISCONNECT_MESSAGE *discon
 
     /* Send data to server */
     MQTT311Client_SendToMQTTBroker(current_index);
+
+    MQTT311Client_Print("Successfully disconnected!");
 }
 
 /**
