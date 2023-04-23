@@ -1,3 +1,7 @@
-# secure-distributed-password-storage
+# About
 
-The title of the project is: "Secure Distributed Password Storage and Recovery using Shamir's Secret Sharing and Cryptography on an MQTT connected ESP32s"
+The title of the project is: "Secure Distributed Password Storage and Recovery on MQTT-connected Hardware IoT Nodes using RSA Cryptography and Shamir's Secret Sharing Scheme"
+
+# Description
+
+The subject of the master's thesis covers the analysis and development of a secure distributed system for storing and accessing secret passwords. In this work, a system is demonstrated that is based on the implementation of an access node in the form of a software program, implemented in the C++ programming language, as well as a larger number of hardware devices (nodes) with internet access, which in this work are ESP32 devices. The software program implements RSA encryption, RSA decryption, and the functionality of splitting and reconstructing passwords using Shamir's Secret Sharing Scheme. The hardware devices in this system represent nodes for storing parts of the password that also implement RSA encryption and RSA decryption, using the Mbed-TLS library. The system is based on IoT connections between devices, implementing [MQTT 3.1.1](https://github.com/danijelcamdzic/mqtt311-client-library) protocol through a library written in the C programming language. The work demonstrates a system whose essence is the exchange of encrypted password parts between IoT nodes. Through the implementation and practical application of the system, the aim of the work is to demonstrate the robustness and security of this system, showing its advantages in terms of resistance to attacks, protection of confidential data, efficiency in the recovery of secret information, as well as the advantage of distributed storage compared to centralized data storage.
