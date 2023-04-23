@@ -25,9 +25,9 @@ MQTT311Client_ProcessBufferDataPtr MQTT311Client_ProcessBufferData = NULL;
 struct UserData userdata;
 
 /* Bytes to send to function */
-volatile char MQTT311_SEND_BUFFER[10000] = {0};
-volatile char MQTT311_RECEIVE_BUFFER[10000] = {0};
-volatile uint16_t MQTT311_RECEIVED_BYTES = 0; 
+volatile char bytes_to_send[10000] = {0};
+volatile char bytes_to_receive[10000] = {0};
+volatile uint16_t number_of_bytes_received = 0; 
 
 /* Variable to keep track of indexes */
 uint16_t current_index;

@@ -95,7 +95,7 @@ void receive_tcp_data(void)
     }
 
     while(1) {
-        char temp_buffer[15]; // Define a temporary buffer of length 10
+        char temp_buffer[15]; // Define a temporary buffer of length 15
 
         /* Receive data from the socket */
         int len = recv(sock, temp_buffer, sizeof(temp_buffer) - 1, 0);

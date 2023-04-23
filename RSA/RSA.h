@@ -43,6 +43,11 @@
 #include <netdb.h>
 #include <fcntl.h>
 
+/* Macros for accessing the internal variables */
+#define RSA_ENCRYPTED_BUFFER    (encrypted_text)
+#define RSA_MESSAGE_TO_ENCRYPT  (text_to_encrypt)
+#define RSA_MESSAGE_LENGTH      (message_length)
+
 /* Public RSA key */
 extern const unsigned char *key;
 
@@ -50,13 +55,13 @@ extern const unsigned char *key;
 extern const unsigned char *private_key;
 
 /* Buffer to hold messages */
-extern unsigned char buf[MBEDTLS_MPI_MAX_SIZE];
+extern unsigned char encrypted_text[MBEDTLS_MPI_MAX_SIZE];
 
 /* Buffer to hold messages to encrypt */
 extern char* text_to_encrypt;
 
 /* Value to hold the encrypted message length */
-extern size_t length;
+extern size_t message_length;
 
 /* Task priorities */
 #define ENCRYPT_TASK_PRIORITY		( tskIDLE_PRIORITY + 1 )

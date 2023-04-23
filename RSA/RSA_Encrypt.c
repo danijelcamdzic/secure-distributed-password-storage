@@ -57,7 +57,6 @@ size_t RSA_Encrypt(const char* text)
     const unsigned char *to_encrypt = (const unsigned char *)text;
     size_t to_encrypt_len = strlen((const char *)to_encrypt); // Get the length of the text to encrypt
 
-    /* unsigned char buf[MBEDTLS_MPI_MAX_SIZE]; */
     size_t olen = 0;                            // Initialize the output length to 0
 
     /*
@@ -67,7 +66,7 @@ size_t RSA_Encrypt(const char* text)
     fflush(stdout);
 
     if ((ret = mbedtls_pk_encrypt(&pk, to_encrypt, to_encrypt_len,
-                                  buf, &olen, sizeof(buf),
+                                  RSA_ENCRYPTED_BUFFER, &olen, sizeof(RSA_ENCRYPTED_BUFFER),
                                   mbedtls_ctr_drbg_random, &ctr_drbg)) != 0) // Perform RSA encryption
     {
         RSA_Print("Failed! mbedtls_pk_encrypt returned an error!");
@@ -76,7 +75,7 @@ size_t RSA_Encrypt(const char* text)
     /* Print the encrypted value in readable form */
     for (size_t i = 0; i < olen; i++)
     {
-        mbedtls_printf("%02X%s", buf[i],
+        mbedtls_printf("%02X%s", RSA_ENCRYPTED_BUFFER[i],
                        (i + 1) % 16 == 0 ? "\r\n" : " "); // Print the encrypted data in hexadecimal format
     }
 

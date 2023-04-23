@@ -40,13 +40,13 @@ void receive_passphrase(int index_start, int index_end)
     for (i = index_start ; i < index_end; i++)
     {
         printf("%c ", MQTT311_RECEIVE_BUFFER[i]);
-        buf[i - index_start] = MQTT311_RECEIVE_BUFFER[i];
+        RSA_ENCRYPTED_BUFFER[i - index_start] = MQTT311_RECEIVE_BUFFER[i];
     }
     printf("\n");
 
-    length = index_end - index_start;
+    RSA_MESSAGE_LENGTH = index_end - index_start;
 
-    ESP_LOGI(TAG, "Received: %d bytes", length);
+    ESP_LOGI(TAG, "Received: %d bytes", RSA_MESSAGE_LENGTH);
     ESP_LOGI(TAG, "Begin encryption and/or decryption");
 
     // Encrypt and decrypt text
@@ -57,11 +57,11 @@ void receive_passphrase(int index_start, int index_end)
 
 void send_passphrase()
 {
-    // text_to_encrypt = (char*) pvPortMalloc(index2-index1-strlen(str1));
-    // memcpy(text_to_encrypt, (void*)&MQTT311_RECEIVE_BUFFER[index1 + strlen(str1)], index2-index1-strlen(str1));
+    // RSA_MESSAGE_TO_ENCRYPT = (char*) pvPortMalloc(index2-index1-strlen(str1));
+    // memcpy(RSA_MESSAGE_TO_ENCRYPT, (void*)&MQTT311_RECEIVE_BUFFER[index1 + strlen(str1)], index2-index1-strlen(str1));
 
     // // Null-terminate the copied string
-    // text_to_encrypt[index2-index1-strlen(str1)] = '\0';
+    // RSA_MESSAGE_TO_ENCRYPT[index2-index1-strlen(str1)] = '\0';
 }
 
 void process_buffer_data(void) 
