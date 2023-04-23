@@ -18,10 +18,10 @@ RSA_PrintPtr RSA_Print = NULL;
 void RSA_SetPublicKeyInUse(PublicKeyControl_t which_key)
 {
     if (which_key == MASTER_PUBLIC_KEY) {
-        RSA_PUBLIC_KEY_TO_USE = RSA_PUBLIC_KEY;
+        RSA_PUBLIC_KEY_TO_USE = RSA_MASTER_PUBLIC_KEY;
     } 
     else {
-        RSA_PUBLIC_KEY_TO_USE = RSA_MASTER_PUBLIC_KEY;
+        RSA_PUBLIC_KEY_TO_USE = RSA_PUBLIC_KEY;
     }
 }
 
