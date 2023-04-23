@@ -10,6 +10,11 @@
 #include "MQTT311Client/MQTT311Client.h"
 #include "RSA/RSA.h"
  
+/**
+ * @brief Print messages to console
+ *
+ * This function prints debugging messages to console
+ */
 void debug_print(char* message) 
 {
     /* Send debugging information */

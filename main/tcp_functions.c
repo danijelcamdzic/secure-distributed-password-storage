@@ -18,6 +18,16 @@
 /* TCP Socket */
 int sock;
 
+
+/**
+ * @brief Connect to a TCP socket using the provided broker address and port.
+ *
+ * This function resolves the provided broker address to an IP address,
+ * creates a TCP socket, and establishes a connection to the specified port.
+ *
+ * @param brokerAddress The address of the broker to connect to.
+ * @param port The port number to establish the connection.
+ */
 void connect_tcp_socket(const char* brokerAddress, uint16_t port) 
 {
     /* Connect to a TCP socket */
@@ -70,6 +80,15 @@ void connect_tcp_socket(const char* brokerAddress, uint16_t port)
     ESP_LOGI(TAG, "Socket successfully connected"); // Log socket connection success
 }
 
+/**
+ * @brief Send data over an established TCP connection.
+ *
+ * This function sends the provided data of a specified size over the
+ * previously established TCP connection.
+ *
+ * @param data Pointer to the data to be sent.
+ * @param size The size of the data to be sent.
+ */
 void send_tcp_data(const char* data, uint16_t size)
 {
     /* Send data over TCP connection */
@@ -85,6 +104,13 @@ void send_tcp_data(const char* data, uint16_t size)
     }
 }
 
+/**
+ * @brief Receive data from an established TCP connection.
+ *
+ * This function reads data from the TCP connection in a non-blocking mode
+ * and stores it in the MQTT311_RECEIVE_BUFFER. It also logs the number of
+ * bytes received and any errors that may occur during reception.
+ */
 void receive_tcp_data(void)
 {
     char* TAG = "receive_tcp_data"; // Declare and initialize TAG for logging purposes                                                  

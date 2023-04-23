@@ -78,7 +78,7 @@ void RSA_Decrypt(const char* text, size_t length)
     /*
      * Calculate the RSA decryption of the data.
      */
-    RSA_Print("Generating the decrypted value");
+    RSA_Print("Generating the decrypted value: \n");
     fflush(stdout);
 
     const unsigned char *to_decrypt = (unsigned char *)text;
