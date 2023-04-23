@@ -10,52 +10,64 @@
 #include "MQTT311Client/MQTT311Client.h"
 
 /* Private functions */
-static void MQTT311Client_SubscribeWithStruct(struct SUBSCRIBE_MESSAGE *subscribe_message_data);
+static SubscribeMessageResult_t MQTT311Client_SubscribeWithStruct(struct SUBSCRIBE_MESSAGE *subscribe_message_data);
 
 /**
  * @brief Subscribes to topic using data from the structure of subscribe message.
  *
  * @param subscribe_message_data Subscribe message structure
  *
- * @return None
+ * @return SubscribeMessageResult_t
  */
-static void MQTT311Client_SubscribeWithStruct(struct SUBSCRIBE_MESSAGE *subscribe_message_data)
+static SubscribeMessageResult_t MQTT311Client_SubscribeWithStruct(struct SUBSCRIBE_MESSAGE *subscribe_message_data)
 {
     current_index = 0;
 
     /* Appending SUBSCRIBE packet type*/
-    bytes_to_send[current_index++] = subscribe_message_data->packet_type | SUB_RESERVED;
+    MQTT311_SEND_BUFFER[current_index++] = subscribe_message_data->packet_type | SUB_RESERVED;
 
     /* Remaining size so far is 0 */
-    bytes_to_send[current_index++] = subscribe_message_data->remaining_length;
+    MQTT311_SEND_BUFFER[current_index++] = subscribe_message_data->remaining_length;
 
     /* Append packet identifier */
-    bytes_to_send[current_index++] = subscribe_message_data->packet_identifier >> 8;
-    bytes_to_send[current_index++] = subscribe_message_data->packet_identifier & 0xFF;
+    MQTT311_SEND_BUFFER[current_index++] = subscribe_message_data->packet_identifier >> 8;
+    MQTT311_SEND_BUFFER[current_index++] = subscribe_message_data->packet_identifier & 0xFF;
 
     MQTT311Client_AppendTopicName(subscribe_message_data->topic_name);
     
     /* Append requested qos */
-    bytes_to_send[current_index++] = subscribe_message_data->requested_qos;
+    MQTT311_SEND_BUFFER[current_index++] = subscribe_message_data->requested_qos;
 
     /* Encode remaining length if larger than 127 */
     MQTT311Client_CheckRemainingLength();
 
-    /* Send data to server */
-    MQTT311Client_SendToMQTTBroker(current_index);
+   uint32_t redelivery_attempts = 0;
 
-    /* Read the acknowledge */
-    if(MQTT311Client_Suback(subscribe_message_data->packet_identifier))
+    while(redelivery_attempts < REDELIVERY_ATTEMPTS_MAX)
     {
-        MQTT311Client_Print("Success");
-    }
-    else 
-    {
-        MQTT311Client_Print("Unsuccesfull subscription!");
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        /* Send data to server */
+        MQTT311Client_SendToMQTTBroker(current_index);
+
+        /* Read the acknowledge */
+        if(MQTT311Client_Suback(subscribe_message_data->packet_identifier))
+        {
+            MQTT311Client_Print("Successfull subscribing!");
+            break;
+        }
+        else 
+        {
+            MQTT311Client_Print("Unsuccesfull subscription!");
+            vTaskDelay(pdMS_TO_TICKS(2000));
+
+            redelivery_attempts++;
+        }
     }
     vPortFree(subscribe_message_data->topic_name);
     vPortFree(subscribe_message_data);
+
+    SubscribeMessageResult_t subscribe_result = (redelivery_attempts < REDELIVERY_ATTEMPTS_MAX) ? SUBSCRIBE_SUCCESS:SUBSCRIBE_FAIL;
+
+    return subscribe_result;
 }
 
 /**

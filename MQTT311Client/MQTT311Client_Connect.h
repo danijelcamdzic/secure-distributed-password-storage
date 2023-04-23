@@ -48,11 +48,18 @@
 #define CLEAN_SESSION_FLAG              1           /* Specifies the handling of the Session state */
 #define RESERVED                        0
 
+/* Return Type of the Connect Message */
+typedef enum ConnectMessageResult_e
+{
+    CONNECT_SUCCESS = 0,
+    CONNECT_FAIL
+} ConnectMessageResult_t;
+
 /* Connect Message Structure */
 struct CONNECT_MESSAGE 
 {
     /* Function to which it is sent */
-    void (*MQTT311Client_ConnectWithStruct)(struct CONNECT_MESSAGE *);
+    ConnectMessageResult_t (*MQTT311Client_ConnectWithStruct)(struct CONNECT_MESSAGE *);
 
     char* willTopic;
     char* willMessage;
@@ -74,6 +81,8 @@ struct CONNECT_MESSAGE
     bool clean_session;                             /* Clean Session present in payload? */
     bool reserved;                                
 };
+
+/* ----------------------------------------------------------------------------------------- */
 
 /* Function declarations */
 void MQTT311Client_Connect(uint8_t connect_flags, uint16_t keepalive, const char* will_topic, const char* will_message);

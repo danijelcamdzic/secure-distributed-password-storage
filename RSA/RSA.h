@@ -30,18 +30,23 @@
 #include "mbedtls/platform.h"
 #include "mbedtls/base64.h"
 
-/* TO DELETE */
-#include <string.h>
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/event_groups.h"
-#include "esp_system.h"
-#include "esp_wifi.h"
-#include "esp_event.h"
-#include "esp_log.h"
-#include "nvs_flash.h"
-#include <netdb.h>
-#include <fcntl.h>
+/* Control type over which public key to use */
+typedef enum PublicKeyControl_e {
+    MASTER_PUBLIC_KEY = 0,
+    DEVICE_PUBLIC_KEY
+} PublicKeyControl_t;
+
+/* Macros for accessing the internal variables */
+#define RSA_ENCRYPTED_BUFFER    (encrypted_text)
+#define RSA_MESSAGE_TO_ENCRYPT  (text_to_encrypt)
+#define RSA_MESSAGE_LENGTH      (message_length)
+#define RSA_MASTER_PUBLIC_KEY   (masterkey)
+#define RSA_PUBLIC_KEY          (key)
+#define RSA_PRIVATE_KEY         (private_key)
+#define RSA_PUBLIC_KEY_TO_USE   (key_to_use)
+
+/* Master's Public RSA key */
+extern const unsigned char *masterkey;
 
 /* Public RSA key */
 extern const unsigned char *key;
@@ -49,14 +54,17 @@ extern const unsigned char *key;
 /* Private RSA key */
 extern const unsigned char *private_key;
 
+/* Public RSA key to use */
+extern const unsigned char *key_to_use;
+
 /* Buffer to hold messages */
-extern unsigned char buf[MBEDTLS_MPI_MAX_SIZE];
+extern unsigned char encrypted_text[MBEDTLS_MPI_MAX_SIZE];
 
 /* Buffer to hold messages to encrypt */
 extern char* text_to_encrypt;
 
 /* Value to hold the encrypted message length */
-extern size_t length;
+extern size_t message_length;
 
 /* Task priorities */
 #define ENCRYPT_TASK_PRIORITY		( tskIDLE_PRIORITY + 1 )
@@ -71,7 +79,7 @@ void RSA_EncryptionTask(void *pvParameter);
 void RSA_DecryptionTask(void *pvParameter);
 
 /* Encryption/Decryption function prototypes */
-size_t RSA_Encrypt(const char* text);
+size_t RSA_Encrypt(const char* text, const unsigned char* rsa_key);
 void RSA_Decrypt(const char* text, size_t length);
 
 /* Utility functions */
@@ -79,6 +87,7 @@ void RSA_Decrypt(const char* text, size_t length);
 typedef void (*RSA_PrintPtr)(char*);
 extern RSA_PrintPtr RSA_Print;
 void RSA_SetPrint(RSA_PrintPtr print);
+void RSA_SetPublicKeyInUse(PublicKeyControl_t which_key);
 
 #endif /* RSA_H */
 

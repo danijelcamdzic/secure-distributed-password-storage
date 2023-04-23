@@ -8,6 +8,18 @@
 
 #include "RSA/RSA.h"
 
+
+/* Master's Public RSA key */
+const unsigned char *masterkey = (const unsigned char *)"-----BEGIN PUBLIC KEY-----\n"
+                                                        "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAm1HdBKqWguESCwi28+Ei\n"
+                                                        "1QZuZcMRUbCAXO0SnMqrjv2j+1UE1HIsCICojWWVada6flaqJuIZqnVcZiglvAWc\n"
+                                                        "q4Hz7dwZdbHqHafi56MchWC2ZV9Spmk6vKkMWJ0CRGU5VFTiPWOO1Xmn2HVJEt74\n"
+                                                        "UUU3TZM8zThacjb2Ck/FJVmjzNLvpUlvinZuIMTl2fhodR8Ji50v72AjsyWz+cEs\n"
+                                                        "OdGc4MxW51cLdg+L6l75W/wbBlMfufQ+cSarWvRc49W6B6fejWm83S96TO+k29GX\n"
+                                                        "BiogZpwNoKbP9wkdvVA7lvgFGS7sQyk54SogVsqERIpKzponmvc7pdafzKMXKcI3\n"
+                                                        "3wIDAQAB\n"
+                                                        "-----END PUBLIC KEY-----\n";
+
 /* Public RSA key */
 const unsigned char *key = (const unsigned char *)"-----BEGIN PUBLIC KEY-----\n"
                                                 "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtuNBiX/VrhP71s+yTIp7\n"
@@ -19,7 +31,7 @@ const unsigned char *key = (const unsigned char *)"-----BEGIN PUBLIC KEY-----\n"
                                                 "pwIDAQAB\n"
                                                 "-----END PUBLIC KEY-----\n";
 
-size_t RSA_Encrypt(const char* text)
+size_t RSA_Encrypt(const char* text, const unsigned char* rsa_key)
 {
     /* RNG (Random number generator init) */
     int ret = 0;
@@ -48,7 +60,7 @@ size_t RSA_Encrypt(const char* text)
     /*
      * Read the RSA public key
      */
-    if ((ret = mbedtls_pk_parse_public_key(&pk, key, strlen((const char *)key) + 1)) != 0)
+    if ((ret = mbedtls_pk_parse_public_key(&pk, rsa_key, strlen((const char *)rsa_key) + 1)) != 0)
     {
         RSA_Print("Failed! mbedtls_pk_parse_public_key returned an error!");
     };
@@ -57,7 +69,6 @@ size_t RSA_Encrypt(const char* text)
     const unsigned char *to_encrypt = (const unsigned char *)text;
     size_t to_encrypt_len = strlen((const char *)to_encrypt); // Get the length of the text to encrypt
 
-    /* unsigned char buf[MBEDTLS_MPI_MAX_SIZE]; */
     size_t olen = 0;                            // Initialize the output length to 0
 
     /*
@@ -67,7 +78,7 @@ size_t RSA_Encrypt(const char* text)
     fflush(stdout);
 
     if ((ret = mbedtls_pk_encrypt(&pk, to_encrypt, to_encrypt_len,
-                                  buf, &olen, sizeof(buf),
+                                  RSA_ENCRYPTED_BUFFER, &olen, sizeof(RSA_ENCRYPTED_BUFFER),
                                   mbedtls_ctr_drbg_random, &ctr_drbg)) != 0) // Perform RSA encryption
     {
         RSA_Print("Failed! mbedtls_pk_encrypt returned an error!");
@@ -76,7 +87,7 @@ size_t RSA_Encrypt(const char* text)
     /* Print the encrypted value in readable form */
     for (size_t i = 0; i < olen; i++)
     {
-        mbedtls_printf("%02X%s", buf[i],
+        mbedtls_printf("%02X%s", RSA_ENCRYPTED_BUFFER[i],
                        (i + 1) % 16 == 0 ? "\r\n" : " "); // Print the encrypted data in hexadecimal format
     }
 

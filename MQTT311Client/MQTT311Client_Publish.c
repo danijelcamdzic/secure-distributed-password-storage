@@ -11,7 +11,7 @@
 
 /* Private function declaration */
 static void MQTT311Client_AppendMessagePayload(const char* message_payload);
-static void MQTT311Client_PublishWithStruct(struct PUBLISH_MESSAGE *publish_message_data);
+static PublishMessageResult_t MQTT311Client_PublishWithStruct(struct PUBLISH_MESSAGE *publish_message_data);
 
 /**
  * @brief Appends data payload to the message
@@ -34,21 +34,21 @@ static void MQTT311Client_AppendMessagePayload(const char* message_payload)
  *
  * @return None
  */
-static void MQTT311Client_PublishWithStruct(struct PUBLISH_MESSAGE *publish_message_data) 
+static PublishMessageResult_t MQTT311Client_PublishWithStruct(struct PUBLISH_MESSAGE *publish_message_data) 
 {
     current_index = 0;
 
     /* Appending PUBLISH packet type*/
-    bytes_to_send[current_index++] = publish_message_data->packet_type;
+    MQTT311_SEND_BUFFER[current_index++] = publish_message_data->packet_type;
 
     uint8_t header_flags = (publish_message_data->dup << DUP_FLAG) | (publish_message_data->qos1 << QOS_LEVEL1) |
                             (publish_message_data->qos2 << QOS_LEVEL2) | (publish_message_data->retain << RETAIN);
 
     /* Append the header flags */                       
-    bytes_to_send[current_index] |= header_flags;
+    MQTT311_SEND_BUFFER[current_index] |= header_flags;
 
     /* Remaining size so far is 0 */
-    bytes_to_send[current_index++] = publish_message_data->remaining_length;
+    MQTT311_SEND_BUFFER[current_index++] = publish_message_data->remaining_length;
 
     /* Appending topic name, packet identifier and payload */
     MQTT311Client_AppendTopicName(publish_message_data->topicName);
@@ -59,8 +59,8 @@ static void MQTT311Client_PublishWithStruct(struct PUBLISH_MESSAGE *publish_mess
     /* Filling up the structure - Packet Identifier */
     if (packet_id_presence) 
     {
-        bytes_to_send[current_index++] = publish_message_data->packetIdentifier >> 8;
-        bytes_to_send[current_index++] = publish_message_data->packetIdentifier & 0xFF;
+        MQTT311_SEND_BUFFER[current_index++] = publish_message_data->packetIdentifier >> 8;
+        MQTT311_SEND_BUFFER[current_index++] = publish_message_data->packetIdentifier & 0xFF;
     }
 
     if (strcmp(publish_message_data->payload, "") != 0)
@@ -71,78 +71,67 @@ static void MQTT311Client_PublishWithStruct(struct PUBLISH_MESSAGE *publish_mess
     /* Encode remaining length if larger than 127 */
     MQTT311Client_CheckRemainingLength();
 
-    bool redelivery_flag = false;
+    uint32_t redelivery_attempts = 0;
 
-    while(!redelivery_flag) 
+    while(redelivery_attempts < REDELIVERY_ATTEMPTS_MAX)
     {
         /* Send data to server */
         MQTT311Client_SendToMQTTBroker(current_index);
 
-        /* Check puback only if QoS == 1 */
+        /* Check response in case QoS == 1 */
         if((publish_message_data->qos1) & !(publish_message_data->qos2))
         {
-            redelivery_flag = MQTT311Client_Puback(publish_message_data->packetIdentifier);
-
-            if(!redelivery_flag)
+            if(MQTT311Client_Puback(publish_message_data->packetIdentifier))
+            {
+                MQTT311Client_Print("Successfull publishing!");
+                break;
+            }
+            else
             {
                 MQTT311Client_Print("Republishing package...");
                 vTaskDelay(pdMS_TO_TICKS(3000));
 
                 /* Setting re-delivery flag */
-                bytes_to_send[1] |= (1 << DUP_FLAG);
-            }
-            else
-            {
-                break;
+                MQTT311_SEND_BUFFER[1] |= (1 << DUP_FLAG);
+
+                redelivery_attempts++;
             }
         }
-        /* Check pubrec only if QoS == 2 */
+        /* Check response in case QoS == 2 */
         else if(!(publish_message_data->qos1) & (publish_message_data->qos2))
         {
-            redelivery_flag = MQTT311Client_Puback(publish_message_data->packetIdentifier);
-            
-            /* Get correct order of ack messages from the server */
-            /* If puback was received */
-            if(redelivery_flag)
+            if (MQTT311Client_Puback(publish_message_data->packetIdentifier) && MQTT311Client_Pubrec(publish_message_data->packetIdentifier) &&
+                MQTT311Client_Pubrel(publish_message_data->packetIdentifier) && MQTT311Client_Pubcomp(publish_message_data->packetIdentifier))
             {
-                redelivery_flag = MQTT311Client_Pubrec(publish_message_data->packetIdentifier);
+                MQTT311Client_Print("Successfull publishing!");
+                break;
             }
-            
-            /* If pubrec was received */
-            if(redelivery_flag)
-            {
-                redelivery_flag = MQTT311Client_Pubrel(publish_message_data->packetIdentifier);
-            }
-
-            /* If pubrel was received */
-            if(redelivery_flag)
-            {
-                redelivery_flag = MQTT311Client_Pubcomp(publish_message_data->packetIdentifier);
-            }
-            
-            /* If pubcomp was received */
-            if(!redelivery_flag)
+            else
             {
                 MQTT311Client_Print("Republishing package...");
                 vTaskDelay(pdMS_TO_TICKS(3000));
 
                 /* Setting re-delivery flag */
-                bytes_to_send[1] |= (1 << DUP_FLAG);
-            }
-            else
-            {
-                break;
+                MQTT311_SEND_BUFFER[1] |= (1 << DUP_FLAG);
+
+                redelivery_attempts++;
             }
         }
         else
         {
+            MQTT311Client_Print("Successfull publishing!");
             break;
         }
     }
+
     /* Free dinamically allocated memory */
     vPortFree(publish_message_data->topicName);
     vPortFree(publish_message_data->payload);
     vPortFree(publish_message_data);
+
+    PublishMessageResult_t publish_result = (redelivery_attempts < REDELIVERY_ATTEMPTS_MAX) ? PUBLISH_SUCCESS:PUBLISH_FAIL;
+
+    return publish_result;
 }
 
 /**

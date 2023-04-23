@@ -191,9 +191,9 @@ void app_main(void)
     MQTT311Client_SetConnectTCPSocket(connect_tcp_socket);
     MQTT311Client_SetSendToTCPSocket(send_tcp_data);
     MQTT311Client_SetReadFromTCPSocket(receive_tcp_data);
-    MQTT311Client_SetPrint(debug_print_mqtt);
+    MQTT311Client_SetPrint(debug_print);
     MQTT311Client_SetProcessBufferData(process_buffer_data);
-    RSA_SetPrint(debug_print_rsa);
+    RSA_SetPrint(debug_print);
 
     /* ---- Start FreeRTOS Tasks ---- */
     MQTT311Client_CreateMQTTFreeRTOSTasks();
@@ -208,19 +208,17 @@ void app_main(void)
     MQTT311Client_Publish(0x00, "/topic/topic1", 0x00, "123test");
     vTaskDelay(pdMS_TO_TICKS(1000));
     MQTT311Client_Publish(0x00, "/topic/topic2", 0x00, "Test123");
-    vTaskDelay(pdMS_TO_TICKS(10000));
+    vTaskDelay(pdMS_TO_TICKS(1000));
    
     /* ------ Subscribe to some topic ------ */
     MQTT311Client_Subscribe(0x02, "/topic/topic3", 0x00);
-    // vTaskDelay(pdMS_TO_TICKS(5000));
-    // MQTT311Client_Publish(0x00, "/topic/topic3", 0x00, PGP_PUBLIC_KEY);
 
     /* ----- Unsubscribe to some topic ----- */
-    // vTaskDelay(pdMS_TO_TICKS(1000));
-    // MQTT311Client_Unsubscribe(0x02, "/topic/mihajlo");
+    vTaskDelay(pdMS_TO_TICKS(1000));
+    MQTT311Client_Unsubscribe(0x02, "/topic/mihajlo");
 
     /* ----- Test pinging ------ */
-    // MQTT311Client_Pingreq();
+    MQTT311Client_Pingreq();
 
     /* ---- Test disconnecting ---- */
     // MQTT311Client_Disconnect();

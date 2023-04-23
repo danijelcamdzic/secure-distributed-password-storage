@@ -34,10 +34,10 @@ void receive_tcp_data(void);
 
 /* MQTT Receive Message Processing function prototypes */
 int find_substring_index(const char *substr, size_t substr_len);
+void receive_passphrase(int index_start, int index_end);
+void send_passphrase(void);
 void process_buffer_data(void);
 
 /* Debug function prototypes */
-void debug_print_mqtt(char* message);
-void debug_print_rsa(char* message);
-
+void debug_print(char* message);
 #endif /* MAIN_H */

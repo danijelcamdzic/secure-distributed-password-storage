@@ -18,7 +18,7 @@ static void MQTT311Client_AppendClientID(const char* client_id);
 static void MQTT311Client_AppendUsernameAndPassword(void);
 static void MQTT311Client_AppendWillTopic(const char* will_topic);
 static void MQTT311Client_AppendWillMessage(const char* will_message);
-static void MQTT311Client_ConnectWithStruct(struct CONNECT_MESSAGE *connect_message_data);
+static ConnectMessageResult_t MQTT311Client_ConnectWithStruct(struct CONNECT_MESSAGE *connect_message_data);
 
 /**
  * @brief Sets the keep-alive value for connection timeouts.
@@ -118,9 +118,9 @@ static void MQTT311Client_AppendWillMessage(const char* will_message)
  *
  * @param connect_message_data Pointer to a `CONNECT_MESSAGE` structure containing the connection details.
  *
- * @return None.
+ * @return ConnectMessageResult_t.
  */
-static void MQTT311Client_ConnectWithStruct(struct CONNECT_MESSAGE *connect_message_data) 
+static ConnectMessageResult_t MQTT311Client_ConnectWithStruct(struct CONNECT_MESSAGE *connect_message_data) 
 {
     /* Making sure the current_index starts at 0 */
     current_index = 0;
@@ -129,27 +129,27 @@ static void MQTT311Client_ConnectWithStruct(struct CONNECT_MESSAGE *connect_mess
     MQTT311Client_SetKeepAlive(connect_message_data->keep_alive);
 
     /* Appending CONNECT packet type*/
-    bytes_to_send[current_index++] = connect_message_data->packet_type;
+    MQTT311_SEND_BUFFER[current_index++] = connect_message_data->packet_type;
 
     /* Remaining size so far is 0 */
-    bytes_to_send[current_index++] = connect_message_data->remaining_length;
+    MQTT311_SEND_BUFFER[current_index++] = connect_message_data->remaining_length;
 
     /* Appending protocol name and length */
     MQTT311Client_AppendData(connect_message_data->protocol_name, connect_message_data->protocol_name_length, true);
 
     /* Appending protocol version */
-    bytes_to_send[current_index++] = connect_message_data->protocol_version;
+    MQTT311_SEND_BUFFER[current_index++] = connect_message_data->protocol_version;
 
     uint8_t connect_flags = (connect_message_data->_username << USERNAME_FLAG) | (connect_message_data->_password << PASSWORD_FLAG) |
                             (connect_message_data->will_retain << WILL_RETAIN_FLAG) | (connect_message_data->will_qos1 << WILL_QoS1_FLAG) |
                             (connect_message_data->will_qos2 << WILL_QoS2_FLAG) | (connect_message_data->clean_session << CLEAN_SESSION_FLAG);
 
     /* Appending control flags */
-    bytes_to_send[current_index++] = connect_flags;
+    MQTT311_SEND_BUFFER[current_index++] = connect_flags;
 
     /* Appending keep alive */
-    bytes_to_send[current_index++] = connect_message_data->keep_alive >> 8;
-    bytes_to_send[current_index++] = connect_message_data->keep_alive & 0xFF;
+    MQTT311_SEND_BUFFER[current_index++] = connect_message_data->keep_alive >> 8;
+    MQTT311_SEND_BUFFER[current_index++] = connect_message_data->keep_alive & 0xFF;
 
     /* Append client ID */
     MQTT311Client_AppendClientID(userdata.deviceID);
@@ -170,24 +170,24 @@ static void MQTT311Client_ConnectWithStruct(struct CONNECT_MESSAGE *connect_mess
     /* Encode remaining length if larger than 127 */
     MQTT311Client_CheckRemainingLength();
 
-    bool redelivery_flag = false;
+    uint32_t redelivery_attempts = 0;
 
-    while(!redelivery_flag)
+    while(redelivery_attempts < REDELIVERY_ATTEMPTS_MAX)
     {
         /* Send data to server */
         MQTT311Client_SendToMQTTBroker(current_index);
 
         /* Read the acknowledge */
-        redelivery_flag = MQTT311Client_Connack();
-
-        if(!redelivery_flag) 
+        if(MQTT311Client_Connack()) 
         {
-            MQTT311Client_Print("Unsuccesfull connection, trying to reconnect...");
-            vTaskDelay(pdMS_TO_TICKS(2000));
+            MQTT311Client_Print("Successfull connection!");
+            break;
         }
         else
         {
-            break;
+            MQTT311Client_Print("Unsuccesfull connection, trying to reconnect...");
+            vTaskDelay(pdMS_TO_TICKS(2000));
+            redelivery_attempts++;
         }
     }
 
@@ -196,6 +196,10 @@ static void MQTT311Client_ConnectWithStruct(struct CONNECT_MESSAGE *connect_mess
     vPortFree(connect_message_data->willMessage);
     vPortFree(connect_message_data->protocol_name);
     vPortFree(connect_message_data);
+
+    ConnectMessageResult_t connect_result = (redelivery_attempts < REDELIVERY_ATTEMPTS_MAX) ? CONNECT_SUCCESS:CONNECT_FAIL;
+
+    return connect_result;
 }
 
 /**

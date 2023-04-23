@@ -23,14 +23,22 @@
      | MQTT Control Packet Type | Remaining Length(0) |
     ...
 */
+/* Return Type of the Pingreq Message */
+typedef enum PingreqMessageResult_e
+{
+    PINGREQ_SUCCESS = 0,
+    PINGREQ_FAIL
+} PingreqMessageResult_t;
 
 /* PINGREQ Message Structure */
 struct PINGREQ_MESSAGE 
 {
-    void (*MQTT311Client_PingreqWithStruct)(struct PINGREQ_MESSAGE*);
+    PingreqMessageResult_t (*MQTT311Client_PingreqWithStruct)(struct PINGREQ_MESSAGE*);
     uint16_t remaining_length;                      /* Remaining length of the packet  = 0 for PINGREQ*/  
     uint8_t packet_type;                            /* MQTT Message Packet Type*/
 };
+
+/* ----------------------------------------------------------------------------------------- */
 
 /* Function declarations */
 void MQTT311Client_Pingreq(void);

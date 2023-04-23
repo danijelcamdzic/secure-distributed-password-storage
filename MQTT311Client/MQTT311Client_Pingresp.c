@@ -31,13 +31,13 @@ bool MQTT311Client_Pingresp(void)
     pingresp_message_data.remaining_length = PINGRESP_PACKET_REMAINING_LENGTH;
     pingresp_message_data.packet_size = PINGRESP_PACKET_SIZE;
 
-    while (number_of_bytes_received != atoi(pingresp_message_data.packet_size))
+    while (MQTT311_RECEIVED_BYTES != atoi(pingresp_message_data.packet_size))
     {
         MQTT311Client_ReceiveFromMQTTBroker();
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
 
-    number_of_bytes_received = 0;
+    MQTT311_RECEIVED_BYTES = 0;
 
     /* Useful flag for keeping track of sucess of response message */
     bool success_message = true;

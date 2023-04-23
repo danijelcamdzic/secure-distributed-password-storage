@@ -31,13 +31,13 @@ bool MQTT311Client_Connack(void)
     connack_message_data.remaining_length = CONACK_PACKET_REMAINING_LENGTH;
     connack_message_data.packet_size = CONNACK_PACKET_SIZE;
 
-    while (number_of_bytes_received != atoi(connack_message_data.packet_size))
+    while (MQTT311_RECEIVED_BYTES != atoi(connack_message_data.packet_size))
     {
         MQTT311Client_ReceiveFromMQTTBroker();
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
 
-    number_of_bytes_received = 0;
+    MQTT311_RECEIVED_BYTES = 0;
 
     /* Useful flag for keeping track of success of response message */
     bool success_message = true;
@@ -53,12 +53,12 @@ bool MQTT311Client_Connack(void)
     }
 
     /* Getting connect acknowledge flags */
-    uint8_t connect_acknowledge_flags = bytes_to_receive[2];
+    uint8_t connect_acknowledge_flags = MQTT311_RECEIVE_BUFFER[2];
 
     connack_message_data.connect_acknowledge_flags = connect_acknowledge_flags;
 
     /* Getting connect response code */
-    uint8_t connect_response_code = bytes_to_receive[3];
+    uint8_t connect_response_code = MQTT311_RECEIVE_BUFFER[3];
 
     connack_message_data.connect_response_code = connect_response_code;
 

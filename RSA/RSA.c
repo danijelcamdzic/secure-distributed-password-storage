@@ -10,13 +10,16 @@
 #include "RSA/RSA.h"
 
 /* Buffer to hold decrypted message */
-unsigned char buf[MBEDTLS_MPI_MAX_SIZE] = {0};
+unsigned char encrypted_text[MBEDTLS_MPI_MAX_SIZE] = {0};
 
 /* Buffer to hold messages to encrypt */
 char* text_to_encrypt;
 
 /* Value to hold the encrypted message length */
-size_t length = 0;
+size_t message_length = 0;
+
+/* Public RSA key to use */
+const unsigned char *key_to_use = NULL;
 
 /**
  * @brief RSA encryption task
@@ -25,8 +28,13 @@ size_t length = 0;
  */
 void RSA_EncryptionTask(void *pvParameter)
 {
-    length = RSA_Encrypt(text_to_encrypt);
-    free(text_to_encrypt);
+    if (RSA_PUBLIC_KEY_TO_USE != NULL) {
+        RSA_MESSAGE_LENGTH = RSA_Encrypt(RSA_MESSAGE_TO_ENCRYPT, RSA_PUBLIC_KEY_TO_USE);
+        free(RSA_MESSAGE_TO_ENCRYPT);
+    }
+    else {
+        RSA_Print("Public key to use is not defined!");
+    }
 
     vTaskDelete(NULL);
 }
@@ -38,7 +46,7 @@ void RSA_EncryptionTask(void *pvParameter)
  */
 void RSA_DecryptionTask(void *pvParameter)
 {
-    RSA_Decrypt((char*)buf, length);
+    RSA_Decrypt((char*)RSA_ENCRYPTED_BUFFER, RSA_MESSAGE_LENGTH);
 
     vTaskDelete(NULL);
 }

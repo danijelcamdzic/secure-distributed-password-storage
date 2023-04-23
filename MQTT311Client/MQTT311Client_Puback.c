@@ -27,13 +27,13 @@ bool MQTT311Client_Puback(uint16_t packetIdentifier)
     puback_message_data.remaining_length = PUBACK_PACKET_REMAINING_LENGTH;
     puback_message_data.packet_size = PUBACK_PACKET_SIZE;
 
-    while (number_of_bytes_received != atoi(puback_message_data.packet_size))
+    while (MQTT311_RECEIVED_BYTES != atoi(puback_message_data.packet_size))
     {
         MQTT311Client_ReceiveFromMQTTBroker();
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
 
-    number_of_bytes_received = 0;
+    MQTT311_RECEIVED_BYTES = 0;
 
     /* Get remaining packet parts */
     bool success_message = MQTT311Client_GetPubPacketInfo(packetIdentifier, puback_message_data.packet_type, puback_message_data.remaining_length, 0);

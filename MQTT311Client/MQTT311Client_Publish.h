@@ -36,11 +36,18 @@
                                                     */
 #define RETAIN                          0  
 
+/* Return Type of the Publish Message */
+typedef enum PublishMessageResult_e
+{
+    PUBLISH_SUCCESS = 0,
+    PUBLISH_FAIL
+} PublishMessageResult_t;
+
 /* Publish Message Structure */
 struct PUBLISH_MESSAGE 
 {
     /* Function to which it is sent */
-    void (*MQTT311Client_PublishWithStruct)(struct PUBLISH_MESSAGE *);
+    PublishMessageResult_t (*MQTT311Client_PublishWithStruct)(struct PUBLISH_MESSAGE *);
 
     char* topicName;                                /* Name of the message topic */
     char* payload;                                  /* Data of the message */
@@ -55,6 +62,8 @@ struct PUBLISH_MESSAGE
     bool qos2;                                      /* Assurance of delivery */
     bool retain;                                    /* Server MUST store the Application Message and it's QoS */                  
 };
+
+/* ----------------------------------------------------------------------------------------- */
 
 /* Function declarations */
 void MQTT311Client_Publish(uint8_t header_flags, const char* topicName, uint16_t packetIdentifier, const char* payload);

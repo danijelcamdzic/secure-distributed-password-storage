@@ -14,7 +14,7 @@
 #include "MQTT311Client/MQTT311Client.h"
 
 /* Private function declaration */
-static void MQTT311Client_UnsubscribeWithStruct(struct UNSUBSCRIBE_MESSAGE *unsubscribe_message_data);
+static UnsubscribeMessageResult_t MQTT311Client_UnsubscribeWithStruct(struct UNSUBSCRIBE_MESSAGE *unsubscribe_message_data);
 
 /**
  * @brief Unsubscribes from a topic using the provided unsubscribe message structure.
@@ -25,42 +25,55 @@ static void MQTT311Client_UnsubscribeWithStruct(struct UNSUBSCRIBE_MESSAGE *unsu
  * 
  * @param unsubscribe_message_data The unsubscribe message structure.
  *
- * @return None.
+ * @return UnsubscribeMessageResult_t.
  */ 
-static void MQTT311Client_UnsubscribeWithStruct(struct UNSUBSCRIBE_MESSAGE *unsubscribe_message_data)
+static UnsubscribeMessageResult_t MQTT311Client_UnsubscribeWithStruct(struct UNSUBSCRIBE_MESSAGE *unsubscribe_message_data)
 {
     current_index = 0;
 
     /* Appending SUBSCRIBE packet type*/
-    bytes_to_send[current_index++] = unsubscribe_message_data->packet_type | UNSUB_RESERVED;
+    MQTT311_SEND_BUFFER[current_index++] = unsubscribe_message_data->packet_type | UNSUB_RESERVED;
 
     /* Remaining size so far is 0 */
-    bytes_to_send[current_index++] = unsubscribe_message_data->remaining_length;
+    MQTT311_SEND_BUFFER[current_index++] = unsubscribe_message_data->remaining_length;
 
     /* Append packet identifier */
-    bytes_to_send[current_index++] = unsubscribe_message_data->packet_identifier >> 8;
-    bytes_to_send[current_index++] = unsubscribe_message_data->packet_identifier & 0xFF;
+    MQTT311_SEND_BUFFER[current_index++] = unsubscribe_message_data->packet_identifier >> 8;
+    MQTT311_SEND_BUFFER[current_index++] = unsubscribe_message_data->packet_identifier & 0xFF;
 
     MQTT311Client_AppendTopicName(unsubscribe_message_data->topic_name);
 
     /* Encode remaining length if larger than 127 */
     MQTT311Client_CheckRemainingLength();
 
-    /* Send data to server */
-    MQTT311Client_SendToMQTTBroker(current_index);
+    uint32_t redelivery_attempts = 0;
 
-    /* Read the acknowledge */
-    if(MQTT311Client_Unsuback(unsubscribe_message_data->packet_identifier))
+    while(redelivery_attempts < REDELIVERY_ATTEMPTS_MAX)
     {
-        MQTT311Client_Print("Unsubscribe succesfull!");
+        /* Send data to server */
+        MQTT311Client_SendToMQTTBroker(current_index);
+
+        /* Read the acknowledge */
+        if(MQTT311Client_Unsuback(unsubscribe_message_data->packet_identifier))
+        {
+            MQTT311Client_Print("Successfull unsubscribing!");
+            break;
+        }
+        else 
+        {
+            MQTT311Client_Print("Unsuccesfull unsubscription!");
+            vTaskDelay(pdMS_TO_TICKS(2000));
+
+            redelivery_attempts++;
+        }
     }
-    else 
-    {
-        MQTT311Client_Print("Unsuccesfull unsubscription!");
-        vTaskDelay(pdMS_TO_TICKS(1000));
-    }
+
     vPortFree(unsubscribe_message_data->topic_name);
     vPortFree(unsubscribe_message_data);
+
+    UnsubscribeMessageResult_t unsubscribe_result = (redelivery_attempts < REDELIVERY_ATTEMPTS_MAX) ? UNSUBSCRIBE_SUCCESS:UNSUBSCRIBE_FAIL;
+
+    return unsubscribe_result;
 }
 
 /**

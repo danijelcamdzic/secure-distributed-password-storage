@@ -30,10 +30,17 @@
 #define SUB_QoS1                            0       /* QoS Level */
 #define SUB_QoS2                            1       /* QoS Level */
 
+/* Return Type of the Subscribe Message */
+typedef enum SubscribeMessageResult_e
+{
+    SUBSCRIBE_SUCCESS = 0,
+    SUBSCRIBE_FAIL
+} SubscribeMessageResult_t;
+
 /* SUBSCRIBE Message Structure */
 struct SUBSCRIBE_MESSAGE 
 {
-    void (*MQTT311Client_SubscribeWithStruct)(struct SUBSCRIBE_MESSAGE *);
+    SubscribeMessageResult_t (*MQTT311Client_SubscribeWithStruct)(struct SUBSCRIBE_MESSAGE *);
 
     char* topic_name;                               /* Topic Name */
 

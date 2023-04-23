@@ -41,7 +41,7 @@ client.on_message = on_message
 client.connect("mqtt.eclipseprojects.io", 1883, 120)
 
 # Load the RSA public key
-public_key = load_public_key("public_key.pem")
+public_key_hardware_node_1 = load_public_key("public_key_hardware_node_1.pem")
 
 # Start the MQTT client loop
 client.loop_start()
@@ -55,7 +55,7 @@ try:
         message = input("Enter the message to send: ")
 
         # Encrypt the message using the RSA public key
-        encrypted_message = encrypt_message(message.encode(), public_key)
+        encrypted_message = encrypt_message(message.encode(), public_key_hardware_node_1)
 
         # Get the number of bytes in the encrypted message
         num_bytes = len(encrypted_message)
