@@ -32,14 +32,14 @@ static void MQTT311Client_UnsubscribeWithStruct(struct UNSUBSCRIBE_MESSAGE *unsu
     current_index = 0;
 
     /* Appending SUBSCRIBE packet type*/
-    bytes_to_send[current_index++] = unsubscribe_message_data->packet_type | UNSUB_RESERVED;
+    MQTT311_SEND_BUFFER[current_index++] = unsubscribe_message_data->packet_type | UNSUB_RESERVED;
 
     /* Remaining size so far is 0 */
-    bytes_to_send[current_index++] = unsubscribe_message_data->remaining_length;
+    MQTT311_SEND_BUFFER[current_index++] = unsubscribe_message_data->remaining_length;
 
     /* Append packet identifier */
-    bytes_to_send[current_index++] = unsubscribe_message_data->packet_identifier >> 8;
-    bytes_to_send[current_index++] = unsubscribe_message_data->packet_identifier & 0xFF;
+    MQTT311_SEND_BUFFER[current_index++] = unsubscribe_message_data->packet_identifier >> 8;
+    MQTT311_SEND_BUFFER[current_index++] = unsubscribe_message_data->packet_identifier & 0xFF;
 
     MQTT311Client_AppendTopicName(unsubscribe_message_data->topic_name);
 

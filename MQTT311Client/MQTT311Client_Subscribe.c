@@ -24,19 +24,19 @@ static void MQTT311Client_SubscribeWithStruct(struct SUBSCRIBE_MESSAGE *subscrib
     current_index = 0;
 
     /* Appending SUBSCRIBE packet type*/
-    bytes_to_send[current_index++] = subscribe_message_data->packet_type | SUB_RESERVED;
+    MQTT311_SEND_BUFFER[current_index++] = subscribe_message_data->packet_type | SUB_RESERVED;
 
     /* Remaining size so far is 0 */
-    bytes_to_send[current_index++] = subscribe_message_data->remaining_length;
+    MQTT311_SEND_BUFFER[current_index++] = subscribe_message_data->remaining_length;
 
     /* Append packet identifier */
-    bytes_to_send[current_index++] = subscribe_message_data->packet_identifier >> 8;
-    bytes_to_send[current_index++] = subscribe_message_data->packet_identifier & 0xFF;
+    MQTT311_SEND_BUFFER[current_index++] = subscribe_message_data->packet_identifier >> 8;
+    MQTT311_SEND_BUFFER[current_index++] = subscribe_message_data->packet_identifier & 0xFF;
 
     MQTT311Client_AppendTopicName(subscribe_message_data->topic_name);
     
     /* Append requested qos */
-    bytes_to_send[current_index++] = subscribe_message_data->requested_qos;
+    MQTT311_SEND_BUFFER[current_index++] = subscribe_message_data->requested_qos;
 
     /* Encode remaining length if larger than 127 */
     MQTT311Client_CheckRemainingLength();

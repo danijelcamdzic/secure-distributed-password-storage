@@ -27,13 +27,13 @@ bool MQTT311Client_Pubrel(uint16_t packetIdentifier)
     pubrel_message_data.remaining_length = PUBREL_PACKET_REMAINING_LENGTH;
     pubrel_message_data.packet_size = PUBREL_PACKET_SIZE;
 
-    while (number_of_bytes_received != atoi(pubrel_message_data.packet_size))
+    while (MQTT311_RECEIVED_BYTES != atoi(pubrel_message_data.packet_size))
     {
         MQTT311Client_ReceiveFromMQTTBroker();
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
 
-    number_of_bytes_received = 0;
+    MQTT311_RECEIVED_BYTES = 0;
 
     /* Get remaining packet parts */
     bool success_message = MQTT311Client_GetPubPacketInfo(packetIdentifier, pubrel_message_data.packet_type, pubrel_message_data.remaining_length, 0);

@@ -25,9 +25,9 @@ MQTT311Client_ProcessBufferDataPtr MQTT311Client_ProcessBufferData = NULL;
 struct UserData userdata;
 
 /* Bytes to send to function */
-volatile char bytes_to_send[10000] = {0};
-volatile char bytes_to_receive[10000] = {0};
-volatile uint16_t number_of_bytes_received = 0; 
+volatile char MQTT311_SEND_BUFFER[10000] = {0};
+volatile char MQTT311_RECEIVE_BUFFER[10000] = {0};
+volatile uint16_t MQTT311_RECEIVED_BYTES = 0; 
 
 /* Variable to keep track of indexes */
 uint16_t current_index;
@@ -272,11 +272,11 @@ void MQTT311Client_AppendData(const char* data, uint16_t data_length, bool appen
     /* Appends data length to byte array */
     if (append_data_length)
     {
-        bytes_to_send[current_index++] = data_length >> 8;
-        bytes_to_send[current_index++] = data_length & 0xFF;
+        MQTT311_SEND_BUFFER[current_index++] = data_length >> 8;
+        MQTT311_SEND_BUFFER[current_index++] = data_length & 0xFF;
     }
     /* Appends data to byte array */
-    memcpy(((void*)bytes_to_send) + current_index, data, data_length);
+    memcpy(((void*)MQTT311_SEND_BUFFER) + current_index, data, data_length);
     current_index += data_length;
 }
 
@@ -310,14 +310,14 @@ void MQTT311Client_AppendTopicName(const char* topic_name)
  */ 
 void MQTT311Client_SendToMQTTBroker(uint16_t size) 
 {
-    MQTT311Client_SendToTCPSocket((const char *)bytes_to_send, size);
+    MQTT311Client_SendToTCPSocket((const char *)MQTT311_SEND_BUFFER, size);
 }
 
 /**
  * @brief Receives a message from the MQTT Broker.
  *
  * This function is used to receive a message from the MQTT Broker. The message bytes are stored in
- * bytes_to_receive and the number of bytes received is stored in number_of_bytes_received.
+ * MQTT311_RECEIVE_BUFFER and the number of bytes received is stored in MQTT311_RECEIVED_BYTES.
  * 
  * @param None
  *
@@ -358,10 +358,10 @@ uint8_t MQTT311Client_EncodeRemainingLength(uint32_t length, uint8_t *encoded_by
 }
 
 /**
- * @brief Checks if the remaining length value needs to be encoded and updates the bytes_to_send array.
+ * @brief Checks if the remaining length value needs to be encoded and updates the MQTT311_SEND_BUFFER array.
  *
  * This function is used to check if the remaining length value needs to be encoded according to the MQTT 3.1.1 specification.
- * It encodes the remaining length value and updates the bytes_to_send array accordingly.
+ * It encodes the remaining length value and updates the MQTT311_SEND_BUFFER array accordingly.
  * 
  * @return None.
  */ 
@@ -377,14 +377,14 @@ void MQTT311Client_CheckRemainingLength(void)
 
         for (uint8_t i = 0; i < num_encoded_bytes; i++)
         {
-            bytes_to_send[i + 1] = encoded_bytes[i];
+            MQTT311_SEND_BUFFER[i + 1] = encoded_bytes[i];
         }
 
         current_index += num_encoded_bytes - 1;
     }
     else {
         remaining_length = current_index - 2;
-        bytes_to_send[1] = remaining_length;
+        MQTT311_SEND_BUFFER[1] = remaining_length;
     }
 }
 
@@ -402,7 +402,7 @@ void MQTT311Client_MoveByteArrayToRight(uint8_t shift)
     /* Moving the array */
     for (int i = current_index; i > 1; i--)
     {
-        bytes_to_send[i + shift - 1] = bytes_to_send[i];
+        MQTT311_SEND_BUFFER[i + shift - 1] = MQTT311_SEND_BUFFER[i];
     }
 }
 
@@ -425,7 +425,7 @@ bool MQTT311Client_CheckResponseHeader(uint8_t packet_type, uint16_t remainingLe
     uint8_t server_response_header;
 
     /* Getting proper bytes from the header */
-    server_response_header = bytes_to_receive[offset];
+    server_response_header = MQTT311_RECEIVE_BUFFER[offset];
 
     /* Checking the response header */
     if (server_response_header != packet_type)
@@ -434,7 +434,7 @@ bool MQTT311Client_CheckResponseHeader(uint8_t packet_type, uint16_t remainingLe
     }
 
     /* Getting remaining length */
-    uint8_t remaining_length = bytes_to_receive[offset + 1];
+    uint8_t remaining_length = MQTT311_RECEIVE_BUFFER[offset + 1];
 
     /* Checking the remaining length */
     if (remaining_length != remainingLength)
@@ -459,7 +459,7 @@ uint16_t MQTT311Client_GetPacketIdentifier(uint8_t offset)
 {
 
     /* Getting packet identifier */
-    uint16_t packet_identifier = (bytes_to_receive[offset] << 8) | (bytes_to_receive[offset + 1]);
+    uint16_t packet_identifier = (MQTT311_RECEIVE_BUFFER[offset] << 8) | (MQTT311_RECEIVE_BUFFER[offset + 1]);
 
     return packet_identifier;
 }

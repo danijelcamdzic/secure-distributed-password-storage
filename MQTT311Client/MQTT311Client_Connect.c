@@ -129,27 +129,27 @@ static void MQTT311Client_ConnectWithStruct(struct CONNECT_MESSAGE *connect_mess
     MQTT311Client_SetKeepAlive(connect_message_data->keep_alive);
 
     /* Appending CONNECT packet type*/
-    bytes_to_send[current_index++] = connect_message_data->packet_type;
+    MQTT311_SEND_BUFFER[current_index++] = connect_message_data->packet_type;
 
     /* Remaining size so far is 0 */
-    bytes_to_send[current_index++] = connect_message_data->remaining_length;
+    MQTT311_SEND_BUFFER[current_index++] = connect_message_data->remaining_length;
 
     /* Appending protocol name and length */
     MQTT311Client_AppendData(connect_message_data->protocol_name, connect_message_data->protocol_name_length, true);
 
     /* Appending protocol version */
-    bytes_to_send[current_index++] = connect_message_data->protocol_version;
+    MQTT311_SEND_BUFFER[current_index++] = connect_message_data->protocol_version;
 
     uint8_t connect_flags = (connect_message_data->_username << USERNAME_FLAG) | (connect_message_data->_password << PASSWORD_FLAG) |
                             (connect_message_data->will_retain << WILL_RETAIN_FLAG) | (connect_message_data->will_qos1 << WILL_QoS1_FLAG) |
                             (connect_message_data->will_qos2 << WILL_QoS2_FLAG) | (connect_message_data->clean_session << CLEAN_SESSION_FLAG);
 
     /* Appending control flags */
-    bytes_to_send[current_index++] = connect_flags;
+    MQTT311_SEND_BUFFER[current_index++] = connect_flags;
 
     /* Appending keep alive */
-    bytes_to_send[current_index++] = connect_message_data->keep_alive >> 8;
-    bytes_to_send[current_index++] = connect_message_data->keep_alive & 0xFF;
+    MQTT311_SEND_BUFFER[current_index++] = connect_message_data->keep_alive >> 8;
+    MQTT311_SEND_BUFFER[current_index++] = connect_message_data->keep_alive & 0xFF;
 
     /* Append client ID */
     MQTT311Client_AppendClientID(userdata.deviceID);

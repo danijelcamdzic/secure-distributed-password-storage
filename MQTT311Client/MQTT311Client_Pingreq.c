@@ -30,15 +30,15 @@ static void MQTT311Client_PingreqWithStruct(struct PINGREQ_MESSAGE *pingreq_mess
     current_index = 0;
 
     /* Appending SUBSCRIBE packet type*/
-    bytes_to_send[current_index++] = pingreq_message_data->packet_type;
+    MQTT311_SEND_BUFFER[current_index++] = pingreq_message_data->packet_type;
 
     /* Remaining size so far is 0 */
-    bytes_to_send[current_index++] = pingreq_message_data->remaining_length;
+    MQTT311_SEND_BUFFER[current_index++] = pingreq_message_data->remaining_length;
 
     pingreq_message_data->remaining_length = current_index - 2;
 
     /* Append remaining size */
-    bytes_to_send[1] = pingreq_message_data->remaining_length;
+    MQTT311_SEND_BUFFER[1] = pingreq_message_data->remaining_length;
 
     /* Send data to server */
     MQTT311Client_SendToMQTTBroker(current_index);

@@ -39,16 +39,16 @@ static void MQTT311Client_PublishWithStruct(struct PUBLISH_MESSAGE *publish_mess
     current_index = 0;
 
     /* Appending PUBLISH packet type*/
-    bytes_to_send[current_index++] = publish_message_data->packet_type;
+    MQTT311_SEND_BUFFER[current_index++] = publish_message_data->packet_type;
 
     uint8_t header_flags = (publish_message_data->dup << DUP_FLAG) | (publish_message_data->qos1 << QOS_LEVEL1) |
                             (publish_message_data->qos2 << QOS_LEVEL2) | (publish_message_data->retain << RETAIN);
 
     /* Append the header flags */                       
-    bytes_to_send[current_index] |= header_flags;
+    MQTT311_SEND_BUFFER[current_index] |= header_flags;
 
     /* Remaining size so far is 0 */
-    bytes_to_send[current_index++] = publish_message_data->remaining_length;
+    MQTT311_SEND_BUFFER[current_index++] = publish_message_data->remaining_length;
 
     /* Appending topic name, packet identifier and payload */
     MQTT311Client_AppendTopicName(publish_message_data->topicName);
@@ -59,8 +59,8 @@ static void MQTT311Client_PublishWithStruct(struct PUBLISH_MESSAGE *publish_mess
     /* Filling up the structure - Packet Identifier */
     if (packet_id_presence) 
     {
-        bytes_to_send[current_index++] = publish_message_data->packetIdentifier >> 8;
-        bytes_to_send[current_index++] = publish_message_data->packetIdentifier & 0xFF;
+        MQTT311_SEND_BUFFER[current_index++] = publish_message_data->packetIdentifier >> 8;
+        MQTT311_SEND_BUFFER[current_index++] = publish_message_data->packetIdentifier & 0xFF;
     }
 
     if (strcmp(publish_message_data->payload, "") != 0)
@@ -89,7 +89,7 @@ static void MQTT311Client_PublishWithStruct(struct PUBLISH_MESSAGE *publish_mess
                 vTaskDelay(pdMS_TO_TICKS(3000));
 
                 /* Setting re-delivery flag */
-                bytes_to_send[1] |= (1 << DUP_FLAG);
+                MQTT311_SEND_BUFFER[1] |= (1 << DUP_FLAG);
             }
             else
             {
@@ -127,7 +127,7 @@ static void MQTT311Client_PublishWithStruct(struct PUBLISH_MESSAGE *publish_mess
                 vTaskDelay(pdMS_TO_TICKS(3000));
 
                 /* Setting re-delivery flag */
-                bytes_to_send[1] |= (1 << DUP_FLAG);
+                MQTT311_SEND_BUFFER[1] |= (1 << DUP_FLAG);
             }
             else
             {

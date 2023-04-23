@@ -15,9 +15,9 @@
 #include "MQTT311Client/MQTT311Client.h"
 
 /* Macros for accessing the internal variables */
-#define MQTT311_SEND_BUFFER     (bytes_to_send)
-#define MQTT311_RECEIVE_BUFFER  (bytes_to_receive)
-#define MQTT311_RECEIVED_BYTES  (number_of_bytes_received)
+#define MQTT311_SEND_BUFFER     (MQTT311_SEND_BUFFER)
+#define MQTT311_RECEIVE_BUFFER  (MQTT311_RECEIVE_BUFFER)
+#define MQTT311_RECEIVED_BYTES  (MQTT311_RECEIVED_BYTES)
 
 /* External functions for socket connection */
 typedef void (*MQTT311Client_ConnectTCPSocketPtr)(const char*, uint16_t);
@@ -100,9 +100,9 @@ struct MQTTPacket
 extern struct UserData userdata;
 
 /* Bytes to send to function */
-extern volatile char bytes_to_send[10000];
-extern volatile char bytes_to_receive[10000];
-extern volatile uint16_t number_of_bytes_received; 
+extern volatile char MQTT311_SEND_BUFFER[10000];
+extern volatile char MQTT311_RECEIVE_BUFFER[10000];
+extern volatile uint16_t MQTT311_RECEIVED_BYTES; 
 
 /* Variable used to keep track of indexes */
 extern uint16_t current_index;
