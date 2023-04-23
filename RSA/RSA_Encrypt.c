@@ -8,6 +8,18 @@
 
 #include "RSA/RSA.h"
 
+
+/* Master's Public RSA key */
+const unsigned char *masterkey = (const unsigned char *)"-----BEGIN PUBLIC KEY-----\n"
+                                                        "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAm1HdBKqWguESCwi28+Ei\n"
+                                                        "1QZuZcMRUbCAXO0SnMqrjv2j+1UE1HIsCICojWWVada6flaqJuIZqnVcZiglvAWc\n"
+                                                        "q4Hz7dwZdbHqHafi56MchWC2ZV9Spmk6vKkMWJ0CRGU5VFTiPWOO1Xmn2HVJEt74\n"
+                                                        "UUU3TZM8zThacjb2Ck/FJVmjzNLvpUlvinZuIMTl2fhodR8Ji50v72AjsyWz+cEs\n"
+                                                        "OdGc4MxW51cLdg+L6l75W/wbBlMfufQ+cSarWvRc49W6B6fejWm83S96TO+k29GX\n"
+                                                        "BiogZpwNoKbP9wkdvVA7lvgFGS7sQyk54SogVsqERIpKzponmvc7pdafzKMXKcI3\n"
+                                                        "3wIDAQAB\n"
+                                                        "-----END PUBLIC KEY-----\n";
+
 /* Public RSA key */
 const unsigned char *key = (const unsigned char *)"-----BEGIN PUBLIC KEY-----\n"
                                                 "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtuNBiX/VrhP71s+yTIp7\n"
@@ -19,7 +31,7 @@ const unsigned char *key = (const unsigned char *)"-----BEGIN PUBLIC KEY-----\n"
                                                 "pwIDAQAB\n"
                                                 "-----END PUBLIC KEY-----\n";
 
-size_t RSA_Encrypt(const char* text)
+size_t RSA_Encrypt(const char* text, const unsigned char* rsa_key)
 {
     /* RNG (Random number generator init) */
     int ret = 0;
@@ -48,7 +60,7 @@ size_t RSA_Encrypt(const char* text)
     /*
      * Read the RSA public key
      */
-    if ((ret = mbedtls_pk_parse_public_key(&pk, key, strlen((const char *)key) + 1)) != 0)
+    if ((ret = mbedtls_pk_parse_public_key(&pk, rsa_key, strlen((const char *)rsa_key) + 1)) != 0)
     {
         RSA_Print("Failed! mbedtls_pk_parse_public_key returned an error!");
     };

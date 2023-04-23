@@ -18,6 +18,9 @@ char* text_to_encrypt;
 /* Value to hold the encrypted message length */
 size_t message_length = 0;
 
+/* Public RSA key to use */
+const unsigned char *key_to_use = NULL;
+
 /**
  * @brief RSA encryption task
  *
@@ -25,8 +28,13 @@ size_t message_length = 0;
  */
 void RSA_EncryptionTask(void *pvParameter)
 {
-    RSA_MESSAGE_LENGTH = RSA_Encrypt(RSA_MESSAGE_TO_ENCRYPT);
-    free(RSA_MESSAGE_TO_ENCRYPT);
+    if (RSA_PUBLIC_KEY_TO_USE != NULL) {
+        RSA_MESSAGE_LENGTH = RSA_Encrypt(RSA_MESSAGE_TO_ENCRYPT, RSA_PUBLIC_KEY_TO_USE);
+        free(RSA_MESSAGE_TO_ENCRYPT);
+    }
+    else {
+        RSA_Print("Public key to use is not defined!");
+    }
 
     vTaskDelete(NULL);
 }

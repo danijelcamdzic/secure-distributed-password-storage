@@ -50,6 +50,7 @@ void receive_passphrase(int index_start, int index_end)
     ESP_LOGI(TAG, "Begin encryption and/or decryption");
 
     // Encrypt and decrypt text
+    // RSA_SetPublicKeyInUse((PublicKeyControl_t)MASTER_PUBLIC_KEY)
     // RSA_StartEncryptionTask();
     // vTaskDelay(pdMS_TO_TICKS(3000));
     RSA_StartDecryptionTask();

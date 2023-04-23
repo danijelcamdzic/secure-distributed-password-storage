@@ -221,5 +221,5 @@ void app_main(void)
     MQTT311Client_Pingreq();
 
     /* ---- Test disconnecting ---- */
-    MQTT311Client_Disconnect();
+    // MQTT311Client_Disconnect();
 }
