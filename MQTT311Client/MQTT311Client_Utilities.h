@@ -14,6 +14,11 @@
 
 #include "MQTT311Client/MQTT311Client.h"
 
+/* Macros for accessing the internal variables */
+#define MQTT311_SEND_BUFFER     (bytes_to_send)
+#define MQTT311_RECEIVE_BUFFER  (bytes_to_receive)
+#define MQTT311_RECEIVED_BYTES  (number_of_bytes_received)
+
 /* External functions for socket connection */
 typedef void (*MQTT311Client_ConnectTCPSocketPtr)(const char*, uint16_t);
 typedef void (*MQTT311Client_CloseTCPSocketPtr)(void);

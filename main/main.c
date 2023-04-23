@@ -191,9 +191,9 @@ void app_main(void)
     MQTT311Client_SetConnectTCPSocket(connect_tcp_socket);
     MQTT311Client_SetSendToTCPSocket(send_tcp_data);
     MQTT311Client_SetReadFromTCPSocket(receive_tcp_data);
-    MQTT311Client_SetPrint(debug_print_mqtt);
+    MQTT311Client_SetPrint(debug_print);
     MQTT311Client_SetProcessBufferData(process_buffer_data);
-    RSA_SetPrint(debug_print_rsa);
+    RSA_SetPrint(debug_print);
 
     /* ---- Start FreeRTOS Tasks ---- */
     MQTT311Client_CreateMQTTFreeRTOSTasks();

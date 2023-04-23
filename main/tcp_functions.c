@@ -107,10 +107,10 @@ void receive_tcp_data(void)
             ESP_LOGI(TAG, "Error during reception");                        // Log if an error occurred during receiving
             break;
         } else {
-            /* Concatenate the received data to the existing data in the bytes_to_receive */
-            memcpy((void *)(bytes_to_receive + number_of_bytes_received), (const void *) temp_buffer, len);
+            /* Concatenate the received data to the existing data in the MQTT311_RECEIVE_BUFFER */
+            memcpy((void *)(MQTT311_RECEIVE_BUFFER + MQTT311_RECEIVED_BYTES), (const void *) temp_buffer, len);
 
-            number_of_bytes_received += len;                                // Increment the number of bytes received
+            MQTT311_RECEIVED_BYTES += len;                                // Increment the number of bytes received
 
             ESP_LOGI(TAG, "Received bytes: %d ", len);
         }
