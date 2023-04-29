@@ -7,6 +7,9 @@
 #include <openssl/pem.h>
 #include <openssl/err.h>
 
+#include "sss.h"
+#include "randombytes.h"
+
 const std::string SERVER_ADDRESS("tcp://mqtt.eclipseprojects.io:1883");
 const std::string CLIENT_ID("MQTT_CPP_Subscriber");
 const std::string SUB_TOPIC("topic/topic4");
@@ -95,6 +98,26 @@ int main(int argc, char* argv[])
     mqtt::connect_options connOpts;
     connOpts.set_keep_alive_interval(20);
     connOpts.set_clean_session(true);
+
+    uint8_t data[sss_MLEN], restored[sss_MLEN];
+	sss_Share shares[5];
+	size_t idx;
+	int tmp;
+
+	// Read a message to be shared
+	strncpy(reinterpret_cast<char*>(data), "Tyler Durden isn't real.", sizeof(data));
+
+	// Split the secret into 5 shares (with a recombination theshold of 4)
+	sss_create_shares(shares, data, 5, 4);
+
+	// Combine some of the shares to restore the original secret
+	tmp = sss_combine_shares(restored, shares, 5);
+
+    /* Print the messages */
+    std::cout << "Original message" << std::endl;
+    std::cout << data << std::endl;
+    std::cout << "Restored message:" << std::endl;
+    std::cout << restored << std::endl;
 
     try
     {
