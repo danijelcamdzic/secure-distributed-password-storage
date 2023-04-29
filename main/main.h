@@ -24,6 +24,10 @@
 #include "lwip/err.h"
 #include "lwip/sys.h"
 
+#include "esp_system.h"
+#include "nvs_flash.h"
+#include "nvs.h"
+
 /* TCP Socket */
 extern int sock;
 

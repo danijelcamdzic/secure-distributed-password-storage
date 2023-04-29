@@ -171,6 +171,35 @@ void wifi_init_sta(void)
     }
 }
 
+esp_err_t nvs_init() {
+    esp_err_t err = nvs_flash_init();
+    if (err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+        ESP_ERROR_CHECK(nvs_flash_erase());
+        err = nvs_flash_init();
+    }
+    return err;
+}
+
+esp_err_t nvs_store_string(const char *key, const char *value) {
+    nvs_handle_t my_handle;
+    esp_err_t err = nvs_open("storage", NVS_READWRITE, &my_handle);
+    if (err != ESP_OK) return err;
+
+    err = nvs_set_str(my_handle, key, value);
+    if (err != ESP_OK) return err;
+
+    return nvs_commit(my_handle);
+}
+
+esp_err_t nvs_read_string(const char *key, char *value, size_t *length) {
+    nvs_handle_t my_handle;
+    esp_err_t err = nvs_open("storage", NVS_READONLY, &my_handle);
+    if (err != ESP_OK) return err;
+
+    err = nvs_get_str(my_handle, key, value, length);
+    return err;
+}
+
 void app_main(void)
 {
     char* TAG = "app_main";  // Declare and initialize TAG for logging purposes
@@ -219,6 +248,23 @@ void app_main(void)
 
     /* ----- Test pinging ------ */
     MQTT311Client_Pingreq();
+
+    const char *key = "example_key";
+    const char *value_to_store = "Hello, ESP32!";
+    char value_read[32];
+    size_t length = sizeof(value_read);
+
+    // Initialize the NVS
+    ESP_ERROR_CHECK(nvs_init());
+
+    // Store the string in the NVS
+    // ESP_ERROR_CHECK(nvs_store_string(key, value_to_store));
+
+    // Read the string from the NVS
+    ESP_ERROR_CHECK(nvs_read_string(key, value_read, &length));
+
+    // Print the read value
+    printf("Value read from NVS: %s\n", value_read);
 
     /* ---- Test disconnecting ---- */
     // MQTT311Client_Disconnect();
