@@ -5,6 +5,9 @@
    CONDITIONS OF ANY KIND, either express or implied.
 */
 #include "main.h"
+#include "tcp_functions.h"
+#include "mqtt_functions.h"
+#include "nvs_functions.h"
 #include "MQTT311Client/MQTT311Client.h"
 #include "RSA/RSA.h"
 
@@ -171,66 +174,11 @@ void wifi_init_sta(void)
     }
 }
 
-esp_err_t nvs_init() {
-    esp_err_t err = nvs_flash_init();
-    if (err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-        ESP_ERROR_CHECK(nvs_flash_erase());
-        err = nvs_flash_init();
-    }
-    return err;
-}
-
-esp_err_t nvs_store_string(const char *key, const char *value) {
-    nvs_handle_t my_handle;
-    esp_err_t err = nvs_open("storage", NVS_READWRITE, &my_handle);
-    if (err != ESP_OK) return err;
-
-    err = nvs_set_str(my_handle, key, value);
-    if (err != ESP_OK) return err;
-
-    return nvs_commit(my_handle);
-}
-
-esp_err_t nvs_read_string(const char *key, char *value, size_t *length) {
-    nvs_handle_t my_handle;
-    esp_err_t err = nvs_open("storage", NVS_READONLY, &my_handle);
-    if (err != ESP_OK) return err;
-
-    err = nvs_get_str(my_handle, key, value, length);
-    return err;
-}
-
-void store_in_nvs(const char* key, const void* value, size_t length)
+void debug_print(char* message) 
 {
-    nvs_handle_t my_handle;
-    ESP_ERROR_CHECK(nvs_open(STORAGE_NAMESPACE, NVS_READWRITE, &my_handle));
-    ESP_ERROR_CHECK(nvs_set_blob(my_handle, key, value, length));
-    ESP_ERROR_CHECK(nvs_commit(my_handle));
-    nvs_close(my_handle);
-}
-
-void* read_from_nvs(const char* key)
-{
-    nvs_handle_t my_handle;
-    size_t length;
-    void *read_value;
-
-    ESP_ERROR_CHECK(nvs_open(STORAGE_NAMESPACE, NVS_READWRITE, &my_handle));
-
-    // Get the length of the binary data
-    ESP_ERROR_CHECK(nvs_get_blob(my_handle, key, NULL, &length));
-
-    ESP_LOGI("read_from_nvs", "Length is %d", length);
-
-    // Allocate memory for read_value
-    read_value = malloc(length);
-
-    // Read the binary data
-    ESP_ERROR_CHECK(nvs_get_blob(my_handle, key, read_value, &length));
-
-    nvs_close(my_handle);
-
-    return read_value;
+    /* Send debugging information */
+    char* TAG = "debug_print";                  // Declare and initialize TAG for logging purposes
+    ESP_LOGI(TAG, "%s", message);               // Log the input message with ESP_LOGI function
 }
 
 void app_main(void)
@@ -253,24 +201,24 @@ void app_main(void)
     ESP_ERROR_CHECK(nvs_init());
 
     /* --- Set External Functions --- */
-    MQTT311Client_SetConnectTCPSocket(connect_tcp_socket);
-    MQTT311Client_SetSendToTCPSocket(send_tcp_data);
-    MQTT311Client_SetReadFromTCPSocket(receive_tcp_data);
+    MQTT311Client_SetConnectTCPSocket(tcp_connect_socket);
+    MQTT311Client_SetSendToTCPSocket(tcp_send_data);
+    MQTT311Client_SetReadFromTCPSocket(tcp_receive_data);
     MQTT311Client_SetPrint(debug_print);
-    MQTT311Client_SetProcessBufferData(process_buffer_data);
+    MQTT311Client_SetProcessBufferData(mqtt_process_buffer_data);
     RSA_SetPrint(debug_print);
 
     /* ---- Start FreeRTOS Tasks ---- */
     MQTT311Client_CreateMQTTFreeRTOSTasks();
 
     /* ---- Connect to MQTT Broker ---- */
-    MQTT311Client_CreateClient("client_id_dado");
-    MQTT311Client_EstablishConnectionToMQTTBroker("mqtt.eclipseprojects.io", 1883);
+    MQTT311Client_CreateClient(CLIENT_ID);
+    MQTT311Client_EstablishConnectionToMQTTBroker(BROKER_ADDRESS, BROKER_PORT_TCP);
     MQTT311Client_SetUsernameAndPassword("", "");
     MQTT311Client_Connect(0xC2, 600, "", "");
 
     /* ----- Publish some messages ------*/
-    // MQTT311Client_Publish(0x00, "/topic/topic1", 0x00, "123test");
+    // MQTT311Client_Publish(0x00, "/topic/topic1", 0x00, "123test", sizeof("123test"));
     // vTaskDelay(pdMS_TO_TICKS(1000));
    
     /* ------ Subscribe to some topic ------ */
@@ -284,20 +232,6 @@ void app_main(void)
 
     /* ----- Test pinging ------ */
     MQTT311Client_Pingreq();
-
-    const char *keyy = "example_key";
-    const char *value_to_store = "Hello, ESP32!";
-    char value_read[32];
-    size_t length = sizeof(value_read);
-
-    // Store the string in the NVS
-    // ESP_ERROR_CHECK(nvs_store_string(key, value_to_store));
-
-    // Read the string from the NVS
-    ESP_ERROR_CHECK(nvs_read_string(keyy, value_read, &length));
-
-    // Print the read value
-    printf("Value read from NVS: %s\n", value_read);
 
     /* ---- Test disconnecting ---- */
     // MQTT311Client_Disconnect();

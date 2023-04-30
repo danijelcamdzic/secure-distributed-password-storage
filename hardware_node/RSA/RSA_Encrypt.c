@@ -8,7 +8,6 @@
 
 #include "RSA/RSA.h"
 
-
 /* Master's Public RSA key */
 const unsigned char *masterkey = (const unsigned char *)"-----BEGIN PUBLIC KEY-----\n"
                                                         "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAm1HdBKqWguESCwi28+Ei\n"
@@ -31,7 +30,7 @@ const unsigned char *key = (const unsigned char *)"-----BEGIN PUBLIC KEY-----\n"
                                                 "pwIDAQAB\n"
                                                 "-----END PUBLIC KEY-----\n";
 
-size_t RSA_Encrypt(const char* text, const unsigned char* rsa_key)
+size_t RSA_Encrypt(const char* text, size_t length, const unsigned char* rsa_key)
 {
     /* RNG (Random number generator init) */
     int ret = 0;
@@ -67,7 +66,7 @@ size_t RSA_Encrypt(const char* text, const unsigned char* rsa_key)
 
     /* Encrypting data */
     const unsigned char *to_encrypt = (const unsigned char *)text;
-    size_t to_encrypt_len = RSA_MESSAGE_LENGTH;
+    size_t to_encrypt_len = length;
 
     size_t olen = 0;                            // Initialize the output length to 0
 

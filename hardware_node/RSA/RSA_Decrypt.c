@@ -38,7 +38,7 @@ const unsigned char *private_key = (const unsigned char *)"-----BEGIN PRIVATE KE
                                                         "zOnlXq5SzkJViJXh2CtNAthK4Q==\n"
                                                         "-----END PRIVATE KEY-----\n";
 
-size_t RSA_Decrypt(const char* text, size_t length)
+size_t RSA_Decrypt(const char* text, size_t length, const unsigned char* rsa_private_key)
 {
     // RNG (Random number generator init)
     int ret = 0;
@@ -67,7 +67,7 @@ size_t RSA_Decrypt(const char* text, size_t length)
     /*
      * Read the RSA private key
      */
-    if ((ret = mbedtls_pk_parse_key(&pk, private_key, strlen((const char *)private_key) + 1, NULL, 0, mbedtls_ctr_drbg_random, &ctr_drbg)) != 0)
+    if ((ret = mbedtls_pk_parse_key(&pk, rsa_private_key, strlen((const char *)rsa_private_key) + 1, NULL, 0, mbedtls_ctr_drbg_random, &ctr_drbg)) != 0)
     {
        RSA_Print("Failed! mbedtls_pk_parse_public_key returned an error");
     }

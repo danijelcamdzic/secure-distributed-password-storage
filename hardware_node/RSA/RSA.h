@@ -43,7 +43,6 @@ typedef enum PublicKeyControl_e {
 #define RSA_MASTER_PUBLIC_KEY   (masterkey)
 #define RSA_PUBLIC_KEY          (key)
 #define RSA_PRIVATE_KEY         (private_key)
-#define RSA_PUBLIC_KEY_TO_USE   (key_to_use)
 
 /* Master's Public RSA key */
 extern const unsigned char *masterkey;
@@ -53,9 +52,6 @@ extern const unsigned char *key;
 
 /* Private RSA key */
 extern const unsigned char *private_key;
-
-/* Public RSA key to use */
-extern const unsigned char *key_to_use;
 
 /* Buffer to hold messages */
 extern unsigned char encrypted_text[MBEDTLS_MPI_MAX_SIZE];
@@ -79,15 +75,14 @@ void RSA_EncryptionTask(void *pvParameter);
 void RSA_DecryptionTask(void *pvParameter);
 
 /* Encryption/Decryption function prototypes */
-size_t RSA_Encrypt(const char* text, const unsigned char* rsa_key);
-size_t RSA_Decrypt(const char* text, size_t length);
+size_t RSA_Encrypt(const char* text, size_t length, const unsigned char* rsa_key);
+size_t RSA_Decrypt(const char* text, size_t length, const unsigned char* rsa_private_key);
 
 /* Utility functions */
 /* External functions for debugging */
 typedef void (*RSA_PrintPtr)(char*);
 extern RSA_PrintPtr RSA_Print;
 void RSA_SetPrint(RSA_PrintPtr print);
-void RSA_SetPublicKeyInUse(PublicKeyControl_t which_key);
 
 #endif /* RSA_H */
 

@@ -111,12 +111,12 @@ extern uint16_t current_index;
 extern QueueHandle_t xMQTTQueue;
 
 /* Function declarations */
-void MQTT311Client_SetConnectTCPSocket(MQTT311Client_ConnectTCPSocketPtr connect_tcp_socket);
+void MQTT311Client_SetConnectTCPSocket(MQTT311Client_ConnectTCPSocketPtr tcp_connect_socket);
 void MQTT311Client_SetCloseTCPSocket(MQTT311Client_CloseTCPSocketPtr close_tcp_socket);
 void MQTT311Client_SetSendToTCPSocket(MQTT311Client_SendToTCPSocketPtr send_to_tcp_socket);
 void MQTT311Client_SetReadFromTCPSocket(MQTT311Client_ReadFromTCPSocketPtr read_from_tcp_socket);
 void MQTT311Client_SetPrint(MQTT311Client_PrintPtr print);
-void MQTT311Client_SetProcessBufferData(MQTT311Client_ProcessBufferDataPtr process_buffer_data);
+void MQTT311Client_SetProcessBufferData(MQTT311Client_ProcessBufferDataPtr mqtt_process_buffer_data);
 void MQTT311Client_SendMQTTPacket(struct MQTTPacket *mqtt_packet);
 void MQTT311Client_CreateClient(const char* deviceID);
 void MQTT311Client_SetUsernameAndPassword(const char* username, const char* password);

@@ -139,6 +139,7 @@ static PublishMessageResult_t MQTT311Client_PublishWithStruct(struct PUBLISH_MES
  * @param topicName Name of the topic that gets published
  * @param packetIdentifier Identifier of the packet. Possible only when QoS == 1 or QoS == 2
  * @param payload Data that gets published
+ * @param payload_length Length of the payload data
  *
  * @return None
  */

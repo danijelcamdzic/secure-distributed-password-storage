@@ -18,7 +18,6 @@
 /* TCP Socket */
 int sock;
 
-
 /**
  * @brief Connect to a TCP socket using the provided broker address and port.
  *
@@ -28,10 +27,10 @@ int sock;
  * @param brokerAddress The address of the broker to connect to.
  * @param port The port number to establish the connection.
  */
-void connect_tcp_socket(const char* brokerAddress, uint16_t port) 
+void tcp_connect_socket(const char* brokerAddress, uint16_t port) 
 {
     /* Connect to a TCP socket */
-    char* TAG = "send_tcp_data"; // Declare and initialize TAG for logging purposes
+    char* TAG = "tcp_send_data"; // Declare and initialize TAG for logging purposes
 
     int addr_family = 0;
     int ip_protocol = 0;
@@ -89,10 +88,10 @@ void connect_tcp_socket(const char* brokerAddress, uint16_t port)
  * @param data Pointer to the data to be sent.
  * @param size The size of the data to be sent.
  */
-void send_tcp_data(const char* data, uint16_t size)
+void tcp_send_data(const char* data, uint16_t size)
 {
     /* Send data over TCP connection */
-    char* TAG = "send_tcp_data";                            // Declare and initialize TAG for logging purposes
+    char* TAG = "tcp_send_data";                            // Declare and initialize TAG for logging purposes
 
     int err = send(sock, data, size, 0);                    // Send data through the socket
 
@@ -111,9 +110,9 @@ void send_tcp_data(const char* data, uint16_t size)
  * and stores it in the MQTT311_RECEIVE_BUFFER. It also logs the number of
  * bytes received and any errors that may occur during reception.
  */
-void receive_tcp_data(void)
+void tcp_receive_data(void)
 {
-    char* TAG = "receive_tcp_data"; // Declare and initialize TAG for logging purposes                                                  
+    char* TAG = "tcp_receive_data"; // Declare and initialize TAG for logging purposes                                                  
 
     /* Set socket to non-blocking mode */
     if (fcntl(sock, F_SETFL, fcntl(sock, F_GETFL) | O_NONBLOCK) < 0) {

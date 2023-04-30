@@ -18,9 +18,6 @@ char* text_to_encrypt;
 /* Value to hold the encrypted message length */
 size_t message_length = 0;
 
-/* Public RSA key to use */
-const unsigned char *key_to_use = NULL;
-
 /**
  * @brief RSA encryption task
  *
@@ -28,18 +25,9 @@ const unsigned char *key_to_use = NULL;
  */
 void RSA_EncryptionTask(void *pvParameter)
 {
-    for (int i = 0; i < RSA_MESSAGE_LENGTH; i++)
-    {
-        printf("%c ", RSA_MESSAGE_TO_ENCRYPT[i]);
-    }
-
-    if (RSA_PUBLIC_KEY_TO_USE != NULL) {
-        RSA_MESSAGE_LENGTH = RSA_Encrypt(RSA_MESSAGE_TO_ENCRYPT, RSA_MASTER_PUBLIC_KEY);
-        free(RSA_MESSAGE_TO_ENCRYPT);
-    }
-    else {
-        RSA_Print("Public key to use is not defined!");
-    }
+    /* Always encrypt with the master public key (of the software node) */
+    RSA_MESSAGE_LENGTH = RSA_Encrypt(RSA_MESSAGE_TO_ENCRYPT, RSA_MESSAGE_LENGTH, RSA_MASTER_PUBLIC_KEY);
+    free(RSA_MESSAGE_TO_ENCRYPT);
 
     vTaskDelete(NULL);
 }
@@ -51,7 +39,8 @@ void RSA_EncryptionTask(void *pvParameter)
  */
 void RSA_DecryptionTask(void *pvParameter)
 {
-    RSA_MESSAGE_LENGTH = RSA_Decrypt((char*)RSA_ENCRYPTED_BUFFER, RSA_MESSAGE_LENGTH);
+    /* Always decrypt with the private key of the hardware device */
+    RSA_MESSAGE_LENGTH = RSA_Decrypt((char*)RSA_ENCRYPTED_BUFFER, RSA_MESSAGE_LENGTH, RSA_PRIVATE_KEY);
 
     vTaskDelete(NULL);
 }
