@@ -1,5 +1,8 @@
 #include "mqtt.h"
 
+const std::string RETRIEVE_PASSWORD_COMMAND("GetPassEND_MESSAGE");
+const std::string END_MESSAGE_FLAG("END_MESSAGE");
+
 const std::string SERVER_ADDRESS("tcp://mqtt.eclipseprojects.io:1883");
 const std::string CLIENT_ID("access_node");
 const std::string TOPIC_SUB_HW_1("/topic/sub/hw_node_1");
@@ -14,7 +17,7 @@ callback mqttCallbackFunction;
 
 void callback::message_arrived(mqtt::const_message_ptr msg)
 {
-    std::cout << "Message arrived: " << msg->get_topic() << ": " << msg->to_string() << std::endl;
+    // std::cout << "Message arrived: " << msg->get_topic() << ": " << msg->to_string() << std::endl;
     std::unique_lock<std::mutex> lock(received_messages_mutex);
     received_messages.emplace_back(msg->get_topic(), msg->to_string());
     lock.unlock();
@@ -70,14 +73,15 @@ void mqtt_subscribe(const std::string& topic)
     }
 }
 
-void mqtt_publish(const std::string& topic, const std::string& message)
+void mqtt_publish(const std::string& topic, const std::vector<unsigned char>& message)
 {
     try
     {
-        auto msg = mqtt::make_message(topic, message);
+        auto msg = mqtt::make_message(topic, std::string(message.begin(), message.end()));
         msg->set_qos(1);
         client.publish(msg)->wait_for(std::chrono::seconds(10));
-        std::cout << "Message published: " << message << std::endl;
+        std::cout << "Message published! " << std::endl;
+        // std::cout << "Message published: " << std::string(message.begin(), message.end()) << std::endl;
     }
     catch (const mqtt::exception& exc)
     {

@@ -13,8 +13,8 @@
 #include "mqtt/callback.h"
 #include "mqtt/async_client.h"
 
-#define RETRIEVE_PASSWORD_COMMAND   "GetPassEND_MESSAGE"
-#define END_MESSAGE_FLAG            "END_MESSAGE"
+extern const std::string RETRIEVE_PASSWORD_COMMAND;
+extern const std::string END_MESSAGE_FLAG;
 
 extern const std::string SERVER_ADDRESS;
 extern const std::string CLIENT_ID;
@@ -39,6 +39,6 @@ extern callback mqttCallbackFunction;
 
 void mqtt_connect(void);
 void mqtt_subscribe(const std::string& topic);
-void mqtt_publish(const std::string& topic, const std::string& message);
+void mqtt_publish(const std::string& topic, const std::vector<unsigned char>& message);
 
 #endif
