@@ -13,5 +13,6 @@
 #define SHAMIR_THRESHOLD    1
 
 void sss_split_password_into_shares(const std::string& password, std::vector<sss_Share>& shares);
+std::string sss_recombine_password_from_shares(const std::vector<sss_Share>& shares);
 
 #endif

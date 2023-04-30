@@ -3,7 +3,6 @@
 const std::string RSA_PUBLIC_KEY("../rsa_public_key.pem");
 const std::string RSA_PRIVATE_KEY("../rsa_private_key.pem");
 const std::string RSA_PUBLIC_KEY_HW_NODE_1("../rsa_public_key_hw_node_1.pem");
-
 const std::vector<std::string> public_keys_hw_nodes = {RSA_PUBLIC_KEY_HW_NODE_1};
 
 std::string rsa_encrypt_message(const std::string& message, const std::string& public_key_filename)
@@ -40,6 +39,7 @@ std::string rsa_encrypt_message(const std::string& message, const std::string& p
 
     RSA_free(rsa_pubkey);
     BIO_free(bio);
+
     return std::string(reinterpret_cast<char*>(encrypted_message.data()), encrypt_len);
 }
 
@@ -77,6 +77,7 @@ std::string rsa_decrypt_message(const std::string& encrypted_message, const std:
 
     RSA_free(rsa_privkey);
     BIO_free(bio);
+    
     return std::string(reinterpret_cast<char*>(decrypted_message.data()), decrypt_len);
 }
 

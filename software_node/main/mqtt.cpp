@@ -5,23 +5,49 @@ const std::string CLIENT_ID("access_node");
 const std::string TOPIC_SUB_HW_1("/topic/sub/hw_node_1");
 const std::string TOPIC_PUB_HW_1("/topic/pub/hw_node_1");
 const std::string TOPIC_PUB_ALL("/topic/pub/all");
-const std::string RETRIEVE_PASSWORD("RETRIEVE PASSWORD");
-
 const std::vector<std::string> sub_topics = {TOPIC_SUB_HW_1};
 const std::vector<std::string> pub_topics = {TOPIC_PUB_HW_1};
 
 mqtt::async_client client(SERVER_ADDRESS, CLIENT_ID);
 static mqtt::connect_options connOpts;
-static callback callbackFunction;
+callback mqttCallbackFunction;
 
 void callback::message_arrived(mqtt::const_message_ptr msg)
 {
     std::cout << "Message arrived: " << msg->get_topic() << ": " << msg->to_string() << std::endl;
+    std::unique_lock<std::mutex> lock(received_messages_mutex);
+    received_messages.emplace_back(msg->get_topic(), msg->to_string());
+    lock.unlock();
+    received_messages_cv.notify_one();
 }
+
+std::vector<std::pair<std::string, std::string>> callback::get_received_messages() const
+{
+    std::unique_lock<std::mutex> lock(received_messages_mutex);
+    return received_messages;
+}
+
+void callback::wait_for_messages(int num_messages)
+{
+    std::unique_lock<std::mutex> lock(received_messages_mutex);
+    received_messages_cv.wait(lock, [this, num_messages] { return received_messages.size() >= num_messages; });
+}
+
+// void callback::wait_for_messages(int num_unique_topics)
+// {
+//     std::unique_lock<std::mutex> lock(received_messages_mutex);
+//     received_messages_cv.wait(lock, [this, num_unique_topics] { 
+//         std::unordered_set<std::string> unique_topics;
+//         for (const auto& [topic, message] : received_messages) {
+//             unique_topics.insert(topic);
+//         }
+//         return unique_topics.size() >= num_unique_topics; 
+//     });
+// }
 
 void mqtt_connect(void)
 {
-    client.set_callback(callbackFunction);
+    client.set_callback(mqttCallbackFunction);
     connOpts.set_keep_alive_interval(120);
     connOpts.set_clean_session(true);
 
