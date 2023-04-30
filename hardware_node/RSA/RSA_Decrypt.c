@@ -38,7 +38,7 @@ const unsigned char *private_key = (const unsigned char *)"-----BEGIN PRIVATE KE
                                                         "zOnlXq5SzkJViJXh2CtNAthK4Q==\n"
                                                         "-----END PRIVATE KEY-----\n";
 
-void RSA_Decrypt(const char* text, size_t length)
+size_t RSA_Decrypt(const char* text, size_t length)
 {
     // RNG (Random number generator init)
     int ret = 0;
@@ -56,7 +56,7 @@ void RSA_Decrypt(const char* text, size_t length)
     {
        RSA_Print("Error occured during the function mbedtls_ctr_drbg_seed");
 
-        return;
+        return 0;
     }
 
     /* Creating rsa context + Importing pub key */
@@ -102,5 +102,9 @@ void RSA_Decrypt(const char* text, size_t length)
     mbedtls_pk_free(&pk);                       // Free the public key context
     mbedtls_entropy_free(&entropy);             // Free the entropy context
     mbedtls_ctr_drbg_free(&ctr_drbg);           // Free the CTR-DRBG context
+
+    memcpy(RSA_ENCRYPTED_BUFFER, result, olen);
+
+    return olen;
 }
 

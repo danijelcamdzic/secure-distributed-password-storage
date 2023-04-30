@@ -52,6 +52,7 @@ struct PUBLISH_MESSAGE
     char* topicName;                                /* Name of the message topic */
     char* payload;                                  /* Data of the message */
 
+    uint32_t payload_length;                        /* Length of the payload package */
     uint16_t remaining_length;                      /* Remaining length of the packet */   
     uint16_t packetIdentifier;                      /* Packet identifier present only if QoS == 1 or QoS == 2 */
     uint8_t packet_type;                            /* MQTT Message Packet Type*/
@@ -66,7 +67,7 @@ struct PUBLISH_MESSAGE
 /* ----------------------------------------------------------------------------------------- */
 
 /* Function declarations */
-void MQTT311Client_Publish(uint8_t header_flags, const char* topicName, uint16_t packetIdentifier, const char* payload);
+void MQTT311Client_Publish(uint8_t header_flags, const char* topicName, uint16_t packetIdentifier, const char* payload, uint32_t payload_length);
 
 #endif /* MQTT311Client_PUBLISH_H */
 

@@ -21,15 +21,26 @@
 #include <netdb.h>
 #include <fcntl.h>
 
-#include "lwip/err.h"
-#include "lwip/sys.h"
-
 #include "esp_system.h"
 #include "nvs_flash.h"
 #include "nvs.h"
 
+#include "lwip/err.h"
+#include "lwip/sys.h"
+
+#define END_MESSAGE_FLAG            "END_MESSAGE"
+#define SUB_TOPIC                   "/topic/pub/hw_node_1"
+#define PUB_TOPIC                   "/topic/sub/hw_node_1"
+#define ALL_TOPIC                   "/topic/pub/all"
+
+#define STORAGE_NAMESPACE "pass_space"
+
 /* TCP Socket */
 extern int sock;
+
+/* Store in NVS and read from NVS function prototypes */
+void store_in_nvs(const char* key, const void* value, size_t length);
+void* read_from_nvs(const char* key);
 
 /* TCP Socket function prototypes */
 void connect_tcp_socket(const char* brokerAddress, uint16_t port);

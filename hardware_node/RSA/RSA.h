@@ -80,7 +80,7 @@ void RSA_DecryptionTask(void *pvParameter);
 
 /* Encryption/Decryption function prototypes */
 size_t RSA_Encrypt(const char* text, const unsigned char* rsa_key);
-void RSA_Decrypt(const char* text, size_t length);
+size_t RSA_Decrypt(const char* text, size_t length);
 
 /* Utility functions */
 /* External functions for debugging */

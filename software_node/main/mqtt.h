@@ -13,7 +13,7 @@
 #include "mqtt/callback.h"
 #include "mqtt/async_client.h"
 
-#define RETRIEVE_PASSWORD_COMMAND   "GetPass"
+#define RETRIEVE_PASSWORD_COMMAND   "GetPassEND_MESSAGE"
 #define END_MESSAGE_FLAG            "END_MESSAGE"
 
 extern const std::string SERVER_ADDRESS;

@@ -24,7 +24,7 @@ void sss_split_password_into_shares(const std::string& password, std::vector<sss
 std::string sss_recombine_password_from_shares(const std::vector<sss_Share>& shares) 
 {
     /* Ensure the shares vector is the correct size */
-    if (shares.size() >= SHAMIR_THRESHOLD) {
+    if (shares.size() < SHAMIR_THRESHOLD) {
         throw std::runtime_error("Shares vector size must be greate than or equal to SHAMIR_THRESHOLD.");
     }
 
@@ -41,7 +41,7 @@ std::string sss_recombine_password_from_shares(const std::vector<sss_Share>& sha
 
     /* Convert the restored data back to a string */
     std::string restored_password(reinterpret_cast<char*>(restored_data));
-    
+
     return restored_password;
 }
 

@@ -28,8 +28,13 @@ const unsigned char *key_to_use = NULL;
  */
 void RSA_EncryptionTask(void *pvParameter)
 {
+    for (int i = 0; i < RSA_MESSAGE_LENGTH; i++)
+    {
+        printf("%c ", RSA_MESSAGE_TO_ENCRYPT[i]);
+    }
+
     if (RSA_PUBLIC_KEY_TO_USE != NULL) {
-        RSA_MESSAGE_LENGTH = RSA_Encrypt(RSA_MESSAGE_TO_ENCRYPT, RSA_PUBLIC_KEY_TO_USE);
+        RSA_MESSAGE_LENGTH = RSA_Encrypt(RSA_MESSAGE_TO_ENCRYPT, RSA_MASTER_PUBLIC_KEY);
         free(RSA_MESSAGE_TO_ENCRYPT);
     }
     else {
@@ -46,7 +51,7 @@ void RSA_EncryptionTask(void *pvParameter)
  */
 void RSA_DecryptionTask(void *pvParameter)
 {
-    RSA_Decrypt((char*)RSA_ENCRYPTED_BUFFER, RSA_MESSAGE_LENGTH);
+    RSA_MESSAGE_LENGTH = RSA_Decrypt((char*)RSA_ENCRYPTED_BUFFER, RSA_MESSAGE_LENGTH);
 
     vTaskDelete(NULL);
 }

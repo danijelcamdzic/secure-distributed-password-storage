@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <stdexcept>
+#include <iomanip>
 
 #if defined(_WIN32) || defined(_WIN64)
 #include <Windows.h>
@@ -66,6 +67,14 @@ std::string read_password()
     return password;
 }
 
+void print_hex(const std::string& label, const std::vector<unsigned char>& data) {
+    std::cout << label << ": ";
+    for (const auto& byte : data) {
+        std::cout << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(byte) << " ";
+    }
+    std::cout << std::dec << std::endl;
+}
+
 int main(int argc, char *argv[]) 
 {
     /* Read the arguments to deduce whether to save or retrieve password */
@@ -98,10 +107,18 @@ int main(int argc, char *argv[])
             throw std::runtime_error("Number of shares must match the number of publish topics!");
         }
 
+        // std::vector<unsigned char> encrypted_share = rsa_encrypt_message(password, RSA_PUBLIC_KEY_HW_NODE_1);
+
+        // std::string encrypted_share_str(encrypted_share.begin(), encrypted_share.end());
+        // encrypted_share_str += END_MESSAGE_FLAG;
+        // mqtt_publish(pub_topics[0], encrypted_share_str);
+
         /* Encrypt and send the shares */
         std::vector<std::string> encrypted_shares(SHAMIR_NUM_SHARES);
         for (size_t i = 0; i < SHAMIR_NUM_SHARES; i++) {
             std::string share_data(reinterpret_cast<char*>(shares[i]), sss_SHARE_LEN);
+            std::cout << "The original share has the length of: " << share_data.size() << std::endl;
+            std::cout << "The original share is: " << share_data << std::endl;
             encrypted_shares[i] = rsa_encrypt_message(share_data, public_keys_hw_nodes[i]);
             encrypted_shares[i] += END_MESSAGE_FLAG;
             mqtt_publish(pub_topics[i], encrypted_shares[i]);
@@ -123,7 +140,13 @@ int main(int argc, char *argv[])
         /* 1. Decrypt the messages using rsa_decrypt_message */
         std::vector<std::string> decrypted_share_strings;
         for (const auto& [topic, message] : received_messages) {
-            std::string decrypted_message = rsa_decrypt_message(message, RSA_PRIVATE_KEY);
+            std::cout << "Received message has length of: " << message.size() << std::endl;
+            std::vector<unsigned char> encrypted_message(message.begin(), message.end());
+            print_hex("Encrypted data received", encrypted_message);
+            std::vector<unsigned char> decrypted_message_vec = rsa_decrypt_message(encrypted_message, RSA_PRIVATE_KEY);
+            print_hex("Decrypted data", decrypted_message_vec);
+            std::string decrypted_message(decrypted_message_vec.begin(), decrypted_message_vec.end());
+            std::cout << "The decrypted share has the length of: " << decrypted_message.size() << " and the string is: " << decrypted_message << std::endl;
             decrypted_share_strings.push_back(decrypted_message);
         }
 
@@ -139,7 +162,7 @@ int main(int argc, char *argv[])
         /* 3. Call the sss_recombine_password_from_shares function */
         std::string restored_password = sss_recombine_password_from_shares(shares);
         std::cout << "Restored password is: " << restored_password << std::endl;
-        
+
     } else {
         std::cerr << "Invalid option. Please provide either 'save_password' or 'get_password' as an argument." << std::endl;
     }

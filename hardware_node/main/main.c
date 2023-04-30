@@ -200,6 +200,39 @@ esp_err_t nvs_read_string(const char *key, char *value, size_t *length) {
     return err;
 }
 
+void store_in_nvs(const char* key, const void* value, size_t length)
+{
+    nvs_handle_t my_handle;
+    ESP_ERROR_CHECK(nvs_open(STORAGE_NAMESPACE, NVS_READWRITE, &my_handle));
+    ESP_ERROR_CHECK(nvs_set_blob(my_handle, key, value, length));
+    ESP_ERROR_CHECK(nvs_commit(my_handle));
+    nvs_close(my_handle);
+}
+
+void* read_from_nvs(const char* key)
+{
+    nvs_handle_t my_handle;
+    size_t length;
+    void *read_value;
+
+    ESP_ERROR_CHECK(nvs_open(STORAGE_NAMESPACE, NVS_READWRITE, &my_handle));
+
+    // Get the length of the binary data
+    ESP_ERROR_CHECK(nvs_get_blob(my_handle, key, NULL, &length));
+
+    ESP_LOGI("read_from_nvs", "Length is %d", length);
+
+    // Allocate memory for read_value
+    read_value = malloc(length);
+
+    // Read the binary data
+    ESP_ERROR_CHECK(nvs_get_blob(my_handle, key, read_value, &length));
+
+    nvs_close(my_handle);
+
+    return read_value;
+}
+
 void app_main(void)
 {
     char* TAG = "app_main";  // Declare and initialize TAG for logging purposes
@@ -215,6 +248,9 @@ void app_main(void)
     /* ------ Initialize Wifi ------- */
     ESP_LOGI(TAG, "Initializing device as station and connecting to wifi...");
     wifi_init_sta();
+
+    /* ------ Initialize NVS ------- */
+    ESP_ERROR_CHECK(nvs_init());
 
     /* --- Set External Functions --- */
     MQTT311Client_SetConnectTCPSocket(connect_tcp_socket);
@@ -234,34 +270,31 @@ void app_main(void)
     MQTT311Client_Connect(0xC2, 600, "", "");
 
     /* ----- Publish some messages ------*/
-    MQTT311Client_Publish(0x00, "/topic/topic1", 0x00, "123test");
-    vTaskDelay(pdMS_TO_TICKS(1000));
-    MQTT311Client_Publish(0x00, "/topic/topic2", 0x00, "Test123");
-    vTaskDelay(pdMS_TO_TICKS(1000));
+    // MQTT311Client_Publish(0x00, "/topic/topic1", 0x00, "123test");
+    // vTaskDelay(pdMS_TO_TICKS(1000));
    
     /* ------ Subscribe to some topic ------ */
-    MQTT311Client_Subscribe(0x02, "/topic/topic3", 0x00);
+    MQTT311Client_Subscribe(0x02, SUB_TOPIC, 0x00);
+    vTaskDelay(pdMS_TO_TICKS(1000));
+    MQTT311Client_Subscribe(0x02, ALL_TOPIC, 0x00);
 
     /* ----- Unsubscribe to some topic ----- */
     vTaskDelay(pdMS_TO_TICKS(1000));
-    MQTT311Client_Unsubscribe(0x02, "/topic/mihajlo");
+    MQTT311Client_Unsubscribe(0x02, "/topic/unsubscribe_test");
 
     /* ----- Test pinging ------ */
     MQTT311Client_Pingreq();
 
-    const char *key = "example_key";
+    const char *keyy = "example_key";
     const char *value_to_store = "Hello, ESP32!";
     char value_read[32];
     size_t length = sizeof(value_read);
-
-    // Initialize the NVS
-    ESP_ERROR_CHECK(nvs_init());
 
     // Store the string in the NVS
     // ESP_ERROR_CHECK(nvs_store_string(key, value_to_store));
 
     // Read the string from the NVS
-    ESP_ERROR_CHECK(nvs_read_string(key, value_read, &length));
+    ESP_ERROR_CHECK(nvs_read_string(keyy, value_read, &length));
 
     // Print the read value
     printf("Value read from NVS: %s\n", value_read);

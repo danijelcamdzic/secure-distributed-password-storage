@@ -67,7 +67,7 @@ size_t RSA_Encrypt(const char* text, const unsigned char* rsa_key)
 
     /* Encrypting data */
     const unsigned char *to_encrypt = (const unsigned char *)text;
-    size_t to_encrypt_len = strlen((const char *)to_encrypt); // Get the length of the text to encrypt
+    size_t to_encrypt_len = RSA_MESSAGE_LENGTH;
 
     size_t olen = 0;                            // Initialize the output length to 0
 

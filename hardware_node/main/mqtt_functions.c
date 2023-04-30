@@ -61,7 +61,7 @@ void receive_passphrase(int index_start, int index_end)
 
     int i = 0;
 
-    for (i = index_start ; i < index_end; i++)
+    for (i = index_start; i < index_end; i++)
     {
         printf("%c ", MQTT311_RECEIVE_BUFFER[i]);
         RSA_ENCRYPTED_BUFFER[i - index_start] = MQTT311_RECEIVE_BUFFER[i];
@@ -74,10 +74,25 @@ void receive_passphrase(int index_start, int index_end)
     ESP_LOGI(TAG, "Begin encryption and/or decryption");
 
     // Encrypt and decrypt text
-    // RSA_SetPublicKeyInUse((PublicKeyControl_t)MASTER_PUBLIC_KEY)
-    // RSA_StartEncryptionTask();
-    // vTaskDelay(pdMS_TO_TICKS(3000));
     RSA_StartDecryptionTask();
+    vTaskDelay(pdMS_TO_TICKS(3000));
+    ESP_LOGI(TAG, "Length after decrypting %d bytes", RSA_MESSAGE_LENGTH);
+    vTaskDelay(pdMS_TO_TICKS(3000));
+    ESP_LOGI(TAG, "Finished decryption");
+    RSA_SetPublicKeyInUse((PublicKeyControl_t)MASTER_PUBLIC_KEY);
+    free(RSA_MESSAGE_TO_ENCRYPT);
+    RSA_MESSAGE_TO_ENCRYPT = malloc(RSA_MESSAGE_LENGTH);
+    memcpy(RSA_MESSAGE_TO_ENCRYPT, RSA_ENCRYPTED_BUFFER, RSA_MESSAGE_LENGTH);
+    RSA_StartEncryptionTask();
+    vTaskDelay(pdMS_TO_TICKS(3000));
+    ESP_LOGI(TAG, "Finished encryption");
+    const char *pass_key = "password";
+    char* password = malloc(RSA_MESSAGE_LENGTH);
+    ESP_LOGI(TAG, "Final length %d bytes", RSA_MESSAGE_LENGTH);
+    memcpy(password, RSA_ENCRYPTED_BUFFER, RSA_MESSAGE_LENGTH);
+    store_in_nvs(pass_key, password, RSA_MESSAGE_LENGTH);
+    ESP_LOGI(TAG, "Finished storing");
+    // vTaskDelay(pdMS_TO_TICKS(3000));
 }
 
 /**
@@ -89,11 +104,29 @@ void receive_passphrase(int index_start, int index_end)
  */
 void send_passphrase()
 {
-    // RSA_MESSAGE_TO_ENCRYPT = (char*) pvPortMalloc(index2-index1-strlen(str1));
-    // memcpy(RSA_MESSAGE_TO_ENCRYPT, (void*)&MQTT311_RECEIVE_BUFFER[index1 + strlen(str1)], index2-index1-strlen(str1));
+    char* TAG = "send_passphrase"; // Declare and initialize TAG for logging purposes  
 
-    // // Null-terminate the copied string
-    // RSA_MESSAGE_TO_ENCRYPT[index2-index1-strlen(str1)] = '\0';
+    const char *pass_key = "password";
+
+    char* read_value = read_from_nvs(pass_key);
+
+    printf("%s: ", "before sending\n\n");
+    for (size_t i = 0; i < 256; i++) {
+        printf("%02x ", (unsigned char)read_value[i]);
+    }
+    printf("\n");
+
+    // ESP_LOGI(TAG, "Trying to decrypt myself..");
+
+    // memcpy(RSA_ENCRYPTED_BUFFER, read_value, 256);
+    // RSA_MESSAGE_LENGTH = 256;
+    // RSA_StartDecryptionTask();
+    // vTaskDelay(pdMS_TO_TICKS(3000));
+
+    MQTT311Client_Publish(0x00, PUB_TOPIC, 0x00, read_value, 256);
+    vTaskDelay(pdMS_TO_TICKS(3000));
+    free(read_value); // Free the allocated memory
+    ESP_LOGI(TAG, "Finished sending");
 }
 
 /**
@@ -107,14 +140,33 @@ void send_passphrase()
  */
 void process_buffer_data(void) 
 {
-    char* str1 = "/topic/topic3";
-    char* str2 = "END_MESSAGE";
+    char* TAG = "process_buffer_data"; // Declare and initialize TAG for logging purposes  
+
+    char* str1 = ALL_TOPIC;
+    char* str2 = END_MESSAGE_FLAG;
 
     int index_start = find_substring_index(str1, strlen(str1));
     int index_end = find_substring_index(str2, strlen(str2));
 
     if ((index_start != -1) && (index_end != -1)) {
-        receive_passphrase(index_start + strlen(str1), index_end);
+        ESP_LOGI(TAG, "Received command to send password!");
+        // for (int i = index_start ; i < index_end; i++)
+        // {
+        //     printf("%c ", MQTT311_RECEIVE_BUFFER[i]);
+        // }
+        send_passphrase();
+        MQTT311_RECEIVED_BYTES = 0;
+        return;
+    }
+
+    char* str3 = SUB_TOPIC;
+    char* str4 = END_MESSAGE_FLAG;
+
+    index_start = find_substring_index(str3, strlen(str3));
+    index_end = find_substring_index(str4, strlen(str4));
+
+    if ((index_start != -1) && (index_end != -1)) {
+        receive_passphrase(index_start + strlen(str3), index_end);
     }
 
     MQTT311_RECEIVED_BYTES = 0;

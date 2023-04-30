@@ -11,7 +11,7 @@ std::string rsa_encrypt_message(const std::string& message, const std::string& p
     if (!pub_key_file)
     {
         std::cerr << "Error opening public key file: " << public_key_filename << std::endl;
-        return "";
+        return {};
     }
 
     std::string pub_key_str((std::istreambuf_iterator<char>(pub_key_file)), std::istreambuf_iterator<char>());
@@ -22,7 +22,7 @@ std::string rsa_encrypt_message(const std::string& message, const std::string& p
     {
         std::cerr << "Error reading public key from BIO" << std::endl;
         BIO_free(bio);
-        return "";
+        return {};
     }
 
     int rsa_size = RSA_size(rsa_pubkey);
@@ -34,51 +34,42 @@ std::string rsa_encrypt_message(const std::string& message, const std::string& p
         std::cerr << "Error encrypting message: " << ERR_error_string(ERR_get_error(), nullptr) << std::endl;
         RSA_free(rsa_pubkey);
         BIO_free(bio);
-        return "";
+        return {};
     }
 
     RSA_free(rsa_pubkey);
     BIO_free(bio);
 
-    return std::string(reinterpret_cast<char*>(encrypted_message.data()), encrypt_len);
+    encrypted_message.resize(encrypt_len);
+
+    std::string encrypted_message_str(encrypted_message.begin(), encrypted_message.end());
+
+    return encrypted_message_str;
 }
 
-std::string rsa_decrypt_message(const std::string& encrypted_message, const std::string& private_key_filename)
+std::vector<unsigned char> rsa_decrypt_message(const std::vector<unsigned char>& encrypted_message, const std::string& private_key_filename)
 {
-    std::ifstream priv_key_file(private_key_filename);
-    if (!priv_key_file)
-    {
-        std::cerr << "Error opening private key file: " << private_key_filename << std::endl;
-        return "";
-    }
+    FILE *fp = fopen(private_key_filename.c_str(), "r");
 
-    std::string priv_key_str((std::istreambuf_iterator<char>(priv_key_file)), std::istreambuf_iterator<char>());
-    BIO* bio = BIO_new_mem_buf(priv_key_str.data(), priv_key_str.size());
-    RSA* rsa_privkey = RSA_new();
+    RSA *rsa = PEM_read_RSAPrivateKey(fp, NULL, NULL, NULL);
 
-    if (!PEM_read_bio_RSAPrivateKey(bio, &rsa_privkey, nullptr, nullptr))
-    {
-        std::cerr << "Error reading private key from BIO" << std::endl;
-        BIO_free(bio);
-        return "";
-    }
+    fclose(fp);
 
-    int rsa_size = RSA_size(rsa_privkey);
-    std::vector<unsigned char> decrypted_message(rsa_size);
+    int keysize = RSA_size(rsa);
 
-    int decrypt_len = RSA_private_decrypt(encrypted_message.size(), reinterpret_cast<const unsigned char*>(encrypted_message.data()), decrypted_message.data(), rsa_privkey, RSA_PKCS1_PADDING);
-    if (decrypt_len == -1)
-    {
-        std::cerr << "Error decrypting message: " << ERR_error_string(ERR_get_error(), nullptr) << std::endl;
-        RSA_free(rsa_privkey);
-        BIO_free(bio);
-        return "";
-    }
+    std::unique_ptr<unsigned char[]> rsa_out(new unsigned char[keysize]);
 
-    RSA_free(rsa_privkey);
-    BIO_free(bio);
-    
-    return std::string(reinterpret_cast<char*>(decrypted_message.data()), decrypt_len);
+    memset(rsa_out.get(), 0, keysize);
+
+    int rsa_outlen = RSA_private_decrypt(
+            encrypted_message.size(), encrypted_message.data(), rsa_out.get(),
+            rsa, RSA_PKCS1_PADDING);
+
+    std::vector<unsigned char> decrypted_message(rsa_out.get(), rsa_out.get() + rsa_outlen);
+
+    RSA_free(rsa);
+
+    return decrypted_message;
 }
 
 
