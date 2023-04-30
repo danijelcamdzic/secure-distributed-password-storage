@@ -101,12 +101,6 @@ int main(int argc, char *argv[])
         std::vector<sss_Share> shares(SHAMIR_NUM_SHARES);
         sss_split_password_into_shares(password, shares);
 
-        uint8_t restored[sss_MLEN];
-        int tmp = sss_combine_shares(restored, shares.data(), 1);
-        std::cout << "Restored message:" << std::endl;
-        std::string restored_string(reinterpret_cast<char*>(restored), password.size());
-        std::cout << restored_string << std::endl;
-
         /* Check if the number of shares match the number of publish topics (HW nodes) */
         if (SHAMIR_NUM_SHARES != pub_topics.size()) {
             throw std::runtime_error("Number of shares must match the number of publish topics!");
@@ -118,7 +112,7 @@ int main(int argc, char *argv[])
             std::vector<unsigned char> share_data(shares[i], shares[i] + sss_SHARE_LEN);
             std::cout << "The original share has the length of: " << share_data.size() << std::endl;
 
-            // Print the share in hex
+            /* Print the share in hex */
             std::stringstream hex_ss;
             for (unsigned char c : share_data) {
                 hex_ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(c);
@@ -131,7 +125,7 @@ int main(int argc, char *argv[])
             mqtt_publish(pub_topics[i], encrypted_shares[i]);
         }
     /* Retrieve password from the hw nodes */
-    } else if (option == "get_password") {
+    } else {
         /* Send command to retrieve the password from hw nodes */
         std::vector<unsigned char> retrieve_message_command(RETRIEVE_PASSWORD_COMMAND.begin(), RETRIEVE_PASSWORD_COMMAND.end());
         mqtt_publish(TOPIC_PUB_ALL, retrieve_message_command);
@@ -156,11 +150,12 @@ int main(int argc, char *argv[])
             std::cout << "Received message has length of: " << message.size() << " bytes" << std::endl;
             std::vector<unsigned char> encrypted_message(message.begin(), message.end());
 
+            /* Decrypt with the private key of the master device */
             std::vector<unsigned char> decrypted_message_vec = rsa_decrypt_message(encrypted_message, RSA_PRIVATE_KEY);
 
             std::cout << "The decrypted share has the length of: " << decrypted_message_vec.size() << " bytes" << std::endl;
 
-            // Print decrypted message in hex
+            /* Print decrypted message in hex */
             std::stringstream hex_ss;
             for (unsigned char c : decrypted_message_vec) {
                 hex_ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(c);
@@ -176,17 +171,12 @@ int main(int argc, char *argv[])
             if (decrypted_shares[i].size() > sss_SHARE_LEN) {
                 throw std::runtime_error("Decrypted share length must be less than or equal to sss_SHARE_LEN.");
             }
-            // Zero-pad the decrypted share
-            decrypted_shares[i].resize(sss_SHARE_LEN, 0);
             memcpy(&(shares[i]), decrypted_shares[i].data(), decrypted_shares[i].size());
         }
 
         /* 3. Call the sss_recombine_password_from_shares function */
         std::string restored_password = sss_recombine_password_from_shares(shares);
         std::cout << "Restored password is: " << restored_password << std::endl;
-
-    } else {
-        std::cerr << "Invalid option. Please provide either 'save_password' or 'get_password' as an argument." << std::endl;
     }
 
     return 0;
