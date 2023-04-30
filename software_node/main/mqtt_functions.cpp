@@ -1,4 +1,12 @@
-#include "mqtt.h"
+/**
+ * @file mqtt_functions.cpp
+ * @brief Contains helper mqtt functions implementation
+ *
+ * @author Danijel Camdzic
+ * @date 10 Apr 2023
+ */
+
+#include "mqtt_functions.h"
 
 const std::string RETRIEVE_PASSWORD_COMMAND("GetPassEND_MESSAGE");
 const std::string END_MESSAGE_FLAG("END_MESSAGE");
@@ -30,23 +38,23 @@ std::vector<std::pair<std::string, std::string>> callback::get_received_messages
     return received_messages;
 }
 
-void callback::wait_for_messages(int num_messages)
-{
-    std::unique_lock<std::mutex> lock(received_messages_mutex);
-    received_messages_cv.wait(lock, [this, num_messages] { return received_messages.size() >= num_messages; });
-}
-
-// void callback::wait_for_messages(int num_unique_topics)
+// void callback::wait_for_messages(int num_messages)
 // {
 //     std::unique_lock<std::mutex> lock(received_messages_mutex);
-//     received_messages_cv.wait(lock, [this, num_unique_topics] { 
-//         std::unordered_set<std::string> unique_topics;
-//         for (const auto& [topic, message] : received_messages) {
-//             unique_topics.insert(topic);
-//         }
-//         return unique_topics.size() >= num_unique_topics; 
-//     });
+//     received_messages_cv.wait(lock, [this, num_messages] { return received_messages.size() >= num_messages; });
 // }
+
+void callback::wait_for_messages(int num_unique_topics)
+{
+    std::unique_lock<std::mutex> lock(received_messages_mutex);
+    received_messages_cv.wait(lock, [this, num_unique_topics] { 
+        std::unordered_set<std::string> unique_topics;
+        for (const auto& [topic, message] : received_messages) {
+            unique_topics.insert(topic);
+        }
+        return unique_topics.size() >= num_unique_topics; 
+    });
+}
 
 void mqtt_connect(void)
 {

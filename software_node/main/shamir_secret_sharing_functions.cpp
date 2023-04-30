@@ -1,4 +1,12 @@
-#include "shamir_secret_sharing.h"
+/**
+ * @file shamir_secret_sharing_functions.cpp
+ * @brief Contains helper shamir secret sharing functions implementation
+ *
+ * @author Danijel Camdzic
+ * @date 10 Apr 2023
+ */
+
+#include "shamir_secret_sharing_functions.h"
 
 void sss_split_password_into_shares(const std::string& password, std::vector<sss_Share>& shares) 
 {

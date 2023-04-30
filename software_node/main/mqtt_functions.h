@@ -1,5 +1,13 @@
-#ifndef MQTT_H
-#define MQTT_H
+/**
+ * @file mqtt_functions.h
+ * @brief Contains helper mqtt functions prototypes
+ *
+ * @author Danijel Camdzic
+ * @date 10 Apr 2023
+ */
+
+#ifndef MQTT_FUNCTIONS_H
+#define MQTT_FUNCTIONS_H
 
 #include <iostream>
 #include <thread>
@@ -8,6 +16,7 @@
 #include <string>
 #include <utility>
 #include <mutex>
+#include <unordered_set>
 #include <condition_variable>
 #include <chrono>
 #include "mqtt/callback.h"
@@ -41,4 +50,4 @@ void mqtt_connect(void);
 void mqtt_subscribe(const std::string& topic);
 void mqtt_publish(const std::string& topic, const std::vector<unsigned char>& message);
 
-#endif
+#endif /* MQTT_FUNCTIONS_H */

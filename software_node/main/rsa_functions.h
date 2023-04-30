@@ -1,5 +1,13 @@
-#ifndef RSA_H
-#define RSA_H
+/**
+ * @file rsa_functions.h
+ * @brief Contains helper rsa functions prototypes
+ *
+ * @author Danijel Camdzic
+ * @date 10 Apr 2023
+ */
+
+#ifndef RSA_FUNCTIONS_H
+#define RSA_FUNCTIONS_H
 
 #include <iostream>
 #include <thread>
@@ -18,4 +26,4 @@ extern const std::vector<std::string> public_keys_hw_nodes;
 std::vector<unsigned char> rsa_encrypt_message(const std::vector<unsigned char>& message, const std::string& public_key_filename);
 std::vector<unsigned char> rsa_decrypt_message(const std::vector<unsigned char>& encrypted_message, const std::string& private_key_filename);
 
-#endif
+#endif /* RSA_FUNCTIONS_H */

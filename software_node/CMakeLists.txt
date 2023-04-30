@@ -8,9 +8,9 @@ find_package(PahoMqttCpp REQUIRED)
 # Add the main source files
 set(MAIN_SOURCE_FILES
     main/main.cpp
-    main/mqtt.cpp
-    main/rsa.cpp
-    main/shamir_secret_sharing.cpp
+    main/mqtt_functions.cpp
+    main/rsa_functions.cpp
+    main/shamir_secret_sharing_functions.cpp
 )
 
 # Add the sss source files

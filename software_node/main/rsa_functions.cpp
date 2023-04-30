@@ -1,4 +1,12 @@
-#include "rsa.h"
+/**
+ * @file rsa_functions.cpp
+ * @brief Contains helper rsa functions implementation
+ *
+ * @author Danijel Camdzic
+ * @date 10 Apr 2023
+ */
+
+#include "rsa_functions.h"
 
 const std::string RSA_PUBLIC_KEY("../rsa_public_key.pem");
 const std::string RSA_PRIVATE_KEY("../rsa_private_key.pem");

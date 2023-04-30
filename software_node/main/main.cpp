@@ -13,9 +13,9 @@
 #include <unistd.h>
 #endif
 
-#include "mqtt.h"
-#include "rsa.h"
-#include "shamir_secret_sharing.h"
+#include "mqtt_functions.h"
+#include "rsa_functions.h"
+#include "shamir_secret_sharing_functions.h"
 
 std::string read_password() 
 {
