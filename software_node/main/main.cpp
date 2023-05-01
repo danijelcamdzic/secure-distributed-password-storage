@@ -7,7 +7,6 @@
  * @date 1 May 2023
  */
 
-
 #include <iostream>
 #include <thread>
 #include <fstream>
@@ -90,6 +89,42 @@ std::string read_password()
     return password;
 }
 
+#ifdef DEBUG
+/**
+ * @brief This function prints debugging information from the received vector including the size and
+ * its hex form
+ *
+ * @param data vector of unsigned chars
+ */
+void debug_print(const std::vector<unsigned char> data)
+{
+    /* Print the vector length */
+    std::cout << "Vector length: " << data.size() << std::endl;
+
+    /* Print the vector in readable hex form */
+    std::stringstream hex_ss;
+    for (unsigned char c : data) {
+        hex_ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(c);
+    }
+    std::cout << "Vector in hex: " << hex_ss.str() << std::endl;
+}
+
+/**
+ * @brief This function prints debugging information from the received string including the size and
+ * its contents
+ *
+ * @param data string
+ */
+void debug_print(const std::string data)
+{
+    /* Print the vector length */
+    std::cout << "String length is: " << data.size() << std::endl;
+
+    /* Print the string */
+    std::cout << "String: " << data << std::endl;
+}
+#endif
+
 /**
  * @brief The main function of the secure password storage and retrieval application.
  * 
@@ -150,15 +185,13 @@ int main(int argc, char *argv[])
         for (size_t i = 0; i < SHAMIR_NUM_SHARES; i++) {
             std::vector<unsigned char> share_data(shares[i], shares[i] + sss_SHARE_LEN);
 
-            /* Uncomment to see the length of the original share */
-            // std::cout << "The original share has the length of: " << share_data.size() << std::endl;
-
-            /* Uncomment to print the share in hex */
-            // std::stringstream hex_ss;
-            // for (unsigned char c : share_data) {
-            //     hex_ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(c);
-            // }
-            // std::cout << "Share in hex: " << hex_ss.str() << std::endl;
+#ifdef DEBUG
+            /* ----------------------------DEBUG-------------------------------- */
+            /* Uncomment to see the length of the original share and its contents */
+            std::cout << "Printing the share_data.." << std::endl;
+            debug_print(share_data);
+            /* ------------------------------------------------------------------ */
+#endif
 
             /* Encrypt share with the correct public key of the hardware node */
             encrypted_shares[i] = rsa_encrypt_message(share_data, public_keys_hw_nodes[i]);
@@ -171,8 +204,8 @@ int main(int argc, char *argv[])
             mqtt_publish(pub_topics[i], encrypted_shares[i]);
         }
 
-        /* Wait for confirmation of reception from the hardware nodes (wait for minimum threshold confirmations) */
-        mqttCallbackFunction.wait_for_messages(SHAMIR_THRESHOLD);
+        /* Wait for confirmation of reception from the hardware nodes (wait for SHAMIR_NUM_SHARES confirmations) */
+        mqttCallbackFunction.wait_for_messages(SHAMIR_NUM_SHARES);
 
         /** Check if the receive messages are OK
         *   This block of code functions properly because the only topics this app is subscribing to are the ones
@@ -182,6 +215,16 @@ int main(int argc, char *argv[])
         */
         auto received_messages = mqttCallbackFunction.get_received_messages();
         for (const auto& [topic, message] : received_messages) {
+#ifdef DEBUG
+            /* ----------------------------DEBUG-------------------------------- */
+            /* Uncomment to see the length of the topic and message and its contents */
+            std::cout << "Printing the topic.." << std::endl;
+            debug_print(std::string(topic.begin(), topic.end()));
+            std::cout << "Printing the message.." << std::endl;
+            debug_print(std::string(message.begin(), message.end()));
+            /* ----------------------------------------------------------------- */
+#endif
+
             /* Check if the topic is in the sub_topics vector */
             auto it = std::find(sub_topics.begin(), sub_topics.end(), topic);
             bool topic_exists = it != sub_topics.end();
@@ -194,7 +237,7 @@ int main(int argc, char *argv[])
             }
         }
         /* Notify correct password saving */
-        std::cout << "The shares have been sent and confirmed by the hardware nodes" << std::endl;
+        std::cout << "The shares have been sent and confirmed by the hardware nodes!" << std::endl;
     /* Retrieve password from the hardware nodes */
     } else {
         /* Send command to retrieve the password from hardware nodes */
@@ -204,35 +247,37 @@ int main(int argc, char *argv[])
         /* Wait for the minimum number of messages */
         mqttCallbackFunction.wait_for_messages(SHAMIR_THRESHOLD);
 
-        /* Print the messages for debugging */
+        /* Fetch the messages */
         auto received_messages = mqttCallbackFunction.get_received_messages();
-        for (const auto& [topic, message] : received_messages) {
-            // std::cout << "Received message from topic " << topic << ": " << message << std::endl;
-            std::stringstream hex_ss;
-            for (unsigned char c : message) {
-                hex_ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(c);
-            }
-            std::cout << "Received message from topic " << topic << ": " << hex_ss.str() << std::endl;
-        }
 
         /* 1. Decrypt the messages using rsa_decrypt_message */
         std::vector<std::vector<unsigned char>> decrypted_shares;
         for (const auto& [topic, message] : received_messages) {
-            std::cout << "Received message has length of: " << message.size() << " bytes" << std::endl;
-            std::vector<unsigned char> encrypted_message(message.begin(), message.end());
+            /* Transform the received message */
+            std::vector<unsigned char> encrypted_message_vec(message.begin(), message.end());
+
+#ifdef DEBUG
+        /* ----------------------------DEBUG-------------------------------- */
+        /* Uncomment to see the length of the topic and message and its contents */
+        std::cout << "Printing the topic" << std::endl;
+            debug_print(std::string(topic.begin(), topic.end()));
+            std::cout << "Printing the encrypted message vector.." << std::endl;
+            debug_print(encrypted_message_vec);
+        /* ----------------------------------------------------------------- */
+#endif
 
             /* Decrypt with the private key of the master device */
-            std::vector<unsigned char> decrypted_message_vec = rsa_decrypt_message(encrypted_message, RSA_PRIVATE_KEY);
+            std::vector<unsigned char> decrypted_message_vec = rsa_decrypt_message(encrypted_message_vec, RSA_PRIVATE_KEY);
 
-            std::cout << "The decrypted share has the length of: " << decrypted_message_vec.size() << " bytes" << std::endl;
+#ifdef DEBUG
+            /* ----------------------------DEBUG-------------------------------- */
+            /* Uncomment to see the length of and the contents of the decrypted message*/
+            std::cout << "Printing the decrypted message vector.." << std::endl;
+            debug_print(decrypted_message_vec);
+            /* ----------------------------------------------------------------- */
+#endif
 
-            /* Print decrypted message in hex */
-            std::stringstream hex_ss;
-            for (unsigned char c : decrypted_message_vec) {
-                hex_ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(c);
-            }
-            std::cout << "Decrypted message in hex: " << hex_ss.str() << std::endl;
-
+            /* Push the decrypted share into the vector */
             decrypted_shares.push_back(decrypted_message_vec);
         }
 

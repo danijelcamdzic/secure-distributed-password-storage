@@ -13,6 +13,9 @@ project(access_node)
 # Set the C++ standard to C++17 for this project
 set(CMAKE_CXX_STANDARD 17)
 
+# Uncomment the following line to enable debug mode
+# add_definitions(-DDEBUG)
+
 # Find the PahoMqttCpp package and make it a required dependency
 find_package(PahoMqttCpp REQUIRED)
 
