@@ -187,7 +187,7 @@ int main(int argc, char *argv[])
 
 #ifdef DEBUG
             /* ----------------------------DEBUG-------------------------------- */
-            /* Uncomment to see the length of the original share and its contents */
+            /* See the length of the original share and its contents */
             std::cout << "Printing the share_data.." << std::endl;
             debug_print(share_data);
             /* ------------------------------------------------------------------ */
@@ -217,7 +217,7 @@ int main(int argc, char *argv[])
         for (const auto& [topic, message] : received_messages) {
 #ifdef DEBUG
             /* ----------------------------DEBUG-------------------------------- */
-            /* Uncomment to see the length of the topic and message and its contents */
+            /* See the length of the topic and message and its contents */
             std::cout << "Printing the topic.." << std::endl;
             debug_print(std::string(topic.begin(), topic.end()));
             std::cout << "Printing the message.." << std::endl;
@@ -258,8 +258,8 @@ int main(int argc, char *argv[])
 
 #ifdef DEBUG
         /* ----------------------------DEBUG-------------------------------- */
-        /* Uncomment to see the length of the topic and message and its contents */
-        std::cout << "Printing the topic" << std::endl;
+            /* See the length of the topic and message and its contents */
+            std::cout << "Printing the topic" << std::endl;
             debug_print(std::string(topic.begin(), topic.end()));
             std::cout << "Printing the encrypted message vector.." << std::endl;
             debug_print(encrypted_message_vec);
@@ -271,7 +271,7 @@ int main(int argc, char *argv[])
 
 #ifdef DEBUG
             /* ----------------------------DEBUG-------------------------------- */
-            /* Uncomment to see the length of and the contents of the decrypted message*/
+            /* See the length of and the contents of the decrypted message*/
             std::cout << "Printing the decrypted message vector.." << std::endl;
             debug_print(decrypted_message_vec);
             /* ----------------------------------------------------------------- */

@@ -88,8 +88,12 @@ callback mqttCallbackFunction;
  */
 void callback::message_arrived(mqtt::const_message_ptr msg)
 {
-    /* Uncomment the following line to print the received messages to the console upon reception */
-    // std::cout << "Message arrived: " << msg->get_topic() << ": " << msg->to_string() << std::endl;
+#ifdef DEBUG
+    /* ----------------------------DEBUG-------------------------------- */
+    /* Print the received messages to the console upon reception */
+    std::cout << "Message arrived: " << msg->get_topic() << ": " << msg->to_string() << std::endl;
+    /* ----------------------------------------------------------------- */
+#endif
 
     /* Lock the mutex to ensure thread-safety when accessing the received_messages buffer */
     std::unique_lock<std::mutex> lock(received_messages_mutex);
@@ -186,7 +190,7 @@ void mqtt_subscribe(const std::string& topic)
     {
         /* Subscribe to a MQTT topic */
         client.subscribe(topic, 1)->wait();
-        std::cout << "Subscribed to: " << topic << std::endl;
+        std::cout << "Subscribed to topic: " << topic << std::endl;
     }
     catch (const mqtt::exception& exc)
     {
@@ -210,10 +214,14 @@ void mqtt_publish(const std::string& topic, const std::vector<unsigned char>& me
         msg->set_qos(1);
         /* Publish the message */
         client.publish(msg)->wait_for(std::chrono::seconds(10));
-        std::cout << "Message published! " << std::endl;
+        std::cout << "Message published on topic: " << topic << std::endl;
 
-        /* Uncomment the following line to print the published messages to the console upon send */
-        // std::cout << "Message published: " << std::string(message.begin(), message.end()) << std::endl;
+#ifdef DEBUG
+        /* ----------------------------DEBUG-------------------------------- */
+        /* Print the published messages to the console upon send */
+        std::cout << "Message: " << std::string(message.begin(), message.end()) << std::endl;
+        /* ----------------------------------------------------------------- */
+#endif
     }
     catch (const mqtt::exception& exc)
     {
