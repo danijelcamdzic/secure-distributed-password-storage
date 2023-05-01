@@ -1,12 +1,14 @@
 /**
- * @file RSA_Decrypt.c
+ * @file RSA_Dencrypt.c
  * @brief Contains implementation of RSA decrypt algorithm
  *
  * @author Danijel Camdzic
- * @date 10 Apr 2023
+ * @date 1 May 2023
  */
 
 #include "RSA/RSA.h"
+
+/* ------------------------- VARIABLE DEFINITIONS ------------------------------------ */
 
 /* Private RSA key */
 const unsigned char *private_key = (const unsigned char *)"-----BEGIN PRIVATE KEY-----\n"
@@ -38,23 +40,34 @@ const unsigned char *private_key = (const unsigned char *)"-----BEGIN PRIVATE KE
                                                         "zOnlXq5SzkJViJXh2CtNAthK4Q==\n"
                                                         "-----END PRIVATE KEY-----\n";
 
+/* ------------------------- FUNCTION DEFINITIONS ------------------------------------ */
+
+/**
+ * @brief Decrypt a given text using an RSA private key.
+ *
+ * @param text             The ciphertext to be decrypted.
+ * @param length           The length of the ciphertext in bytes.
+ * @param rsa_private_key  The RSA private key for decryption.
+ *
+ * @return size_t The length of the decrypted data.
+ */
 size_t RSA_Decrypt(const char* text, size_t length, const unsigned char* rsa_private_key)
 {
-    // RNG (Random number generator init)
+    /**< RNG (Random number generator init) */
     int ret = 0;
     mbedtls_entropy_context entropy;
-    mbedtls_entropy_init(&entropy);             // Initialize the entropy context
+    mbedtls_entropy_init(&entropy);                                             /**< Initialize the entropy context */
     mbedtls_ctr_drbg_context ctr_drbg;
     const char *personalization = "wefoierncniuerhfiowenjfkwebufu";
 
-    mbedtls_ctr_drbg_init(&ctr_drbg);           // Initialize the CTR-DRBG context
+    mbedtls_ctr_drbg_init(&ctr_drbg);                                           /**< Initialize the CTR-DRBG context */
 
     ret = mbedtls_ctr_drbg_seed(&ctr_drbg, mbedtls_entropy_func, &entropy,
                                 (const unsigned char *)personalization,
-                                strlen(personalization));   // Seed the random number generator
+                                strlen(personalization));                       /**< Seed the random number generator */
     if (ret != 0)
     {
-       RSA_Print("Error occured during the function mbedtls_ctr_drbg_seed");
+        RSA_Print("mbedtls_ctr_drbg_seed returned an error!");
 
         return 0;
     }
@@ -62,14 +75,14 @@ size_t RSA_Decrypt(const char* text, size_t length, const unsigned char* rsa_pri
     /* Creating rsa context + Importing pub key */
     ret = 0;
     mbedtls_pk_context pk;
-    mbedtls_pk_init(&pk);                       // Initialize the private key context
+    mbedtls_pk_init(&pk);                                                       /**< Initialize the private key context */
 
     /*
      * Read the RSA private key
      */
     if ((ret = mbedtls_pk_parse_key(&pk, rsa_private_key, strlen((const char *)rsa_private_key) + 1, NULL, 0, mbedtls_ctr_drbg_random, &ctr_drbg)) != 0)
     {
-       RSA_Print("Failed! mbedtls_pk_parse_public_key returned an error");
+        RSA_Print("mbedtls_pk_parse_public_key returned an error!");
     }
 
     unsigned char result[MBEDTLS_MPI_MAX_SIZE];
@@ -78,33 +91,39 @@ size_t RSA_Decrypt(const char* text, size_t length, const unsigned char* rsa_pri
     /*
      * Calculate the RSA decryption of the data.
      */
-    RSA_Print("Generating the decrypted value: \n");
+    RSA_Print("Generating the decrypted value...");
     fflush(stdout);
 
     const unsigned char *to_decrypt = (unsigned char *)text;
     if ((ret = mbedtls_pk_decrypt(&pk, to_decrypt, length, result, &olen, sizeof(result),
-                                  mbedtls_ctr_drbg_random, &ctr_drbg)) != 0) // Perform RSA decryption
+                                  mbedtls_ctr_drbg_random, &ctr_drbg)) != 0)                /**< Perform RSA decryption */
     {
-        RSA_Print("Failed! mbedtls_pk_decrypt returned an error");
+        RSA_Print("mbedtls_pk_decrypt returned an error!");
     }
 
+#ifdef DEBUG
     /* Print the result of the decrypted string */
+    RSA_Print("Printing decrypted message...");
+
     if (olen < sizeof(result)) {
         result[olen] = '\0';
     } else {
-       RSA_Print("Decrypted data is too large for the result buffer");
+        RSA_Print("Decrypted data is too large for the result buffer!");
     }
 
-    RSA_Print("Decrypted string:");
+    RSA_Print("Decrypted message: ");
     RSA_Print((char *)result);
+#endif
 
     /* Free space */
-    mbedtls_pk_free(&pk);                       // Free the public key context
-    mbedtls_entropy_free(&entropy);             // Free the entropy context
-    mbedtls_ctr_drbg_free(&ctr_drbg);           // Free the CTR-DRBG context
+    mbedtls_pk_free(&pk);                       /**< Free the public key context */
+    mbedtls_entropy_free(&entropy);             /**< Free the entropy context */
+    mbedtls_ctr_drbg_free(&ctr_drbg);           /**< Free the CTR-DRBG context */
 
+    /* Copy the decrypted message into the RSA_ENCRYPTED_BUFFER */
     memcpy(RSA_ENCRYPTED_BUFFER, result, olen);
 
+    /* Return the length of the decrypted data */
     return olen;
 }
 

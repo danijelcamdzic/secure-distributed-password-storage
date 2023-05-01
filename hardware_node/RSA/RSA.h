@@ -1,10 +1,11 @@
 /**
  * @file RSA.h
- * @brief Contains libraries and definitions necessary for proper
- * proper functioning of the RSA cryptographic algorithm
+ * @brief Contains necessary defines, variables declarations
+ * and function protypes for using the the mbedTLS library for RSA
+ * cryptography
  *
  * @author Danijel Camdzic
- * @date 10 Apr 2023
+ * @date 1 May 2023
  */
 
 #ifndef RSA_H

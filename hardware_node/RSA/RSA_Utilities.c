@@ -3,13 +3,18 @@
  * @brief Contains implementation of RSA utility functions
  *
  * @author Danijel Camdzic
- * @date 10 Apr 2023
+ * @date 1 May 2023
  */
 
 /* RSA library */
 #include "RSA/RSA.h"
 
+/* ------------------------- VARIABLE DEFINITIONS ------------------------------------ */
+
+/* Print function handle */
 RSA_PrintPtr RSA_Print = NULL;
+
+/* ------------------------- FUNCTION DEFINITIONS ------------------------------------ */
 
 /**
  * @brief Sets the RSA Print function.

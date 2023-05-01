@@ -256,33 +256,33 @@ void app_main(void)
 {
     char* TAG = "app_main";                     /**< Declare and initialize TAG for logging purposes */
 
-    /* ------ Initialize NVS ------- */
+    /* Initialize NVS */
     ESP_ERROR_CHECK(nvs_init());
 
-    /* ------ Initialize Wifi ------- */
+    /* Initialize Wifi */
     ESP_LOGI(TAG, "Initializing device as station and connecting to wifi...");
     wifi_init_sta();
 
-    /* --- Set external functions for MQTT library --- */
+    /* Set external functions for MQTT library */
     MQTT311Client_SetConnectTCPSocket(tcp_connect_socket);
     MQTT311Client_SetSendToTCPSocket(tcp_send_data);
     MQTT311Client_SetReadFromTCPSocket(tcp_receive_data);
     MQTT311Client_SetPrint(debug_print);
     MQTT311Client_SetProcessBufferData(mqtt_process_buffer_data);
 
-    /* --- Set external functions for RSA utility library --- */
+    /* Set external functions for RSA utility library */
     RSA_SetPrint(debug_print);
 
-    /* ---- Start FreeRTOS tasks for sending and receiving MQTT messages ---- */
+    /* Start FreeRTOS tasks for sending and receiving MQTT messages */
     MQTT311Client_CreateMQTTFreeRTOSTasks();
 
-    /* ---- Connect to MQTT broker ---- */
+    /* Connect to MQTT broker */
     MQTT311Client_CreateClient(CLIENT_ID);
     MQTT311Client_EstablishConnectionToMQTTBroker(BROKER_ADDRESS, BROKER_PORT_TCP);
     MQTT311Client_SetUsernameAndPassword("", "");
     MQTT311Client_Connect(0xC2, KEEP_ALIVE, "", "");
    
-    /* ------ Subscribe to MQTT topics ------ */
+    /* Subscribe to MQTT topics */
     MQTT311Client_Subscribe(0x02, SUB_TOPIC, 0x00);
     vTaskDelay(pdMS_TO_TICKS(1000));
     MQTT311Client_Subscribe(0x02, ALL_TOPIC, 0x00);

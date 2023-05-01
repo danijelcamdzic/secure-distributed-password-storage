@@ -1,13 +1,16 @@
 /**
- * @file RSA.c
- * @brief Contains implementation of RSA encrypt and decrypt tasks
+ * @file RSA.h
+ * @brief Contains tasks and task creation for RSA encryption
+ * and decryption
  *
  * @author Danijel Camdzic
- * @date 10 Apr 2023
+ * @date 1 May 2023
  */
 
-/* RSA library */
+/* RSA utility library */
 #include "RSA/RSA.h"
+
+/* ------------------------- VARIABLE DEFINITIONS ------------------------------------ */
 
 /* Buffer to hold decrypted message */
 unsigned char encrypted_text[MBEDTLS_MPI_MAX_SIZE] = {0};
@@ -17,6 +20,8 @@ char* text_to_encrypt;
 
 /* Value to hold the encrypted message length */
 size_t message_length = 0;
+
+/* ------------------------- FUNCTION DEFINITIONS ------------------------------------ */
 
 /**
  * @brief RSA encryption task
@@ -28,6 +33,7 @@ void RSA_EncryptionTask(void *pvParameter)
     /* Always encrypt with the master public key (of the software node) */
     RSA_MESSAGE_LENGTH = RSA_Encrypt(RSA_MESSAGE_TO_ENCRYPT, RSA_MESSAGE_LENGTH, RSA_MASTER_PUBLIC_KEY);
 
+    /* Delete the task */
     vTaskDelete(NULL);
 }
 
@@ -41,6 +47,7 @@ void RSA_DecryptionTask(void *pvParameter)
     /* Always decrypt with the private key of the hardware device */
     RSA_MESSAGE_LENGTH = RSA_Decrypt((char*)RSA_ENCRYPTED_BUFFER, RSA_MESSAGE_LENGTH, RSA_PRIVATE_KEY);
 
+    /* Delete the task */
     vTaskDelete(NULL);
 }
 

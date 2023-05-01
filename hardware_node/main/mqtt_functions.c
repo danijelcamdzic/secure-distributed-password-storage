@@ -71,10 +71,8 @@ void mqtt_receive_passphrase(int index_start, int index_end)
 
     for (int i = index_start; i < index_end; i++)
     {
-        printf("%c ", MQTT311_RECEIVE_BUFFER[i]);
         RSA_ENCRYPTED_BUFFER[i - index_start] = MQTT311_RECEIVE_BUFFER[i];
     }
-    printf("\n");
 
     /* Set the received data length */
     RSA_MESSAGE_LENGTH = index_end - index_start;
