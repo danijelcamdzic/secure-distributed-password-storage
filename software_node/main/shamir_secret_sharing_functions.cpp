@@ -1,13 +1,19 @@
 /**
  * @file shamir_secret_sharing_functions.cpp
- * @brief Contains helper shamir secret sharing functions implementation
+ * @brief Contains necessary defines, variables definitions
+ * and function definitions for using the shamir secret sharing library
  *
  * @author Danijel Camdzic
- * @date 10 Apr 2023
+ * @date 1 May 2023
  */
 
 #include "shamir_secret_sharing_functions.h"
 
+/**
+ * @brief Split a given password into shares using Shamir's Secret Sharing library
+ * @param[in] password The password to be split into shares
+ * @param[out] shares The vector to store the generated shares
+ */
 void sss_split_password_into_shares(const std::string& password, std::vector<sss_Share>& shares) 
 {
     /* Ensure the shares vector is the correct size */
@@ -17,7 +23,7 @@ void sss_split_password_into_shares(const std::string& password, std::vector<sss
 
     /* Check if length of password exceeds the max length */
     if (password.size() > sss_MLEN) {
-        throw std::runtime_error("Password length must not exceed sss_MLEN.");
+        throw std::runtime_error("Password length must not exceed sss_MLEN bytes");
     }
 
     /* Convert password to a fixed-length array */
@@ -27,8 +33,15 @@ void sss_split_password_into_shares(const std::string& password, std::vector<sss
 
     /* Split the password into shares */
     sss_create_shares(shares.data(), password_data, SHAMIR_NUM_SHARES, SHAMIR_THRESHOLD);
+
+    /* The shares of the password are now located in the std::vector<sss_Share>& shares */
 }
 
+/**
+ * @brief Recombine the password from the given shares using Shamir's Secret Sharing algorithm
+ * @param[in] shares The vector containing the shares for recombination
+ * @return The recombined password
+ */
 std::string sss_recombine_password_from_shares(const std::vector<sss_Share>& shares)
 {
     /* Ensure the shares vector is the correct size */
