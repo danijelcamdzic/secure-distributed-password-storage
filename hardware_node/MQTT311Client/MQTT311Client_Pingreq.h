@@ -36,8 +36,8 @@ typedef enum PingreqMessageResult_e
 struct PINGREQ_MESSAGE 
 {
     PingreqMessageResult_t (*MQTT311Client_PingreqWithStruct)(struct PINGREQ_MESSAGE*);
-    uint16_t remaining_length;                      /* Remaining length of the packet  = 0 for PINGREQ*/  
-    uint8_t packet_type;                            /* MQTT Message Packet Type*/
+    uint16_t remaining_length;                      /**< Remaining length of the packet  = 0 for PINGREQ*/  
+    uint8_t packet_type;                            /**< MQTT Message Packet Type*/
 };
 
 /* ----------------------------------------------------------------------------------------- */

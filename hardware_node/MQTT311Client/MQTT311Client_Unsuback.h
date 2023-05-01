@@ -23,17 +23,17 @@
 */
 
 /* Packet Information */
-#define UNSUBACK_PACKET_REMAINING_LENGTH     0x02        /* Packet's fixed remaining length */
-#define UNSUBACK_PACKET_SIZE                 "4"         /* Packet size */
+#define UNSUBACK_PACKET_REMAINING_LENGTH     0x02        /**< Packet's fixed remaining length */
+#define UNSUBACK_PACKET_SIZE                 "4"         /**< Packet size */
 
 /* UNSUBACK Message Structure */
 struct UNSUBACK_MESSAGE 
 {
-    char* packet_size;                               /* Packet size = 2 for unsuback */
+    char* packet_size;                              /**< Packet size = 2 for unsuback */
 
-    uint16_t remaining_length;                      /* Remaining length of the packet */  
-    uint16_t packet_identifier;                     /* Packet identifier from the publish message */
-    uint8_t packet_type;                            /* MQTT Message Packet Type*/
+    uint16_t remaining_length;                      /**< Remaining length of the packet */  
+    uint16_t packet_identifier;                     /**< Packet identifier from the publish message */
+    uint8_t packet_type;                            /**< MQTT Message Packet Type*/
 };
 
 /* Function declarations */

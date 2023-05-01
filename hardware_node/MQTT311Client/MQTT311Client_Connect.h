@@ -36,17 +36,17 @@
 #define PROTOCOL_NAME                   "MQTT"
 
 /* Protocol Version*/
-#define PROTOCOL_VERSION                0x04        /* Protocol level for MQTT 3.1.1 is 4 */
+#define PROTOCOL_VERSION                0x04        /**< Protocol level for MQTT 3.1.1 is 4 */
 
 /* Connect Flags */
 #define CONNECT_FLAGS                   0x00
-#define USERNAME_FLAG                   7           /* Specifies whether username is present in the payload */
-#define PASSWORD_FLAG                   6           /* Specifies whether password is present in the payload */
-#define WILL_RETAIN_FLAG                5           /* Specifies if Will Message is to be retained when published */
-#define WILL_QoS2_FLAG                  4           /* Specifies the QoS level used when publishing Will Message */
-#define WILL_QoS1_FLAG                  3           /* Specifies the QoS level used when publishing Will Message */
-#define WILL_FLAG                       2           /* Specifies whether Will Message is stored on the server*/
-#define CLEAN_SESSION_FLAG              1           /* Specifies the handling of the Session state */
+#define USERNAME_FLAG                   7           /**< Specifies whether username is present in the payload */
+#define PASSWORD_FLAG                   6           /**< Specifies whether password is present in the payload */
+#define WILL_RETAIN_FLAG                5           /**< Specifies if Will Message is to be retained when published */
+#define WILL_QoS2_FLAG                  4           /**< Specifies the QoS level used when publishing Will Message */
+#define WILL_QoS1_FLAG                  3           /**< Specifies the QoS level used when publishing Will Message */
+#define WILL_FLAG                       2           /**< Specifies whether Will Message is stored on the server*/
+#define CLEAN_SESSION_FLAG              1           /**< Specifies the handling of the Session state */
 #define RESERVED                        0
 
 /* Return Type of the Connect Message */
@@ -67,19 +67,19 @@ struct CONNECT_MESSAGE
     char* protocol_name;
 
     uint16_t keep_alive;  
-    uint16_t remaining_length;                      /* Remaining length of the packet */
+    uint16_t remaining_length;                      /**< Remaining length of the packet */
     uint16_t protocol_name_length;
 
-    uint8_t packet_type;                            /* MQTT Message Packet Type*/
+    uint8_t packet_type;                            /**< MQTT Message Packet Type*/
     uint8_t protocol_version;
 
-    /* connect flags */
-    bool _username;                                 /* Username present in payload? */
-    bool _password;                                 /* Password present in payload? */
-    bool will_retain;                               /* Will retain present in payload? */
-    bool will_qos1;                                 /* will QoS1 present in payload? */
-    bool will_qos2;                                 /* Will QoS2 present in payload? */
-    bool clean_session;                             /* Clean Session present in payload? */
+    /* Connect flags */
+    bool _username;                                 /**< Username present in payload? */
+    bool _password;                                 /**< Password present in payload? */
+    bool will_retain;                               /**< Will retain present in payload? */
+    bool will_qos1;                                 /**< will QoS1 present in payload? */
+    bool will_qos2;                                 /**< Will QoS2 present in payload? */
+    bool clean_session;                             /**< Clean Session present in payload? */
     bool reserved;                                
 };
 

@@ -29,8 +29,8 @@ struct DISCONNECT_MESSAGE
 {
     void (*MQTT311Client_DisconnectWithStruct)(struct DISCONNECT_MESSAGE *);
     
-    uint16_t remaining_length;                      /* Remaining length of the packet  = 0 for PINGRES*/  
-    uint8_t packet_type;                            /* MQTT Message Packet Type*/
+    uint16_t remaining_length;                      /**< Remaining length of the packet  = 0 for PINGRES*/  
+    uint8_t packet_type;                            /**< MQTT Message Packet Type*/
 };
 
 /* ----------------------------------------------------------------------------------------- */

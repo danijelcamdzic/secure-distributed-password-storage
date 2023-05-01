@@ -26,20 +26,20 @@
 */
 
 /* Connect acknowledge flags */
-#define SP                              0           /* Session present - if Clean Session == 1, server must set SP = 0 ..*/
-                                                    /* .. and Connect Return Code = 0x00 */
+#define SP                              0           /**< Session present - if Clean Session == 1, server must set SP = 0 ..*/
+                                                    /**< .. and Connect Return Code = 0x00 */
 
 /* Connect Return codes */
-#define CONNECTION_ACCEPTED             0x00        /* Connection accepted */
-#define UNNACCEPTABLE_PROTOCOL          0x01        /* The Server does not support the level of the MQTT protocol requested by the Client */
-#define IDENTIFIER_REJECTED             0x02        /* The Client identifier is correct UTF-8 but not allowed by the Server */
-#define SERVER_UNAVAILABLE              0x03        /* The Network Connection has been made but the MQTT service is unavailable */
-#define WRONG_USERNAME_OR_PASSWORD      0x04        /* The data in the user name or password is malformed */
-#define NOT_AUTHORIZED                  0x05        /* The Client is not authorized to connect */
+#define CONNECTION_ACCEPTED             0x00        /**< Connection accepted */
+#define UNNACCEPTABLE_PROTOCOL          0x01        /**< The Server does not support the level of the MQTT protocol requested by the Client */
+#define IDENTIFIER_REJECTED             0x02        /**< The Client identifier is correct UTF-8 but not allowed by the Server */
+#define SERVER_UNAVAILABLE              0x03        /**< The Network Connection has been made but the MQTT service is unavailable */
+#define WRONG_USERNAME_OR_PASSWORD      0x04        /**< The data in the user name or password is malformed */
+#define NOT_AUTHORIZED                  0x05        /**< The Client is not authorized to connect */
 
 /* Packet Information */
-#define CONACK_PACKET_REMAINING_LENGTH  0x02        /* Packet's fixed remaining length */
-#define CONNACK_PACKET_SIZE             "4"         /* Packet size */
+#define CONACK_PACKET_REMAINING_LENGTH  0x02        /**< Packet's fixed remaining length */
+#define CONNACK_PACKET_SIZE             "4"         /**< Packet size */
 
 /* Text macros */
 #define CONNECTION_ACCEPTED_MESSAGE               "Connection Accepted"    

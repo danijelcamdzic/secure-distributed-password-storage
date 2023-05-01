@@ -11,7 +11,7 @@
 #define MQTT311Client_DRIVER_H
 
 /* Included libraries */
-#include "MQTT311Client/MQTT311Client.h"        /* Include all the necessary MQTT311 Packets */
+#include "MQTT311Client/MQTT311Client.h"        /**< Include all the necessary MQTT311 Packets */
 
 /* Priorities at which the tasks are created. */
 #define mqttQUEUE_SEND_TASK_PRIORITY		( tskIDLE_PRIORITY + 2 )

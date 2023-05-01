@@ -25,11 +25,11 @@
 */
 
 /* Header flags */
-#define DUP_FLAG                        3           /* Specifies delivery or redelivery of publish packet */
-#define QOS_LEVEL2                      2           /* Specifies QoS level */
-#define QOS_LEVEL1                      1           /* Specifies QoS level */
-                                                    /* QoS Levels */
-                                                    /*
+#define DUP_FLAG                        3           /**< Specifies delivery or redelivery of publish packet */
+#define QOS_LEVEL2                      2           /**< Specifies QoS level */
+#define QOS_LEVEL1                      1           /**< Specifies QoS level */
+                                                    /**< QoS Levels */
+                                                    /**<
                                                         "00" - At most once delivery
                                                         "01" - At least once delivery
                                                         "10" - Exactly once delivery
@@ -50,19 +50,19 @@ struct PUBLISH_MESSAGE
     /* Function to which it is sent */
     PublishMessageResult_t (*MQTT311Client_PublishWithStruct)(struct PUBLISH_MESSAGE *);
 
-    char* topicName;                                /* Name of the message topic */
-    char* payload;                                  /* Data of the message */
+    char* topicName;                                /**< Name of the message topic */
+    char* payload;                                  /**< Data of the message */
 
-    uint32_t payload_length;                        /* Length of the payload package */
-    uint16_t remaining_length;                      /* Remaining length of the packet */   
-    uint16_t packetIdentifier;                      /* Packet identifier present only if QoS == 1 or QoS == 2 */
-    uint8_t packet_type;                            /* MQTT Message Packet Type*/
+    uint32_t payload_length;                        /**< Length of the payload package */
+    uint16_t remaining_length;                      /**< Remaining length of the packet */   
+    uint16_t packetIdentifier;                      /**< Packet identifier present only if QoS == 1 or QoS == 2 */
+    uint8_t packet_type;                            /**< MQTT Message Packet Type*/
     
     /* Fixed header - possible configuration */
-    bool dup;                                       /* Delivery or re-delivery of packet */
-    bool qos1;                                      /* Assurance of delivery */
-    bool qos2;                                      /* Assurance of delivery */
-    bool retain;                                    /* Server MUST store the Application Message and it's QoS */                  
+    bool dup;                                       /**< Delivery or re-delivery of packet */
+    bool qos1;                                      /**< Assurance of delivery */
+    bool qos2;                                      /**< Assurance of delivery */
+    bool retain;                                    /**< Server MUST store the Application Message and it's QoS */                  
 };
 
 /* ----------------------------------------------------------------------------------------- */

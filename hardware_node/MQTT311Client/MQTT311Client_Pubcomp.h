@@ -23,16 +23,16 @@
 */
 
 /* Packet Information */
-#define PUBCOMP_PACKET_REMAINING_LENGTH  0x02        /* Packet's fixed remaining length */
-#define PUBCOMP_PACKET_SIZE              "4"         /* Packet size */
+#define PUBCOMP_PACKET_REMAINING_LENGTH  0x02        /**< Packet's fixed remaining length */
+#define PUBCOMP_PACKET_SIZE              "4"         /**< Packet size */
 
 /* PUBCOMP Message Structure */
 struct PUBCOMP_MESSAGE 
 {
     char* packet_size;
-    uint16_t remaining_length;                      /* Remaining length of the packet == 2 in pubcomp package*/  
-    uint16_t packet_identifier;                     /* Packet identifier from the publish message */
-    uint8_t packet_type;                            /* MQTT Message Packet Type*/
+    uint16_t remaining_length;                      /**< Remaining length of the packet == 2 in pubcomp package*/  
+    uint16_t packet_identifier;                     /**< Packet identifier from the publish message */
+    uint8_t packet_type;                            /**< MQTT Message Packet Type*/
 };
 
 /* Function declarations */

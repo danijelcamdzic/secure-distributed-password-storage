@@ -26,10 +26,10 @@
 
 */
 
-#define SUB_RESERVED                        0x02    /* Reserved field of the header, must be 0x02 */
+#define SUB_RESERVED                        0x02    /**< Reserved field of the header, must be 0x02 */
 
-#define SUB_QoS1                            0       /* QoS Level */
-#define SUB_QoS2                            1       /* QoS Level */
+#define SUB_QoS1                            0       /**< QoS Level */
+#define SUB_QoS2                            1       /**< QoS Level */
 
 /* Return Type of the Subscribe Message */
 typedef enum SubscribeMessageResult_e
@@ -43,13 +43,13 @@ struct SUBSCRIBE_MESSAGE
 {
     SubscribeMessageResult_t (*MQTT311Client_SubscribeWithStruct)(struct SUBSCRIBE_MESSAGE *);
 
-    char* topic_name;                               /* Topic Name */
+    char* topic_name;                               /**< Topic Name */
 
-    uint16_t remaining_length;                      /* Remaining length of the packet */
-    uint16_t packet_identifier;                     /* Packet identifier */
-    uint8_t packet_type;                            /* MQTT Message Packet Type*/
+    uint16_t remaining_length;                      /**< Remaining length of the packet */
+    uint16_t packet_identifier;                     /**< Packet identifier */
+    uint8_t packet_type;                            /**< MQTT Message Packet Type*/
 
-    uint8_t requested_qos;                          /* Requested QoS */
+    uint8_t requested_qos;                          /**< Requested QoS */
 };
 
 /* Function declarations */

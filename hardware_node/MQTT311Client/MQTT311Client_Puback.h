@@ -23,17 +23,17 @@
 */
 
 /* Packet Information */
-#define PUBACK_PACKET_REMAINING_LENGTH  0x02        /* Packet's fixed remaining length */
-#define PUBACK_PACKET_SIZE              "4"         /* Packet size */
+#define PUBACK_PACKET_REMAINING_LENGTH  0x02        /**< Packet's fixed remaining length */
+#define PUBACK_PACKET_SIZE              "4"         /**< Packet size */
 
 /* PUBACK Message Structure */
 struct PUBACK_MESSAGE 
 {
     char* packet_size;
 
-    uint16_t remaining_length;                      /* Remaining length of the packet == 2 in puback package*/  
-    uint16_t packet_identifier;                     /* Packet identifier from the publish message */
-    uint8_t packet_type;                            /* MQTT Message Packet Type*/
+    uint16_t remaining_length;                      /**< Remaining length of the packet == 2 in puback package*/  
+    uint16_t packet_identifier;                     /**< Packet identifier from the publish message */
+    uint8_t packet_type;                            /**< MQTT Message Packet Type*/
 };
 
 /* Function declarations */
