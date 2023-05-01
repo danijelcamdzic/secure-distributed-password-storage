@@ -10,15 +10,12 @@
 #ifndef TCP_FUNCTIONS_H
 #define TCP_FUNCTIONS_H
 
+#include <stdio.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include <stdlib.h>
 #include <string.h>
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/event_groups.h"
-#include "esp_system.h"
-#include "esp_wifi.h"
-#include "esp_event.h"
 #include "esp_log.h"
-#include "nvs_flash.h"
 #include <netdb.h>
 #include <fcntl.h>
 #include "lwip/err.h"
