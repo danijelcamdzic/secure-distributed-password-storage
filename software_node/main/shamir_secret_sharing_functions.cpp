@@ -1,5 +1,5 @@
 /**
- * @file shamir_secret_sharing_functions.cpp
+ * @file shamir_secret_sharing_functions_functions.cpp
  * @brief Contains necessary defines, variables definitions
  * and function definitions for using the shamir secret sharing library
  *
@@ -8,6 +8,8 @@
  */
 
 #include "shamir_secret_sharing_functions.h"
+
+/* ------------------------- FUNCTION DEFINITIONS ------------------------------------ */
 
 /**
  * @brief Split a given password into shares using Shamir's Secret Sharing library

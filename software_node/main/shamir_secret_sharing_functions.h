@@ -1,5 +1,5 @@
 /**
- * @file shamir_secret_sharing_functions.h
+ * @file shamir_secret_sharing_functions_functions.h
  * @brief Contains necessary defines, variables declarations
  * and function protypes for using the shamir secret sharing library
  *
