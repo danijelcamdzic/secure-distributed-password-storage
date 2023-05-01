@@ -1,9 +1,10 @@
 /**
  * @file nvs_functions.h
- * @brief Contains prototypes for helper functions for working with nvs
+ * @brief Contains necessary defines, variables declarations
+ * and function protypes for using the NVS in esp32
  *
  * @author Danijel Camdzic
- * @date 10 Apr 2023
+ * @date 1 May 2023
  */
 
 #ifndef NVS_FUNCTIONS_H
@@ -20,10 +21,8 @@
 #include "nvs_flash.h"
 #include <netdb.h>
 #include <fcntl.h>
-
 #include "lwip/err.h"
 #include "lwip/sys.h"
-
 #include "esp_system.h"
 #include "nvs_flash.h"
 #include "nvs.h"
@@ -34,8 +33,6 @@
 
 /* NVS function prototypes */
 esp_err_t nvs_init();
-esp_err_t nvs_store_string(const char *key, const char *value);
-esp_err_t nvs_read_string(const char *key, char *value, size_t *length);
 void nvs_store(const char* key, const void* value, size_t length);
 void* nvs_read(const char* key);
 

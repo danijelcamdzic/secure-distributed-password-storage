@@ -1,9 +1,10 @@
 /**
  * @file tcp_functions.h
- * @brief Contains prototypes for helper functions for working with tcp sockets
+ * @brief Contains necessary defines, variables declarations
+ * and function protypes for using the tcp sockets in esp32
  *
  * @author Danijel Camdzic
- * @date 10 Apr 2023
+ * @date 1 May 2023
  */
 
 #ifndef TCP_FUNCTIONS_H
@@ -20,14 +21,18 @@
 #include "nvs_flash.h"
 #include <netdb.h>
 #include <fcntl.h>
-
 #include "lwip/err.h"
 #include "lwip/sys.h"
 
-/* TCP Socket */
+/* Defines for configuring the TCP Socket for IPv4 */
+#ifndef CONFIG_EXAMPLE_IPV4
+#define CONFIG_EXAMPLE_IPV4
+#endif
+
+/* Variable to be used as tcp socket */
 extern int sock;
 
-/* TCP Socket function prototypes */
+/* TCP function prototypes */
 void tcp_connect_socket(const char* brokerAddress, uint16_t port);
 void tcp_send_data(const char* data, uint16_t size);
 void tcp_receive_data(void);

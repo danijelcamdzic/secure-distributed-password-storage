@@ -1,5 +1,5 @@
 /**
- * @file mqtt_functions.h
+ * @file mqtt_functions.c
  * @brief Contains necessary defines, variables defintions
  * and function definitions for using the MQTT311Client library 
  * and processing the data that has been received

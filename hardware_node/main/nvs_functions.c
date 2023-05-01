@@ -1,13 +1,21 @@
 /**
  * @file nvs_functions.c
- * @brief Contains helper nvs functions implementation
+ * @brief Contains necessary defines, variables definitions
+ * and function definitions for using the NVS in esp32
  *
  * @author Danijel Camdzic
- * @date 10 Apr 2023
+ * @date 1 May 2023
  */
 
 #include "nvs_functions.h"
 
+/* ------------------------- FUNCTION DEFINITIONS ------------------------------------ */
+
+/**
+ * @brief Initialize the NVS flash.
+ *
+ * @return esp_err_t Error code indicating the result of the operation.
+ */
 esp_err_t nvs_init() 
 {
     esp_err_t err = nvs_flash_init();
@@ -18,28 +26,13 @@ esp_err_t nvs_init()
     return err;
 }
 
-esp_err_t nvs_store_string(const char *key, const char *value) 
-{
-    nvs_handle_t my_handle;
-    esp_err_t err = nvs_open("storage", NVS_READWRITE, &my_handle);
-    if (err != ESP_OK) return err;
-
-    err = nvs_set_str(my_handle, key, value);
-    if (err != ESP_OK) return err;
-
-    return nvs_commit(my_handle);
-}
-
-esp_err_t nvs_read_string(const char *key, char *value, size_t *length) 
-{
-    nvs_handle_t my_handle;
-    esp_err_t err = nvs_open("storage", NVS_READONLY, &my_handle);
-    if (err != ESP_OK) return err;
-
-    err = nvs_get_str(my_handle, key, value, length);
-    return err;
-}
-
+/**
+ * @brief Store binary data in the NVS storage.
+ *
+ * @param key     Key for the binary data to be stored.
+ * @param value   Pointer to the binary data to be stored.
+ * @param length  Length of the binary data in bytes.
+ */
 void nvs_store(const char* key, const void* value, size_t length)
 {
     nvs_handle_t my_handle;
@@ -49,6 +42,13 @@ void nvs_store(const char* key, const void* value, size_t length)
     nvs_close(my_handle);
 }
 
+/**
+ * @brief Read binary data from the NVS storage.
+ *
+ * @param key  Key for the binary data to be read.
+ *
+ * @return void* Pointer to the read binary data. The caller is responsible for freeing the memory.
+ */
 void* nvs_read(const char* key)
 {
     nvs_handle_t my_handle;
