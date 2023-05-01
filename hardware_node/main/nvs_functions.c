@@ -6,7 +6,6 @@
  * @date 10 Apr 2023
  */
 
-#include "main.h"
 #include "nvs_functions.h"
 
 esp_err_t nvs_init() 

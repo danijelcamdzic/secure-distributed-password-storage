@@ -1,27 +1,48 @@
 
 /**
  * @file mqtt_functions.h
- * @brief Contains prototypes for helper functions for working with mqtt
+ * @brief Contains necessary defines, variables declarations
+ * and function protypes for using the MQTT311Client library 
+ * and processing the data that has been received
  *
  * @author Danijel Camdzic
- * @date 10 Apr 2023
+ * @date 1 May 2023
  */
 
 #ifndef MQTT_FUNCTIONS_H
 #define MQTT_FUNCTIONS_H
 
-/* MQTT Specific Defines */
+#include <string.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/event_groups.h"
+#include "esp_system.h"
+#include "esp_wifi.h"
+#include "esp_event.h"
+#include "esp_log.h"
+#include "nvs_flash.h"
+#include <netdb.h>
+#include <fcntl.h>
+#include "lwip/err.h"
+#include "lwip/sys.h"
+
+/* MQTT connection specific defines */
 #define BROKER_ADDRESS              "mqtt.eclipseprojects.io"
 #define BROKER_PORT_TCP             1883
-#define CLIENT_ID                   "client_id_dado"
+#define KEEP_ALIVE                  600
+#define CLIENT_ID                   "hardware_node_1"
+
+/* Topics for subscribing and publishing the data */
+#define SUB_TOPIC                   "/topic/pub/hw_node_1"          /**< On this topic the encrypted data is received */
+#define PUB_TOPIC                   "/topic/sub/hw_node_1"          /**< On this topic the data is sent back */
+#define ALL_TOPIC                   "/topic/pub/all"                /**< On this topic the command to send data back is received */
+
+/* Data processing and confirmation defines */
 #define END_MESSAGE_FLAG            "END_MESSAGE"
-#define SUB_TOPIC                   "/topic/pub/hw_node_1"
-#define PUB_TOPIC                   "/topic/sub/hw_node_1"
-#define ALL_TOPIC                   "/topic/pub/all"
 #define RECEPTION_CONFIRMATION      "OK"
 #define RECEPTION_CONFIRMATION_SIZE 2
 
-/* MQTT Receive Message Processing function prototypes */
+/* MQTT utility function prototypes */
 int mqtt_find_substring_index(const char *substr, size_t substr_len);
 void mqtt_receive_passphrase(int index_start, int index_end);
 void mqtt_send_passphrase(void);

@@ -14,7 +14,7 @@ project(access_node)
 set(CMAKE_CXX_STANDARD 17)
 
 # Uncomment the following line to enable debug mode
-add_definitions(-DDEBUG)
+# add_definitions(-DDEBUG)
 
 # Find the PahoMqttCpp package and make it a required dependency
 find_package(PahoMqttCpp REQUIRED)

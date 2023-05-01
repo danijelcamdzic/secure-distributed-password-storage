@@ -43,6 +43,7 @@ typedef enum PublicKeyControl_e {
 #define RSA_MASTER_PUBLIC_KEY   (masterkey)
 #define RSA_PUBLIC_KEY          (key)
 #define RSA_PRIVATE_KEY         (private_key)
+#define RSA_ENCRYPT_SIZE        (256)
 
 /* Master's Public RSA key */
 extern const unsigned char *masterkey;

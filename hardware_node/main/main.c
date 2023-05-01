@@ -1,14 +1,35 @@
-/* Secure Destributed Password Storage
+/**
+ * @file main.c
+ * @brief Includes the wifi connection function and app_main task which
+ * connects to the MQTT broker and sets up the external functions
+ *
+ * @author Danijel Camdzic
+ * @date 1 May 2023
+ */
 
-   Unless required by applicable law or agreed to in writing, this
-   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-   CONDITIONS OF ANY KIND, either express or implied.
-*/
-#include "main.h"
+#include <string.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/event_groups.h"
+#include "esp_system.h"
+#include "esp_wifi.h"
+#include "esp_event.h"
+#include "esp_log.h"
+#include "nvs_flash.h"
+#include <netdb.h>
+#include <fcntl.h>
+#include "lwip/err.h"
+#include "lwip/sys.h"
+
+/* Utility function headers */
 #include "tcp_functions.h"
 #include "mqtt_functions.h"
 #include "nvs_functions.h"
+
+/* MQTT library header */
 #include "MQTT311Client/MQTT311Client.h"
+
+/* RSA utility library header */
 #include "RSA/RSA.h"
 
 /* This uses WiFi configuration that you can set via project configuration menu
@@ -60,6 +81,24 @@ static EventGroupHandle_t s_wifi_event_group;
 /* Number of retries for connection */
 static int s_retry_num = 0;
 
+/**
+ * @brief Event handler for Wi-Fi and IP events.
+ *
+ * This function handles Wi-Fi and IP events in the system, such as
+ * connecting, disconnecting, and obtaining an IP address.
+ *
+ * @param arg         Unused argument.
+ * @param event_base  The event base indicating the type of event (Wi-Fi or IP).
+ * @param event_id    The event ID associated with the event being handled.
+ * @param event_data  Pointer to the event data.
+ *
+ * The function handles the following events:
+ * - WIFI_EVENT_STA_START: Connects to the Wi-Fi access point.
+ * - WIFI_EVENT_STA_DISCONNECTED: Retries connecting to the Wi-Fi access point if the maximum
+ *   retry count is not reached. Sets the Wi-Fi fail bit if the maximum retry count is reached.
+ * - IP_EVENT_STA_GOT_IP: Logs the assigned IP address, resets the retry count, and sets the
+ *   Wi-Fi connected bit.
+ */
 static void event_handler(void* arg, esp_event_base_t event_base,
                                 int32_t event_id, void* event_data)
 {
@@ -97,6 +136,22 @@ static void event_handler(void* arg, esp_event_base_t event_base,
     }
 }
 
+/**
+ * @brief Initialize and start the Wi-Fi station.
+ *
+ * This function initializes the Wi-Fi station, configures the network interface,
+ * registers event handlers, sets the Wi-Fi configuration, and starts the Wi-Fi station.
+ * It then waits for the connection to be established or for the maximum number of retries
+ * to be reached.
+ *
+ * The following events are handled by the event_handler (see event_handler() function):
+ * - WIFI_CONNECTED_BIT: Connection established.
+ * - WIFI_FAIL_BIT: Connection failed after reaching the maximum number of retries.
+ *
+ * Upon successful connection, the function logs the SSID and password.
+ * If the connection fails, it logs the SSID and password along with the failure message.
+ * In case of an unexpected event, an error message is logged.
+ */
 void wifi_init_sta(void)
 {
     /* Initialize Wi-Fi station */
@@ -174,65 +229,62 @@ void wifi_init_sta(void)
     }
 }
 
+/**
+ * @brief Print a debug message using the ESP_LOGI function.
+ *
+ * This function sends debugging information by logging the input message with
+ * the ESP_LOGI function, which is part of the ESP-IDF logging library.
+ *
+ * @param message  The debug message to be logged.
+ */
 void debug_print(char* message) 
 {
     /* Send debugging information */
-    char* TAG = "debug_print";                  // Declare and initialize TAG for logging purposes
-    ESP_LOGI(TAG, "%s", message);               // Log the input message with ESP_LOGI function
+    char* TAG = "debug_print";                  /**< Declare and initialize TAG for logging purposes */
+    ESP_LOGI(TAG, "%s", message);               /**< Log the input message with ESP_LOGI function */
 }
 
+/**
+ * @brief Main application entry point.
+ *
+ * This function initializes the device as a Wi-Fi station, connects to a Wi-Fi network,
+ * sets external functions for the MQTT library and RSA utility library, creates FreeRTOS tasks
+ * for sending and receiving MQTT messages, connects to an MQTT broker, and subscribes to
+ * MQTT topics.
+ */
 void app_main(void)
 {
-    char* TAG = "app_main";  // Declare and initialize TAG for logging purposes
+    char* TAG = "app_main";                     /**< Declare and initialize TAG for logging purposes */
 
     /* ------ Initialize NVS ------- */
-    esp_err_t ret = nvs_flash_init();
-    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-      ESP_ERROR_CHECK(nvs_flash_erase());
-      ret = nvs_flash_init();
-    }
-    ESP_ERROR_CHECK(ret);
+    ESP_ERROR_CHECK(nvs_init());
 
     /* ------ Initialize Wifi ------- */
     ESP_LOGI(TAG, "Initializing device as station and connecting to wifi...");
     wifi_init_sta();
 
-    /* ------ Initialize NVS ------- */
-    ESP_ERROR_CHECK(nvs_init());
-
-    /* --- Set External Functions --- */
+    /* --- Set external functions for MQTT library --- */
     MQTT311Client_SetConnectTCPSocket(tcp_connect_socket);
     MQTT311Client_SetSendToTCPSocket(tcp_send_data);
     MQTT311Client_SetReadFromTCPSocket(tcp_receive_data);
     MQTT311Client_SetPrint(debug_print);
     MQTT311Client_SetProcessBufferData(mqtt_process_buffer_data);
+
+    /* --- Set external functions for RSA utility library --- */
     RSA_SetPrint(debug_print);
 
-    /* ---- Start FreeRTOS Tasks ---- */
+    /* ---- Start FreeRTOS tasks for sending and receiving MQTT messages ---- */
     MQTT311Client_CreateMQTTFreeRTOSTasks();
 
-    /* ---- Connect to MQTT Broker ---- */
+    /* ---- Connect to MQTT broker ---- */
     MQTT311Client_CreateClient(CLIENT_ID);
     MQTT311Client_EstablishConnectionToMQTTBroker(BROKER_ADDRESS, BROKER_PORT_TCP);
     MQTT311Client_SetUsernameAndPassword("", "");
-    MQTT311Client_Connect(0xC2, 600, "", "");
-
-    /* ----- Publish some messages ------*/
-    // MQTT311Client_Publish(0x00, "/topic/topic1", 0x00, "123test", sizeof("123test"));
-    // vTaskDelay(pdMS_TO_TICKS(1000));
+    MQTT311Client_Connect(0xC2, KEEP_ALIVE, "", "");
    
-    /* ------ Subscribe to some topic ------ */
+    /* ------ Subscribe to MQTT topics ------ */
     MQTT311Client_Subscribe(0x02, SUB_TOPIC, 0x00);
     vTaskDelay(pdMS_TO_TICKS(1000));
     MQTT311Client_Subscribe(0x02, ALL_TOPIC, 0x00);
-
-    /* ----- Unsubscribe to some topic ----- */
     vTaskDelay(pdMS_TO_TICKS(1000));
-    MQTT311Client_Unsubscribe(0x02, "/topic/unsubscribe_test");
-
-    /* ----- Test pinging ------ */
-    MQTT311Client_Pingreq();
-
-    /* ---- Test disconnecting ---- */
-    // MQTT311Client_Disconnect();
 }

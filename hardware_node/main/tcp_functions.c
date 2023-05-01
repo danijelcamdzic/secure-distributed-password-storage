@@ -6,7 +6,7 @@
  * @date 10 Apr 2023
  */
 
-#include "main.h"
+#include "tcp_functions.h"
 #include "MQTT311Client/MQTT311Client.h"
 #include "RSA/RSA.h"
 
