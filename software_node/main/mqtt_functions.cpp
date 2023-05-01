@@ -89,10 +89,8 @@ callback mqttCallbackFunction;
 void callback::message_arrived(mqtt::const_message_ptr msg)
 {
 #ifdef DEBUG
-    /* ----------------------------DEBUG-------------------------------- */
     /* Print the received messages to the console upon reception */
     std::cout << "Message arrived: " << msg->get_topic() << ": " << msg->to_string() << std::endl;
-    /* ----------------------------------------------------------------- */
 #endif
 
     /* Lock the mutex to ensure thread-safety when accessing the received_messages buffer */
@@ -217,10 +215,8 @@ void mqtt_publish(const std::string& topic, const std::vector<unsigned char>& me
         std::cout << "Message published on topic: " << topic << std::endl;
 
 #ifdef DEBUG
-        /* ----------------------------DEBUG-------------------------------- */
         /* Print the published messages to the console upon send */
         std::cout << "Message: " << std::string(message.begin(), message.end()) << std::endl;
-        /* ----------------------------------------------------------------- */
 #endif
     }
     catch (const mqtt::exception& exc)

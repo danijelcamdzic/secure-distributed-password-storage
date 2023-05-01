@@ -186,11 +186,9 @@ int main(int argc, char *argv[])
             std::vector<unsigned char> share_data(shares[i], shares[i] + sss_SHARE_LEN);
 
 #ifdef DEBUG
-            /* ----------------------------DEBUG-------------------------------- */
             /* See the length of the original share and its contents */
             std::cout << "Printing the share_data.." << std::endl;
             debug_print(share_data);
-            /* ------------------------------------------------------------------ */
 #endif
 
             /* Encrypt share with the correct public key of the hardware node */
@@ -216,13 +214,11 @@ int main(int argc, char *argv[])
         auto received_messages = mqttCallbackFunction.get_received_messages();
         for (const auto& [topic, message] : received_messages) {
 #ifdef DEBUG
-            /* ----------------------------DEBUG-------------------------------- */
             /* See the length of the topic and message and its contents */
             std::cout << "Printing the topic.." << std::endl;
             debug_print(std::string(topic.begin(), topic.end()));
             std::cout << "Printing the message.." << std::endl;
             debug_print(std::string(message.begin(), message.end()));
-            /* ----------------------------------------------------------------- */
 #endif
 
             /* Check if the topic is in the sub_topics vector */
@@ -257,24 +253,20 @@ int main(int argc, char *argv[])
             std::vector<unsigned char> encrypted_message_vec(message.begin(), message.end());
 
 #ifdef DEBUG
-        /* ----------------------------DEBUG-------------------------------- */
             /* See the length of the topic and message and its contents */
             std::cout << "Printing the topic" << std::endl;
             debug_print(std::string(topic.begin(), topic.end()));
             std::cout << "Printing the encrypted message vector.." << std::endl;
             debug_print(encrypted_message_vec);
-        /* ----------------------------------------------------------------- */
 #endif
 
             /* Decrypt with the private key of the master device */
             std::vector<unsigned char> decrypted_message_vec = rsa_decrypt_message(encrypted_message_vec, RSA_PRIVATE_KEY);
 
 #ifdef DEBUG
-            /* ----------------------------DEBUG-------------------------------- */
             /* See the length of and the contents of the decrypted message*/
             std::cout << "Printing the decrypted message vector.." << std::endl;
             debug_print(decrypted_message_vec);
-            /* ----------------------------------------------------------------- */
 #endif
 
             /* Push the decrypted share into the vector */
