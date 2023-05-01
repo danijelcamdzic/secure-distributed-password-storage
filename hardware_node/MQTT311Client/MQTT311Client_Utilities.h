@@ -12,6 +12,7 @@
 #ifndef MQTT311Client_UTILITIES_H
 #define MQTT311Client_UTILITIES_H
 
+/* Included libraries */
 #include "MQTT311Client/MQTT311Client.h"
 
 /* Macros for accessing the internal variables */

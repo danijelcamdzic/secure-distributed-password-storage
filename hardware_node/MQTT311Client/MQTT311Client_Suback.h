@@ -14,6 +14,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include "MQTT311Client/MQTT311Client.h"
 
 /*   ----------------- SUBACK MESSAGE STRUCTURE | B0 | B1 | B2 | .. ----------------------
 
@@ -31,6 +32,12 @@
 /* Packet Information */
 #define SUBACK_PACKET_REMAINING_LENGTH      0x03        /* Packet's fixed remaining length */
 #define SUBACK_PACKET_SIZE                  "5"         /* Packet size */
+
+/* Text macros */
+#define SUB_MAX_0                                 "Subscribe success - Maximum QoS 0"
+#define SUB_MAX_1                                 "Subscribe success - Maximum QoS 1"
+#define SUB_MAX_2                                 "Subscribe success - Maximum QoS 2"
+#define SUB_FAILURE                               "Failure to subscribe!"
 
 /* SUBACK Message Structure */
 struct SUBACK_MESSAGE 

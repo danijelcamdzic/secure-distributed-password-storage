@@ -11,7 +11,8 @@
  */
 
 /* Included libraries */
-#include "MQTT311Client/MQTT311Client.h"
+#include "MQTT311Client/MQTT311Client_Unsubscribe.h"
+#include "MQTT311Client/MQTT311Client_Unsuback.h"
 
 /* Private function declaration */
 static UnsubscribeMessageResult_t MQTT311Client_UnsubscribeWithStruct(struct UNSUBSCRIBE_MESSAGE *unsubscribe_message_data);

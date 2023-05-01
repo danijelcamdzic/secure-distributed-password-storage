@@ -7,7 +7,8 @@
  */
 
 /* Included libraries */
-#include "MQTT311Client/MQTT311Client.h"
+#include "MQTT311Client/MQTT311Client_Subscribe.h"
+#include "MQTT311Client/MQTT311Client_Suback.h"
 
 /* Private functions */
 static SubscribeMessageResult_t MQTT311Client_SubscribeWithStruct(struct SUBSCRIBE_MESSAGE *subscribe_message_data);

@@ -10,7 +10,8 @@
  */
 
 /* Included libraries */
-#include "MQTT311Client/MQTT311Client.h"
+#include "MQTT311Client/MQTT311Client_Pingreq.h"
+#include "MQTT311Client/MQTT311Client_Pingresp.h"
 
 /* Private function declaration */
 static PingreqMessageResult_t MQTT311Client_PingreqWithStruct(struct PINGREQ_MESSAGE *pingreq_message_data);

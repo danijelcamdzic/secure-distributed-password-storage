@@ -10,7 +10,7 @@
  */
 
 /* Included libraries */
-#include "MQTT311Client/MQTT311Client.h"
+#include "MQTT311Client/MQTT311Client_Pingresp.h"
 
 /**
  * @brief Reads back the ping response message from the MQTT broker.

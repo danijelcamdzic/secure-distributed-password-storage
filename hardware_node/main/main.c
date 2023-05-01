@@ -26,8 +26,11 @@
 #include "mqtt_functions.h"
 #include "nvs_functions.h"
 
-/* MQTT library header */
+/* MQTT library headers */
 #include "MQTT311Client/MQTT311Client.h"
+#include "MQTT311Client/MQTT311Client_Driver.h"
+#include "MQTT311Client/MQTT311Client_Connect.h"
+#include "MQTT311Client/MQTT311Client_Subscribe.h"
 
 /* RSA utility library header */
 #include "RSA/RSA.h"

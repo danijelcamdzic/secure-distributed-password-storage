@@ -17,6 +17,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include "MQTT311Client/MQTT311Client.h"
 
 /*   ----------------- CONNECT MESSAGE STRUCTURE | B0 | B1 | B2 | .. ----------------------
 

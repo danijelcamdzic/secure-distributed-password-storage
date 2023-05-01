@@ -10,7 +10,7 @@
  */
 
 /* Included libraries */
-#include "MQTT311Client/MQTT311Client.h"
+#include "MQTT311Client/MQTT311Client_Disconnect.h"
 
 /* Private function declaration */
 static void MQTT311Client_DisconnectWithStruct(struct DISCONNECT_MESSAGE *disconnect_message_data);

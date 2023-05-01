@@ -17,6 +17,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include "MQTT311Client/MQTT311Client.h"
 
 /*   ----------------- CONNACK MESSAGE STRUCTURE | B0 | B1 | B2 | .. ----------------------
 
@@ -48,10 +49,6 @@
 #define WRONG_USERNAME_OR_PASSWORD_MESSAGE        "Connection Refused, bad user name or password"
 #define NOT_AUTHORIZED_MESSAGE                    "Connection Refused, not authorized"      
 #define UNSUPPORTED_RESPONSE                      "Unsupported response"  
-#define SUB_MAX_0                                 "Subscribe success - Maximum QoS 0"
-#define SUB_MAX_1                                 "Subscribe success - Maximum QoS 1"
-#define SUB_MAX_2                                 "Subscribe success - Maximum QoS 2"
-#define SUB_FAILURE                               "Failure to subscribe!"
 
 /* Connack Message Structure */
 struct CONNACK_MESSAGE 

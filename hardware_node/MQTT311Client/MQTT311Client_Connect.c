@@ -10,7 +10,8 @@
  */
 
 /* Included libraries */
-#include "MQTT311Client/MQTT311Client.h"
+#include "MQTT311Client/MQTT311Client_Connect.h"
+#include "MQTT311Client/MQTT311Client_Connack.h"
 
 /* Private function declarations */
 static void MQTT311Client_SetKeepAlive(uint16_t keepalive);

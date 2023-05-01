@@ -7,7 +7,11 @@
  */
 
 /* Included libraries */
-#include "MQTT311Client/MQTT311Client.h"
+#include "MQTT311Client/MQTT311Client_Publish.h"
+#include "MQTT311Client/MQTT311Client_Puback.h"
+#include "MQTT311Client/MQTT311Client_Pubrel.h"
+#include "MQTT311Client/MQTT311Client_Pubrec.h"
+#include "MQTT311Client/MQTT311Client_Pubcomp.h"
 
 /* Private function declaration */
 static void MQTT311Client_AppendMessagePayload(const char* message_payload, uint32_t payload_length);

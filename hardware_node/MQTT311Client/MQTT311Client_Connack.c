@@ -11,7 +11,7 @@
  */
 
 /* Included libraries */
-#include "MQTT311Client/MQTT311Client.h"
+#include "MQTT311Client/MQTT311Client_Connack.h"
 
 /**
  * @brief Reads the acknowledgement message from the MQTT broker.

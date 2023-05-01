@@ -7,7 +7,7 @@
  */
 
 /* Included libraries */
-#include "MQTT311Client/MQTT311Client.h"
+#include "MQTT311Client/MQTT311Client_Pubrel.h"
 
 /**
  * @brief Reads back the acknowledgement message from the server.

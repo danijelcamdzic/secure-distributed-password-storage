@@ -14,6 +14,7 @@
 
 /* MQTT311Client library header */
 #include "MQTT311Client/MQTT311Client.h"
+#include "MQTT311Client/MQTT311Client_Publish.h"
 
 /* RSA utility library header */
 #include "RSA/RSA.h"

@@ -23,23 +23,8 @@
 #include "freertos/semphr.h"
 #include "freertos/queue.h"
 
-/* MQTT Packet and Utilities Libraries */
-#include "MQTT311Client/MQTT311Client_Driver.h"
+/* MQTT311Client utility functions */
 #include "MQTT311Client/MQTT311Client_Utilities.h"
-#include "MQTT311Client/MQTT311Client_Connect.h"
-#include "MQTT311Client/MQTT311Client_Connack.h"
-#include "MQTT311Client/MQTT311Client_Publish.h"
-#include "MQTT311Client/MQTT311Client_Puback.h"
-#include "MQTT311Client/MQTT311Client_Pubrec.h"
-#include "MQTT311Client/MQTT311Client_Pubrel.h"
-#include "MQTT311Client/MQTT311Client_Pubcomp.h"
-#include "MQTT311Client/MQTT311Client_Subscribe.h"
-#include "MQTT311Client/MQTT311Client_Suback.h"
-#include "MQTT311Client/MQTT311Client_Unsubscribe.h"
-#include "MQTT311Client/MQTT311Client_Unsuback.h"
-#include "MQTT311Client/MQTT311Client_Pingreq.h"
-#include "MQTT311Client/MQTT311Client_Pingresp.h"
-#include "MQTT311Client/MQTT311Client_Disconnect.h"
 
 /* MQTT Packet Types */
 #define CONNECT                         0x10        /* Client request to connect to server*/
