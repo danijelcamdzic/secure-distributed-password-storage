@@ -27,7 +27,6 @@ void RSA_EncryptionTask(void *pvParameter)
 {
     /* Always encrypt with the master public key (of the software node) */
     RSA_MESSAGE_LENGTH = RSA_Encrypt(RSA_MESSAGE_TO_ENCRYPT, RSA_MESSAGE_LENGTH, RSA_MASTER_PUBLIC_KEY);
-    free(RSA_MESSAGE_TO_ENCRYPT);
 
     vTaskDelete(NULL);
 }

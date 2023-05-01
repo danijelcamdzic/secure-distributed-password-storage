@@ -1,3 +1,13 @@
+/**
+ * @file main.cpp
+ * @brief Includes the control access to save password or get password
+ * from the hardware nodes that are connected to the same MQTT broker
+ *
+ * @author Danijel Camdzic
+ * @date 1 May 2023
+ */
+
+
 #include <iostream>
 #include <thread>
 #include <fstream>
@@ -5,7 +15,9 @@
 #include <string>
 #include <stdexcept>
 #include <iomanip>
+#include <algorithm>
 
+/* Libraries for secure password retrieval from console */
 #if defined(_WIN32) || defined(_WIN64)
 #include <Windows.h>
 #else
@@ -13,10 +25,21 @@
 #include <unistd.h>
 #endif
 
+/* Header files containing utility functions */
 #include "mqtt_functions.h"
 #include "rsa_functions.h"
 #include "shamir_secret_sharing_functions.h"
 
+
+/**
+ * @brief Reads a password from the user without displaying the typed characters.
+ * 
+ * This function prompts the user to enter their password and reads the input
+ * while hiding the typed characters. It handles both Windows and Unix systems
+ * by using platform-specific methods to disable character echo.
+ *
+ * @return The entered password as a std::string.
+ */
 std::string read_password() 
 {
     /* Declare a string variable to store the user's password */
@@ -67,6 +90,20 @@ std::string read_password()
     return password;
 }
 
+/**
+ * @brief The main function of the secure password storage and retrieval application.
+ * 
+ * This function reads command-line arguments to determine whether to save or retrieve a password.
+ * It connects to the MQTT broker, subscribes to topics, and handles the saving and retrieval process.
+ * When saving, it splits the password using Shamir's secret sharing, encrypts the shares, and sends
+ * them to the hardware nodes. It waits confirmation that the password shares have been saved. When 
+ * retrieving, it sends a command to retrieve the password, waits for the minimum number of messages, 
+ * decrypts the shares, and recombines them to restore the password.
+ *
+ * @param argc The number of command-line arguments.
+ * @param argv The array of command-line arguments.
+ * @return 0 on successful execution, non-zero otherwise.
+ */
 int main(int argc, char *argv[]) 
 {
     /* Read the arguments to deduce whether to save or retrieve password */
@@ -75,6 +112,8 @@ int main(int argc, char *argv[])
         std::cerr << "Usage: " << argv[0] << " [save_password|get_password]" << std::endl;
         return 1;
     }
+
+    /* Get the command */
     std::string option = argv[1];
 
     /* Check to see if the options are correct */
@@ -110,23 +149,55 @@ int main(int argc, char *argv[])
         std::vector<std::vector<unsigned char>> encrypted_shares(SHAMIR_NUM_SHARES);
         for (size_t i = 0; i < SHAMIR_NUM_SHARES; i++) {
             std::vector<unsigned char> share_data(shares[i], shares[i] + sss_SHARE_LEN);
-            std::cout << "The original share has the length of: " << share_data.size() << std::endl;
 
-            /* Print the share in hex */
-            std::stringstream hex_ss;
-            for (unsigned char c : share_data) {
-                hex_ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(c);
-            }
-            std::cout << "Share in hex: " << hex_ss.str() << std::endl;
+            /* Uncomment to see the length of the original share */
+            // std::cout << "The original share has the length of: " << share_data.size() << std::endl;
 
+            /* Uncomment to print the share in hex */
+            // std::stringstream hex_ss;
+            // for (unsigned char c : share_data) {
+            //     hex_ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(c);
+            // }
+            // std::cout << "Share in hex: " << hex_ss.str() << std::endl;
+
+            /* Encrypt share with the correct public key of the hardware node */
             encrypted_shares[i] = rsa_encrypt_message(share_data, public_keys_hw_nodes[i]);
+
+            /* Append the END_MESSAGE_FLAG */
             std::vector<unsigned char> end_message_flag_vec(END_MESSAGE_FLAG.begin(), END_MESSAGE_FLAG.end());
             encrypted_shares[i].insert(encrypted_shares[i].end(), end_message_flag_vec.begin(), end_message_flag_vec.end());
+
+            /* Publish the share to the correct topic of the hardware node */
             mqtt_publish(pub_topics[i], encrypted_shares[i]);
         }
-    /* Retrieve password from the hw nodes */
+
+        /* Wait for confirmation of reception from the hardware nodes (wait for minimum threshold confirmations) */
+        mqttCallbackFunction.wait_for_messages(SHAMIR_THRESHOLD);
+
+        /** Check if the receive messages are OK
+        *   This block of code functions properly because the only topics this app is subscribing to are the ones
+        *   from which the hardware nodes are sending data. No other topics should be subscribed.
+        *   If other topics are subscribed to, this part will not function and the wait_for_messages function should be
+        *   edited to wait only for topics that are concerning the hardware nodes communication.
+        */
+        auto received_messages = mqttCallbackFunction.get_received_messages();
+        for (const auto& [topic, message] : received_messages) {
+            /* Check if the topic is in the sub_topics vector */
+            auto it = std::find(sub_topics.begin(), sub_topics.end(), topic);
+            bool topic_exists = it != sub_topics.end();
+            
+            /* Check if the message is "OK" */
+            bool message_ok = ((message[0] == 'O') && (message[1] == 'K'));
+            
+            if (!topic_exists || !message_ok) {
+                throw std::runtime_error("The reception of the shares from the hardware node side encountered and error");
+            }
+        }
+        /* Notify correct password saving */
+        std::cout << "The shares have been sent and confirmed by the hardware nodes" << std::endl;
+    /* Retrieve password from the hardware nodes */
     } else {
-        /* Send command to retrieve the password from hw nodes */
+        /* Send command to retrieve the password from hardware nodes */
         std::vector<unsigned char> retrieve_message_command(RETRIEVE_PASSWORD_COMMAND.begin(), RETRIEVE_PASSWORD_COMMAND.end());
         mqtt_publish(TOPIC_PUB_ALL, retrieve_message_command);
 

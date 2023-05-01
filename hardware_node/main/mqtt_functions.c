@@ -100,6 +100,10 @@ void mqtt_receive_passphrase(int index_start, int index_end)
     memcpy(password, RSA_ENCRYPTED_BUFFER, RSA_MESSAGE_LENGTH);
     nvs_store(pass_key, password, RSA_MESSAGE_LENGTH);
     ESP_LOGI(TAG, "Finished storing data in NVS");
+    
+    /* Publish the OK message */
+    /* Publish the read value */
+    MQTT311Client_Publish(0x00, PUB_TOPIC, 0x00, RECEPTION_CONFIRMATION, RECEPTION_CONFIRMATION_SIZE);
     vTaskDelay(pdMS_TO_TICKS(3000));
 }
 

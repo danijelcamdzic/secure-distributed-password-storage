@@ -18,6 +18,8 @@
 #define SUB_TOPIC                   "/topic/pub/hw_node_1"
 #define PUB_TOPIC                   "/topic/sub/hw_node_1"
 #define ALL_TOPIC                   "/topic/pub/all"
+#define RECEPTION_CONFIRMATION      "OK"
+#define RECEPTION_CONFIRMATION_SIZE 2
 
 /* MQTT Receive Message Processing function prototypes */
 int mqtt_find_substring_index(const char *substr, size_t substr_len);
