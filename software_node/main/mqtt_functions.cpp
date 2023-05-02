@@ -156,12 +156,13 @@ void callback::wait_for_messages(int num_unique_topics)
 
 /**
  * @brief Connect to the MQTT broker and set the callback function to receive the messages
- * @param[in] None
+ * @param[in] username The username for connecting to the MQTT broker
+ * @param[in] password The password for connecting to the MQTT broker
  *
  * This function sets the callback function which receives the MQTT messages and does further processing.
- * It also connects to the MQTT broker using the connOpts options.
+ * It also connects to the MQTT broker using the connOpts options and provided username and password.
  */
-void mqtt_connect(void)
+void mqtt_connect(const std::string& username, const std::string& password)
 {
     /* Set the callback function */
     client.set_callback(mqttCallbackFunction);
@@ -170,12 +171,15 @@ void mqtt_connect(void)
     connOpts.set_keep_alive_interval(120);
     connOpts.set_clean_session(true);
 
+    /* Set the username and password for the connection */
+    connOpts.set_user_name(username.c_str());
+    connOpts.set_password(password.c_str());
+
     /* Connect to the MQTT server using the connOpts */
     std::cout << "Connecting to the MQTT server..." << std::endl;
     client.connect(connOpts)->wait();
     std::cout << "Connected successfully!" << std::endl;
 }
-
 /**
  * @brief Subscribes to a MQTT topic
  * @param[in] topic MQTT topic to subscribe to

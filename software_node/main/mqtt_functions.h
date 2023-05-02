@@ -59,7 +59,7 @@ private:
 extern callback mqttCallbackFunction;
 
 /* Function prototypes */
-void mqtt_connect(void);
+void mqtt_connect(const std::string& username, const std::string& password);
 void mqtt_subscribe(const std::string& topic);
 void mqtt_publish(const std::string& topic, const std::vector<unsigned char>& message);
 

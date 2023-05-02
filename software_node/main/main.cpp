@@ -16,7 +16,7 @@
 #include <iomanip>
 #include <algorithm>
 
-/* Libraries for secure password retrieval from console */
+/* Libraries for secure password/password retrieval from console */
 #if defined(_WIN32) || defined(_WIN64)
 #include <Windows.h>
 #else
@@ -43,9 +43,6 @@ std::string read_password()
 {
     /* Declare a string variable to store the user's password */
     std::string password;
-
-    /* Prompt the user to enter their password */
-    std::cout << "Enter your password: ";
 
 #if defined(_WIN32) || defined(_WIN64)
     /* Get the standard input handle for Windows systems */
@@ -158,8 +155,18 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    /* Get username */
+    std::string mqtt_username;
+    std::cout << "Please enter your MQTT username: ";
+    std::getline(std::cin, mqtt_username);
+
+    /* Get password */
+    std::string mqtt_password;
+    std::cout << "Please enter your MQTT password: ";
+    mqtt_password = read_password();
+
     /* Connect to the MQTT broker */
-    mqtt_connect();
+    mqtt_connect(mqtt_username, mqtt_password);
     /* Subscribe to all topics from the list */
     for (const std::string& topic : sub_topics) {
         mqtt_subscribe(topic);
@@ -168,6 +175,7 @@ int main(int argc, char *argv[])
     /* Save password taken from the console */
     if (option == "save_password") {
         /* Read the password from the console */
+        std::cout << "Please enter the password which you wish to save: ";
         std::string password = read_password();
         std::cout << "Entered password: " << password << std::endl;
 
