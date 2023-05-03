@@ -131,6 +131,66 @@ idf.py build
 idf.py flash
 ```
 
+# Usage
+
+This section will guide you through the process of using the Secure Distributed Password Storage and Recovery system. We'll start with the software access node.
+
+## Software Node
+
+To use the software access node, follow these steps:
+
+1. Add the public RSA (2048-bit) keys of the hardware nodes to the software_node folder in .pem format. Also, add your private and public RSA 2048-bit keys to the same folder in .pem format. To generate an RSA 2048-bit key in PEM format, use the following OpenSSL command:
+
+```bash
+openssl genpkey -algorithm RSA -out private_key.pem -pkeyopt rsa_keygen_bits:2048
+openssl rsa -pubout -in private_key.pem -out public_key.pem
+```
+
+2. Modify the following values in `shamir_secret_sharing_functions.cpp` according to your requirements:
+
+```bash
+#define SHAMIR_NUM_SHARES   1
+#define SHAMIR_THRESHOLD    1
+```
+
+`SHAMIR_NUM_SHARES` should be equal to the number of hardware nodes that the shares are being sent to, and `SHAMIR_THRESHOLD` must be less than or equal to `SHAMIR_NUM_SHARES` and represents the reconstruction threshold.
+
+3. In `rsa_functions.cpp`, update the file paths and list all the public keys of the hardware nodes:
 
 
+```bash
+const std::string RSA_PUBLIC_KEY("../rsa_public_key.pem");
+const std::string RSA_PRIVATE_KEY("../rsa_private_key.pem");
 
+const std::string RSA_PUBLIC_KEY_HW_NODE_1("../rsa_public_key_hw_node_1.pem");
+
+const std::vector<std::string> public_keys_hw_nodes = {RSA_PUBLIC_KEY_HW_NODE_1};
+```
+
+4. Configure the MQTT settings in `mqtt_functions.cpp`:
+
+```bash
+const std::string RETRIEVE_PASSWORD_COMMAND("GetPassEND_MESSAGE");
+const std::string END_MESSAGE_FLAG("END_MESSAGE");
+
+const std::string SERVER_ADDRESS("tcp://mqtt.eclipseprojects.io:1883");
+const std::string CLIENT_ID("access_node");
+
+const std::string TOPIC_SUB_HW_1("/topic/sub/hw_node_1");
+const std::string TOPIC_PUB_HW_1("/topic/pub/hw_node_1");
+const std::string TOPIC_PUB_ALL("/topic/pub/all");
+```
+
+5. To use the `main` app, execute it with either `save_password` or `get_password`:
+
+```
+./access_node save_password
+```
+
+or 
+
+```bash
+./access_node get_password
+```
+
+You will be prompted for your MQTT credentials and the password to save, or you will receive a password, depending on the command you used.
