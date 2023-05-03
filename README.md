@@ -20,3 +20,117 @@ The system is based on the fact that each hardware node listens to a specific to
 
 ## Flexibility and Security
 The system provides enhanced flexibility by allowing users to choose the number of required hardware nodes for password restoration during the splitting process. This offers additional security and protection against unauthorized access, data loss, or system compromise due to individual failures or hacking attempts. Through the implementation and practical application of the system, the goal of the project is to demonstrate the robustness and security of this system, showcasing its advantages in terms of resistance to attacks, protection of confidential data, efficiency in recovering secret information, and the superiority of distributed storage over centralized data storage.
+
+# Installation
+
+This section will guide you through the process of setting up the necessary tools to use the Secure Distributed Password Storage and Recovery system. Start by cloning the repository recursively:
+
+```bash
+git clone --recursive https://github.com/danijelcamdzic/secure-distributed-password-storage.git
+```
+
+Now, let's set up the environment for the software access node and the hardware nodes.
+
+## Software Access Node
+
+To set up the software access node, we'll need to install the Paho MQTT C++ library, OpenSSL, and CMake. Follow the instructions below:
+
+### Install Paho MQTT C++ library
+
+1. Install the required dependencies:
+
+```bash
+sudo apt-get install build-essential gcc make cmake cmake-gui cmake-curses-gui libssl-dev
+```
+
+2. Clone the Paho MQTT C++ library repository:
+
+```bash
+git clone https://github.com/eclipse/paho.mqtt.cpp
+```
+
+3. Build and install the library
+
+```bash
+cd paho.mqtt.cpp
+cmake -Bbuild -H. -DPAHO_BUILD_DOCUMENTATION=TRUE -DPAHO_BUILD_SAMPLES=TRUE -DPAHO_ENABLE_TESTING=FALSE
+sudo cmake --build build/ --target install
+sudo ldconfig
+```
+
+### Install OpenSSL
+
+1. Update the package index: 
+
+```bash
+sudo apt-get update
+```
+
+2. Install OpenSSL:
+
+```
+sudo apt-get install libssl-dev
+```
+
+### Build the project using CMake
+
+1. Navigate to the `software_node` directory:
+
+```bash
+cd secure-distributed-password-storage/software_node
+```
+
+2. Create a build directory and run CMake:
+
+```bash
+mkdir build
+cd build
+cmake ..
+```
+
+3. Compile the project
+
+```bash
+make
+```
+
+## Hardware Node
+
+To set up the hardware nodes, follow the steps to set up the ESP32 build environment as described in the official [documentation](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/linux-macos-setup.html) of the esp32.
+
+### Build the project using `idf.py`:
+
+1. Navigate to the `hardware_node` directory:
+
+```bash
+cd secure-distributed-password-storage/hardware_node
+```
+
+2. Export necessary tools:
+
+```bash
+ . $HOME/esp/esp-idf/export.sh
+```
+
+3. Edit the `menuconfig` to edit your Wi-Fi credentials:
+
+```bash
+idf.py menuconfig
+```
+
+4. Build the project
+
+```bash
+idf.py build
+```
+
+
+4. Flash the project
+
+```bash
+idf.py flash
+```
+
+
+
+
