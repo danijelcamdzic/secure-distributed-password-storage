@@ -125,20 +125,25 @@ std::vector<std::pair<std::string, std::string>> callback::get_received_messages
 }
 
 /**
- * @brief Wait for a specified number of unique topics to be received before returning
+ * @brief Wait for a specified number of unique topics to be received before returning or until the timeout expires
  * @param[in] num_unique_topics The number of unique topics to wait for before the function returns
+ * @param[in] timeout_duration The duration (in milliseconds) to wait before the function times out
  *
  * This function blocks and waits until the specified number of unique topics have been
- * received via the message_arrived callback function. It uses a condition variable to
- * efficiently wait for the arrival of new messages without busy-waiting or polling.
+ * received via the message_arrived callback function, or the timeout expires. It uses
+ * a condition variable to efficiently wait for the arrival of new messages without
+ * busy-waiting or polling.
  */
-void callback::wait_for_messages(int num_unique_topics)
+void callback::wait_for_messages(uint32_t num_unique_topics, uint32_t timeout_duration)
 {
+    /* Announce that wait for messages is in process */
+    std::cout << "Waiting for messages from the hardware nodes..." << std::endl;
+
     /* Lock the mutex to ensure thread-safety when accessing the received_messages buffer */
     std::unique_lock<std::mutex> lock(received_messages_mutex);
 
-    /* Wait on the condition variable until the required number of unique topics have been received */
-    received_messages_cv.wait(lock, [this, num_unique_topics] { 
+    /* Wait on the condition variable with a timeout */
+    bool received_enough_messages = received_messages_cv.wait_for(lock, std::chrono::milliseconds(timeout_duration), [this, num_unique_topics] {
         /* Create a set to store unique topics from the received_messages buffer */
         std::unordered_set<std::string> unique_topics;
 
@@ -148,12 +153,27 @@ void callback::wait_for_messages(int num_unique_topics)
         }
 
         /* Check if the size of the unique_topics set is greater or equal to the specified number of unique topics */
-        return unique_topics.size() >= num_unique_topics; 
+        return unique_topics.size() >= num_unique_topics;
     });
+
+    /* Check if enough unique topics were received before the timeout */
+    if (!received_enough_messages) {
+        /* Create a set to store unique topics from the received_messages buffer */
+        std::unordered_set<std::string> unique_topics;
+
+        /* Iterate over the received_messages buffer and insert topics into the unique_topics set */
+        for (const auto& [topic, message] : received_messages) {
+            unique_topics.insert(topic);
+        }
+
+        /* Throw an error with the required information */
+        throw std::runtime_error("Timeout expired while waiting for all messages. Received " +
+                                 std::to_string(unique_topics.size()) + " messages, but expected " +
+                                 std::to_string(num_unique_topics) + ".");
+    }
 
     /* The lock will be automatically released when the function returns, as std::unique_lock follows RAII principles */
 }
-
 /**
  * @brief Connect to the MQTT broker and set the callback function to receive the messages
  * @param[in] username The username for connecting to the MQTT broker

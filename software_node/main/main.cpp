@@ -211,7 +211,7 @@ int main(int argc, char *argv[])
         }
 
         /* Wait for confirmation of reception from the hardware nodes (wait for SHAMIR_NUM_SHARES confirmations) */
-        mqttCallbackFunction.wait_for_messages(SHAMIR_NUM_SHARES);
+        mqttCallbackFunction.wait_for_messages(SHAMIR_NUM_SHARES, WAIT_PERIOD_MS);
 
         /** Check if the receive messages are OK
         *   This block of code functions properly because the only topics this app is subscribing to are the ones
@@ -249,7 +249,7 @@ int main(int argc, char *argv[])
         mqtt_publish(TOPIC_PUB_ALL, retrieve_message_command);
 
         /* Wait for the minimum number of messages */
-        mqttCallbackFunction.wait_for_messages(SHAMIR_THRESHOLD);
+        mqttCallbackFunction.wait_for_messages(SHAMIR_THRESHOLD, WAIT_PERIOD_MS);
 
         /* Fetch the messages */
         auto received_messages = mqttCallbackFunction.get_received_messages();

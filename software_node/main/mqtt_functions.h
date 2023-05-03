@@ -25,6 +25,9 @@
 #include "mqtt/callback.h"
 #include "mqtt/async_client.h"
 
+/* Wait for 15s for message confirmations or passphrase pieces */
+#define WAIT_PERIOD_MS   15000
+
 /* Variable declarations for commanding the hardware nodes */
 extern const std::string RETRIEVE_PASSWORD_COMMAND;             /**< Used in the restore password command */
 extern const std::string END_MESSAGE_FLAG;                      /**< Sent at the end of every encrypted message to hardware nodes */
@@ -47,7 +50,7 @@ class callback : public virtual mqtt::callback {
 public:
     void message_arrived(mqtt::const_message_ptr msg) override;                         /**< Function for receiving messages */
     std::vector<std::pair<std::string, std::string>> get_received_messages() const;     /**< Function which returns the received messages */
-    void wait_for_messages(int num_messages);                                           /**< Function which wait for num_messages from different topics */
+    void wait_for_messages(uint32_t num_unique_topics, uint32_t timeout_duration);      /**< Function which wait for num_messages from different topics */
 
 private:
     std::vector<std::pair<std::string, std::string>> received_messages;                 /**< Received messages structure */
