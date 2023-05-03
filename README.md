@@ -195,6 +195,7 @@ or
 
 You will be prompted for your MQTT credentials and the password to save, or you will receive a password, depending on the command you used.
 
+
 ## Hardware Node
 
 1. In the `RSA_Encrypt.c` file, add the hardware node's public key and the software node's (master) public key:
