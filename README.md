@@ -194,3 +194,53 @@ or
 ```
 
 You will be prompted for your MQTT credentials and the password to save, or you will receive a password, depending on the command you used.
+
+## Hardware Node
+
+1. In the `RSA_Encrypt.c` file, add the hardware node's public key and the software node's (master) public key:
+
+```bash
+/* Master's Public RSA key */
+const unsigned char *masterkey = (const unsigned char *)"-----BEGIN PUBLIC KEY-----\n"
+                                                        ...
+                                                        "-----END PUBLIC KEY-----\n";
+
+/* Public RSA key (hardware node) */
+const unsigned char *key = (const unsigned char *)"-----BEGIN PUBLIC KEY-----\n"
+                                                    ...
+                                                    "-----END PUBLIC KEY-----\n";
+```
+
+2. In the `RSA_Decrypt.c` file, add the hardware node's private key:
+
+```bash
+/* Private RSA key (hardware node) */
+const unsigned char *private_key = (const unsigned char *)"-----BEGIN PRIVATE KEY-----\n"
+                                                            ...
+                                                            "-----END PRIVATE KEY-----\n";
+```
+
+3. Edit MQTT configuration:
+
+```bash
+/* MQTT connection specific defines */
+#define BROKER_ADDRESS              "mqtt.eclipseprojects.io"
+#define BROKER_PORT_TCP             1883
+#define KEEP_ALIVE                  600
+#define CLIENT_ID                   "hardware_node_1"
+
+/* Topics for subscribing and publishing the data */
+#define SUB_TOPIC                   "/topic/pub/hw_node_1"          /**< On this topic the encrypted data is received */
+#define PUB_TOPIC                   "/topic/sub/hw_node_1"          /**< On this topic the data is sent back */
+#define ALL_TOPIC                   "/topic/pub/all"                /**< On this topic the command to send data back is received */
+
+/* Data processing and confirmation defines */
+#define END_MESSAGE_FLAG            "END_MESSAGE"
+```
+
+Make sure to set the CLIENT_ID to a unique value for each hardware node.
+
+After configuring the RSA keys and MQTT settings, the hardware node is ready to be used with the software node.
+
+
+
