@@ -239,7 +239,7 @@ const unsigned char *private_key = (const unsigned char *)"-----BEGIN PRIVATE KE
 #define END_MESSAGE_FLAG            "END_MESSAGE"
 ```
 
-Make sure to set the CLIENT_ID to a unique value for each hardware node.
+Make sure to set the `CLIENT_ID` to a unique value for each hardware node.
 
 After configuring the RSA keys and MQTT settings, the hardware node is ready to be used with the software node.
 
