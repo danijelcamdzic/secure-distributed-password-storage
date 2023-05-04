@@ -1,17 +1,14 @@
 # About
-Sections below provide an overview of the system.
-
-## Title
-The title of the project is: "Secure Distributed Password Storage and Recovery on MQTT-connected Hardware IoT Nodes using RSA Cryptography and Shamir's Secret Sharing Scheme"
+This project implements **secure distributed password storage and recovery on MQTT-connected hardware IoT nodes using RSA cryptography and Shamir's secret charing scheme**.
 
 ## Overview
-This master's thesis project involves the analysis and development of a secure, distributed system for storing and accessing secret passwords across multiple independent hardware IoT devices. The system utilizes the MQTT 3.1.1 protocol, RSA cryptography, and Shamir's Secret Sharing scheme.
+This project includes the analysis and development of a secure, distributed system for storing and accessing secret passwords across multiple independent hardware IoT devices. The system utilizes the MQTT 3.1.1 protocol, RSA cryptography, and Shamir's Secret Sharing scheme.
 
 ## Software Access Node
 The system demonstrates the use of a software access node implemented in C++, along with multiple hardware devices (nodes) with internet access, specifically ESP32 devices. Each node in the system has its own public and private RSA (2048-bit) key. The cross-platform software access node can run on any platform that supports C++ compilation and execution. It implements RSA encryption, RSA decryption, as well as the splitting and reconstruction of passwords using Shamir's Secret Sharing formula.
 
 ## Hardware Nodes
-Hardware devices in the system act as storage nodes for password fragments. The system relies on IoT connections between devices by implementing the MQTT 3.1.1 protocol, with a custom [MQTT 3.1.1 client library](https://github.com/danijelcamdzic/mqtt311-client-library) built from scratch, using FreeRTOS concurrency mechanisms, and fulfilling all requirements and functionalities specified by the MQTT 3.1.1 standard. This eliminates the need for third-party implementations.
+Hardware devices in the system act as storage nodes for password fragments. The system relies on IoT connections between devices by implementing the MQTT 3.1.1 protocol, with a custom lightweight [MQTT 3.1.1 client library](https://github.com/danijelcamdzic/mqtt311-client-library) built from scratch, using FreeRTOS concurrency mechanisms, and fulfilling all requirements and functionalities specified by the MQTT 3.1.1 standard. This eliminates the need for third-party implementations.
 
 ## Additional Security Features
 Hardware devices in the system also implement RSA encryption and RSA decryption using the Mbed-TLS library. The system is designed so that the software access node has public RSA (2048-bit) keys for all hardware nodes, while hardware nodes only have the public key for the access node. Passwords created via the access node are split into N parts (where N is the number of hardware nodes), with M (M<=N) parts required for password reconstruction. Each password part is encrypted with the hardware node's RSA (2048-bit) public key before being sent.
@@ -148,7 +145,7 @@ openssl rsa -pubout -in private_key.pem -out public_key.pem
 
 2. Modify the following values in `shamir_secret_sharing_functions.cpp` according to your requirements:
 
-```bash
+```cpp
 #define SHAMIR_NUM_SHARES   1
 #define SHAMIR_THRESHOLD    1
 ```
@@ -158,7 +155,7 @@ openssl rsa -pubout -in private_key.pem -out public_key.pem
 3. In `rsa_functions.cpp`, update the file paths and list all the public keys of the hardware nodes:
 
 
-```bash
+```cpp
 const std::string RSA_PUBLIC_KEY("../rsa_public_key.pem");
 const std::string RSA_PRIVATE_KEY("../rsa_private_key.pem");
 
@@ -169,16 +166,25 @@ const std::vector<std::string> public_keys_hw_nodes = {RSA_PUBLIC_KEY_HW_NODE_1}
 
 4. Configure the MQTT settings in `mqtt_functions.cpp`:
 
-```bash
-const std::string RETRIEVE_PASSWORD_COMMAND("GetPassEND_MESSAGE");
-const std::string END_MESSAGE_FLAG("END_MESSAGE");
-
+```cpp
+/* Variable for general broker connection */
 const std::string SERVER_ADDRESS("tcp://mqtt.eclipseprojects.io:1883");
 const std::string CLIENT_ID("access_node");
+const std::string SERVER_CERTICIATE_PATH("../mqtt_ecplipseprojects_io_certificate.pem");    /**< Can be empty if only TCP connection will be used*/
 
-const std::string TOPIC_SUB_HW_1("/topic/sub/hw_node_1");
-const std::string TOPIC_PUB_HW_1("/topic/pub/hw_node_1");
-const std::string TOPIC_PUB_ALL("/topic/pub/all");
+/* Variable for commanding the hardware nodes */
+const std::string RETRIEVE_PASSWORD_COMMAND("GetPassEND_MESSAGE");          /**< Used in the restore password command */
+const std::string END_MESSAGE_FLAG("END_MESSAGE");                          /**< Sent at the end of every encrypted message to hardware nodes */
+
+/* Variable for communication with hardware nodes */
+const std::string TOPIC_SUB_HW_1("/topic/sub/hw_node_1");                   /**< On this topic the hardware node 1 sends messages */
+const std::string TOPIC_PUB_HW_1("/topic/pub/hw_node_1");                   /**< On this topic the hardware node 1 listens for messages */
+/* ... Add more topics for subscription and publishing (one for each hardware node) */
+const std::string TOPIC_PUB_ALL("/topic/pub/all");                          /**< On this topic all hardware nodes are listening */
+
+/* Vectors for containing the publish and subscribe topics */
+const std::vector<std::string> sub_topics = {TOPIC_SUB_HW_1};               /**< Add subscription topics for each hardware node in the vector */
+const std::vector<std::string> pub_topics = {TOPIC_PUB_HW_1};  
 ```
 
 5. To use the `main` app, execute it with either `save_password` or `get_password`:
@@ -198,23 +204,18 @@ You will be prompted for your MQTT credentials and the password to save, or you 
 
 ## Hardware Node
 
-1. In the `RSA_Encrypt.c` file, add the hardware node's public key and the software node's (master) public key:
+1. In the `RSA_Encrypt.c` file, add the software node's (master) public key:
 
-```bash
+```cpp
 /* Master's Public RSA key */
 const unsigned char *masterkey = (const unsigned char *)"-----BEGIN PUBLIC KEY-----\n"
                                                         ...
                                                         "-----END PUBLIC KEY-----\n";
-
-/* Public RSA key (hardware node) */
-const unsigned char *key = (const unsigned char *)"-----BEGIN PUBLIC KEY-----\n"
-                                                    ...
-                                                    "-----END PUBLIC KEY-----\n";
 ```
 
 2. In the `RSA_Decrypt.c` file, add the hardware node's private key:
 
-```bash
+```cpp
 /* Private RSA key (hardware node) */
 const unsigned char *private_key = (const unsigned char *)"-----BEGIN PRIVATE KEY-----\n"
                                                             ...
@@ -223,23 +224,29 @@ const unsigned char *private_key = (const unsigned char *)"-----BEGIN PRIVATE KE
 
 3. Edit MQTT configuration:
 
-```bash
+```cpp
 /* MQTT connection specific defines */
 #define BROKER_ADDRESS              "mqtt.eclipseprojects.io"
 #define BROKER_PORT_TCP             1883
-#define KEEP_ALIVE                  600
+#define BROKER_PORT_SSL             8883
+#define KEEP_ALIVE                  120
 #define CLIENT_ID                   "hardware_node_1"
+#define USERNAME                    ""
+#define PASSWORD                    ""
+
+/* SSL certificate */
+extern const unsigned char *certificate;
 
 /* Topics for subscribing and publishing the data */
 #define SUB_TOPIC                   "/topic/pub/hw_node_1"          /**< On this topic the encrypted data is received */
 #define PUB_TOPIC                   "/topic/sub/hw_node_1"          /**< On this topic the data is sent back */
 #define ALL_TOPIC                   "/topic/pub/all"                /**< On this topic the command to send data back is received */
 
-/* Data processing and confirmation defines */
-#define END_MESSAGE_FLAG            "END_MESSAGE"
 ```
 
-Make sure to set the `CLIENT_ID` to a unique value for each hardware node.
+Make sure to add the full certificate if you are using `ssl_functions.h` to connect to the MQTT broker.
+
+Also make sure to set the `CLIENT_ID` to a unique value for each hardware node.
 
 After configuring the RSA keys and MQTT settings, the hardware node is ready to be used with the software node.
 
