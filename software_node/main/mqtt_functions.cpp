@@ -12,7 +12,7 @@
 /* Variable for general broker connection */
 const std::string SERVER_ADDRESS("tcp://mqtt.eclipseprojects.io:1883");
 const std::string CLIENT_ID("access_node");
-const std::string SERVER_CERTICIATE_PATH("../mqtt_ecplipseprojects_io_certificate.pem");    /**< Can be empty if only TCP connection will be used*/
+const std::string SERVER_CERTIFICATE_PATH("../mqtt_ecplipseprojects_io_certificate.pem");    /**< Can be empty if only TCP connection will be used*/
 
 /* Variable for commanding the hardware nodes */
 const std::string RETRIEVE_PASSWORD_COMMAND("GetPassEND_MESSAGE");          /**< Used in the restore password command */
