@@ -13,14 +13,14 @@
 /* ------------------------- VARIABLE DEFINITIONS ------------------------------------ */
 
 /* Master public and private key (RSA 2048-bit) path */
-const std::string RSA_PUBLIC_KEY("../rsa_public_key.pem");
+const std::string RSA_PUBLIC_KEY("../rsa_public_key.pem"); 
 const std::string RSA_PRIVATE_KEY("../rsa_private_key.pem");
 
 /* Public key (RSA 2048-bit) of the hardware nodes path */
 const std::string RSA_PUBLIC_KEY_HW_NODE_1("../rsa_public_key_hw_node_1.pem");      /**< Should list all the paths to the public keys of the hardware nodes */ 
 
 /* Vector containing the hardware nodes declaration */
-const std::vector<std::string> public_keys_hw_nodes = {RSA_PUBLIC_KEY_HW_NODE_1};   /**< Should list all the above public key paths of the hardware nodes */
+const std::vector<std::string> public_keys_hw_nodes = {RSA_PUBLIC_KEY_HW_NODE_1};   /**< Should include all the above public key paths of the hardware nodes */
 
 
 /* ------------------------- FUNCTION DEFINITIONS ------------------------------------ */

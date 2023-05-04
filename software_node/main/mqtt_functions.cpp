@@ -9,23 +9,24 @@
 
 #include "mqtt_functions.h"
 
+/* Variable for general broker connection */
+const std::string SERVER_ADDRESS("tcp://mqtt.eclipseprojects.io:1883");
+const std::string CLIENT_ID("access_node");
+const std::string SERVER_CERTICIATE_PATH("../mqtt_ecplipseprojects_io_certificate.pem");    /**< Can be empty if only TCP connection will be used*/
+
 /* Variable for commanding the hardware nodes */
 const std::string RETRIEVE_PASSWORD_COMMAND("GetPassEND_MESSAGE");          /**< Used in the restore password command */
 const std::string END_MESSAGE_FLAG("END_MESSAGE");                          /**< Sent at the end of every encrypted message to hardware nodes */
 
-/* Variable for general broker connection */
-const std::string SERVER_ADDRESS("tcp://mqtt.eclipseprojects.io:1883");
-const std::string CLIENT_ID("access_node");
-const std::string SERVER_CERTICIATE_PATH("../mqtt_ecplipseprojects_io_certificate.pem");
-
 /* Variable for communication with hardware nodes */
 const std::string TOPIC_SUB_HW_1("/topic/sub/hw_node_1");                   /**< On this topic the hardware node 1 sends messages */
 const std::string TOPIC_PUB_HW_1("/topic/pub/hw_node_1");                   /**< On this topic the hardware node 1 listens for messages */
+/* ... Add more topics for subscription and publishing (one for each hardware node) */
 const std::string TOPIC_PUB_ALL("/topic/pub/all");                          /**< On this topic all hardware nodes are listening */
 
 /* Vectors for containing the publish and subscribe topics */
-const std::vector<std::string> sub_topics = {TOPIC_SUB_HW_1};
-const std::vector<std::string> pub_topics = {TOPIC_PUB_HW_1};
+const std::vector<std::string> sub_topics = {TOPIC_SUB_HW_1};               /**< Add subscription topics for each hardware node in the vector */
+const std::vector<std::string> pub_topics = {TOPIC_PUB_HW_1};               /**< Add publishing topics for each hardware node in the vector */
 
 /* Variables for connection to MQTT broker with Paho MQTT C++ library */
 mqtt::async_client client(SERVER_ADDRESS, CLIENT_ID);
@@ -240,7 +241,7 @@ void mqtt_subscribe(const std::string& topic)
 }
 
 /**
- * @brief Publishes message to a MQTT topic
+ * @brief Publishes message to an MQTT topic
  * @param[in] topic MQTT topic to send message to
  * @param[in] message vector of unsigned chars that represent a message to send
  *
@@ -259,7 +260,7 @@ void mqtt_publish(const std::string& topic, const std::vector<unsigned char>& me
 
 #ifdef DEBUG
         /* Print the published messages to the console upon send */
-        std::cout << "Message: " << std::string(message.begin(), message.end()) << std::endl;
+        std::cout << "Sent message: " << std::string(message.begin(), message.end()) << std::endl;
 #endif
     }
     catch (const mqtt::exception& exc)
