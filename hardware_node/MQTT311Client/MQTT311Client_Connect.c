@@ -240,7 +240,6 @@ void MQTT311Client_Connect(uint8_t connect_flags, uint16_t keepalive, const char
 
     /* Filling up the structure - Keep Alive */
     connect_message_data->keep_alive = keepalive;
-    userdata.keepAlive = keepalive;
 
     /* Filling up the structure - Will Topic and Will Message Data */
     connect_message_data->willTopic  = (char*) pvPortMalloc(strlen(will_topic)+1);
@@ -261,7 +260,7 @@ void MQTT311Client_Connect(uint8_t connect_flags, uint16_t keepalive, const char
     mqtt_packet->mqtt_packet_type = eCONNECT;
     mqtt_packet->packet_data.connect_message_structure = connect_message_data;
 
-    /* Save connect flags */
+    /* Save user data */
     userdata.connect_flags = connect_flags;
     
     /* Send to queue for the sending task to receive */

@@ -10,9 +10,6 @@
 #include "MQTT311Client/MQTT311Client_Driver.h"    
 #include "MQTT311Client/MQTT311Client_Pingreq.h"
 
-/* Variable definitions */
-#define PING_TIME                           pdMS_TO_TICKS(userdata.keepAlive*1000*0.7)
-
 /* Task handle */
 TaskHandle_t xMQTTSendTask = NULL;
 TaskHandle_t xMQTTCheckSubMesTask = NULL;
@@ -77,10 +74,10 @@ static void prvMQTTQueueSendTask( void *pvParameters )
             /* Do nothing */
         }
 
-        /* Check if SET_TIME has passed since the last packet was sent */
+        /* Check if PING_TIME has passed since the last packet was sent */
         if( ( xTaskGetTickCount() - xLastSentTime ) >= PING_TIME )
         {
-            /* Call the Pingreq function */
+            /* Send the "Ping" packet */
             MQTT311Client_Pingreq();
 
             /* Update the last sent time */
