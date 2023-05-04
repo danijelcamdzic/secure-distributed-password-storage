@@ -165,7 +165,7 @@ int main(int argc, char *argv[])
     mqtt_password = read_password();
 
     /* Connect to the MQTT broker (SSL if certificate included in call, TCP otherwise) */
-    mqtt_connect(mqtt_username, mqtt_password, SERVER_CERTICIATE_PATH);
+    mqtt_connect(mqtt_username, mqtt_password, SERVER_CERTIFICATE_PATH);
     /* Subscribe to all topics from the list */
     for (const std::string& topic : sub_topics) {
         mqtt_subscribe(topic);
