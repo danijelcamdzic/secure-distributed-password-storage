@@ -24,6 +24,7 @@
 /* Paho MQTT C++ library */
 #include "mqtt/callback.h"
 #include "mqtt/async_client.h"
+#include "mqtt/ssl_options.h"
 
 /* Wait for 15s for message confirmations or passphrase pieces */
 #define WAIT_PERIOD_MS   15000
@@ -63,6 +64,7 @@ extern callback mqttCallbackFunction;
 
 /* Function prototypes */
 void mqtt_connect(const std::string& username, const std::string& password);
+void mqtt_connect(const std::string& username, const std::string& password, const std::string& certFile);
 void mqtt_subscribe(const std::string& topic);
 void mqtt_publish(const std::string& topic, const std::vector<unsigned char>& message);
 

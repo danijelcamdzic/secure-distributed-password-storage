@@ -200,6 +200,40 @@ void mqtt_connect(const std::string& username, const std::string& password)
     client.connect(connOpts)->wait();
     std::cout << "Connected successfully!" << std::endl;
 }
+
+/**
+ * @brief Connect to the MQTT broker with SSL and set the callback function to receive the messages
+ * @param[in] username The username for connecting to the MQTT broker
+ * @param[in] password The password for connecting to the MQTT broker
+ * @param[in] certFile The path to the certificate file for SSL/TLS connection
+ *
+ * This function sets the callback function which receives the MQTT messages and does further processing.
+ * It also connects to the MQTT broker using the connOpts options and provided username, password, and certificate file.
+ */
+void mqtt_connect(const std::string& username, const std::string& password, const std::string& certFile)
+{
+    /* Set the callback function */
+    client.set_callback(mqttCallbackFunction);
+
+    /* Set the keepalive interval and clean session */
+    connOpts.set_keep_alive_interval(120);
+    connOpts.set_clean_session(true);
+
+    /* Set the username and password for the connection */
+    connOpts.set_user_name(username.c_str());
+    connOpts.set_password(password.c_str());
+
+    /* Set the SSL/TLS options */
+    mqtt::ssl_options sslOpts;
+    sslOpts.set_trust_store(certFile);
+    connOpts.set_ssl(sslOpts);
+
+    /* Connect to the MQTT server using the connOpts */
+    std::cout << "Connecting to the MQTT server with SSL..." << std::endl;
+    client.connect(connOpts)->wait();
+    std::cout << "Connected successfully!" << std::endl;
+}
+
 /**
  * @brief Subscribes to a MQTT topic
  * @param[in] topic MQTT topic to subscribe to
