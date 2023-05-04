@@ -21,17 +21,6 @@ const unsigned char *masterkey = (const unsigned char *)"-----BEGIN PUBLIC KEY--
                                                         "3wIDAQAB\n"
                                                         "-----END PUBLIC KEY-----\n";
 
-/* Public RSA key */
-const unsigned char *key = (const unsigned char *)"-----BEGIN PUBLIC KEY-----\n"
-                                                "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtuNBiX/VrhP71s+yTIp7\n"
-                                                "pQbDkGfCQYJsa2Tw0Q4P/CaXiDVOa+fKf9KxH60L+MU24jGuP83gKA79DF+Hi098\n"
-                                                "gLqCo5z8Tz4liNV4I78zbCUN99EZSFkr0lSF2/8kRToeBjIQ8ROxZQ3IkNbQqL+E\n"
-                                                "OGgwD39prfOFBHiINhtYP01Huz8qeGtNUXqc2lo70vQxm6fRF+z+6K2CXXf1x6c8\n"
-                                                "PMLvrE5adRM3z3+ZDwLuQ3iYGWIdcdc081Xs6UMzGgNf1ss8m6ZJzxElYqyXsCI6\n"
-                                                "eU35Vr5+7QImOYDXnJi+1IiEHjaBiEypJh3dJk7m1oGLzR3FA2hVujoTXMWsqjmW\n"
-                                                "pwIDAQAB\n"
-                                                "-----END PUBLIC KEY-----\n";
-
 /* ------------------------- FUNCTION DEFINITIONS ------------------------------------ */
 
 /**
@@ -45,7 +34,7 @@ const unsigned char *key = (const unsigned char *)"-----BEGIN PUBLIC KEY-----\n"
  */
 size_t RSA_Encrypt(const char* text, size_t length, const unsigned char* rsa_key)
 {
-    /**< RNG (Random number generator init) */
+    /* RNG (Random number generator init) */
     int ret = 0;
     mbedtls_entropy_context entropy;
     mbedtls_entropy_init(&entropy);                                     /**< Initialize the entropy context */
@@ -80,7 +69,6 @@ size_t RSA_Encrypt(const char* text, size_t length, const unsigned char* rsa_key
     /* Encrypting data */
     const unsigned char *to_encrypt = (const unsigned char *)text;
     size_t to_encrypt_len = length;
-
     size_t olen = 0;                                                    /**< Initialize the output length to 0 */
 
     /*

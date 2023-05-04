@@ -22,7 +22,7 @@
 
 /* NVS Specific Defines */
 #define STORAGE_NAMESPACE           "pass_space"
-#define PASSWORD_STORE_KEY          "password"
+#define PASSWORD_STORE_KEY          "passphrase"
 
 /* NVS function prototypes */
 esp_err_t nvs_init();

@@ -9,22 +9,24 @@
 
 #include "mqtt_functions.h"
 
+/* Variable for general broker connection */
+const std::string SERVER_ADDRESS("tcp://mqtt.eclipseprojects.io:1883");
+const std::string CLIENT_ID("access_node");
+const std::string SERVER_CERTICIATE_PATH("../mqtt_ecplipseprojects_io_certificate.pem");    /**< Can be empty if only TCP connection will be used*/
+
 /* Variable for commanding the hardware nodes */
 const std::string RETRIEVE_PASSWORD_COMMAND("GetPassEND_MESSAGE");          /**< Used in the restore password command */
 const std::string END_MESSAGE_FLAG("END_MESSAGE");                          /**< Sent at the end of every encrypted message to hardware nodes */
 
-/* Variable for general broker connection */
-const std::string SERVER_ADDRESS("tcp://mqtt.eclipseprojects.io:1883");
-const std::string CLIENT_ID("access_node");
-
 /* Variable for communication with hardware nodes */
 const std::string TOPIC_SUB_HW_1("/topic/sub/hw_node_1");                   /**< On this topic the hardware node 1 sends messages */
 const std::string TOPIC_PUB_HW_1("/topic/pub/hw_node_1");                   /**< On this topic the hardware node 1 listens for messages */
+/* ... Add more topics for subscription and publishing (one for each hardware node) */
 const std::string TOPIC_PUB_ALL("/topic/pub/all");                          /**< On this topic all hardware nodes are listening */
 
 /* Vectors for containing the publish and subscribe topics */
-const std::vector<std::string> sub_topics = {TOPIC_SUB_HW_1};
-const std::vector<std::string> pub_topics = {TOPIC_PUB_HW_1};
+const std::vector<std::string> sub_topics = {TOPIC_SUB_HW_1};               /**< Add subscription topics for each hardware node in the vector */
+const std::vector<std::string> pub_topics = {TOPIC_PUB_HW_1};               /**< Add publishing topics for each hardware node in the vector */
 
 /* Variables for connection to MQTT broker with Paho MQTT C++ library */
 mqtt::async_client client(SERVER_ADDRESS, CLIENT_ID);
@@ -174,15 +176,18 @@ void callback::wait_for_messages(uint32_t num_unique_topics, uint32_t timeout_du
 
     /* The lock will be automatically released when the function returns, as std::unique_lock follows RAII principles */
 }
+
 /**
- * @brief Connect to the MQTT broker and set the callback function to receive the messages
+ * @brief Connect to the MQTT broker with TCP/SSL and set the callback function to receive the messages
  * @param[in] username The username for connecting to the MQTT broker
  * @param[in] password The password for connecting to the MQTT broker
+ * @param[in] certificatePath The path to the certificate file for TCP/SSL connection
  *
  * This function sets the callback function which receives the MQTT messages and does further processing.
- * It also connects to the MQTT broker using the connOpts options and provided username and password.
+ * It also connects to the MQTT broker using the connOpts options and provided username, password, and (optinally)
+ * certificate file.
  */
-void mqtt_connect(const std::string& username, const std::string& password)
+void mqtt_connect(const std::string& username, const std::string& password, const std::string& certificatePath)
 {
     /* Set the callback function */
     client.set_callback(mqttCallbackFunction);
@@ -195,11 +200,26 @@ void mqtt_connect(const std::string& username, const std::string& password)
     connOpts.set_user_name(username.c_str());
     connOpts.set_password(password.c_str());
 
+    /* Check whether to connect with TCP or SSL */
+    if (certificatePath != "") {
+        /* Set the SSL/TLS options */
+        mqtt::ssl_options sslOpts;
+        sslOpts.set_trust_store(certificatePath);
+        connOpts.set_ssl(sslOpts);
+
+        /* Announce connection with SSL */
+        std::cout << "Connecting to the MQTT server with SSL..." << std::endl;
+    }
+    else {
+        /* Announce connection with TCP */
+        std::cout << "Connecting to the MQTT server with TCP..." << std::endl;
+    }
+
     /* Connect to the MQTT server using the connOpts */
-    std::cout << "Connecting to the MQTT server..." << std::endl;
     client.connect(connOpts)->wait();
     std::cout << "Connected successfully!" << std::endl;
 }
+
 /**
  * @brief Subscribes to a MQTT topic
  * @param[in] topic MQTT topic to subscribe to
@@ -221,7 +241,7 @@ void mqtt_subscribe(const std::string& topic)
 }
 
 /**
- * @brief Publishes message to a MQTT topic
+ * @brief Publishes message to an MQTT topic
  * @param[in] topic MQTT topic to send message to
  * @param[in] message vector of unsigned chars that represent a message to send
  *
@@ -240,7 +260,7 @@ void mqtt_publish(const std::string& topic, const std::vector<unsigned char>& me
 
 #ifdef DEBUG
         /* Print the published messages to the console upon send */
-        std::cout << "Message: " << std::string(message.begin(), message.end()) << std::endl;
+        std::cout << "Sent message: " << std::string(message.begin(), message.end()) << std::endl;
 #endif
     }
     catch (const mqtt::exception& exc)
