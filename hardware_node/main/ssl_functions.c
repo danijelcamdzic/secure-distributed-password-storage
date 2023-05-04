@@ -51,7 +51,9 @@ mbedtls_ctr_drbg_context ctr_drbg;
 mbedtls_ssl_context ssl;
 mbedtls_ssl_config conf;
 mbedtls_x509_crt cacert;
-uint8_t connected = 0;
+
+/* Connection flag */
+static uint8_t connected = 0;
 
 /* ------------------------- FUNCTION DEFINITIONS ------------------------------------ */
 
@@ -65,79 +67,89 @@ uint8_t connected = 0;
  * @param port The port number to establish the connection.
  * @param certificate The PEM format certificate for SSL connection.
  */
-void ssl_connect_socket(const char* brokerAddress, uint16_t port) 
+void ssl_connect_socket(const char* brokerAddress, uint16_t port)
 {
     /* Connect to a SSL socket */
-    char* TAG = "ssl_connect_socket";                                   /**< Declare and initialize TAG for logging purposes */
+    char* TAG = "ssl_connect_socket";       /**< Declare and initialize TAG for logging purposes */
 
     int ret;
 
-    mbedtls_net_init(&server_fd);
-    mbedtls_ssl_init(&ssl);
-    mbedtls_ssl_config_init(&conf);
-    mbedtls_x509_crt_init(&cacert);
-    mbedtls_ctr_drbg_init(&ctr_drbg);
+    mbedtls_net_init(&server_fd);           /**< Initialize mbedtls networking context */
+    mbedtls_ssl_init(&ssl);                 /**< Initialize mbedtls SSL context */
+    mbedtls_ssl_config_init(&conf);         /**< Initialize mbedtls SSL configuration context */
+    mbedtls_x509_crt_init(&cacert);         /**< Initialize mbedtls X.509 certificate context */
+    mbedtls_ctr_drbg_init(&ctr_drbg);       /**< Initialize mbedtls counter-mode deterministic random bit generator context */
 
-    mbedtls_entropy_init(&entropy);
+    mbedtls_entropy_init(&entropy);         /**< Initialize mbedtls entropy context */
+
+    /* Seed the random number generator with entropy */
     if ((ret = mbedtls_ctr_drbg_seed(&ctr_drbg, mbedtls_entropy_func, &entropy, NULL, 0)) != 0)
     {
-        ESP_LOGE(TAG, "mbedtls_ctr_drbg_seed returned -0x%x", -ret);
+        ESP_LOGE(TAG, "mbedtls_ctr_drbg_seed returned -0x%x", -ret);    /**< Log error if seeding RNG fails */
         return;
     }
 
+    /* Parse the provided X.509 certificate */
     if ((ret = mbedtls_x509_crt_parse(&cacert, certificate, strlen((const char *)certificate) + 1)) != 0)
     {
-        ESP_LOGE(TAG, "mbedtls_x509_crt_parse returned -0x%x", -ret);
+        ESP_LOGE(TAG, "mbedtls_x509_crt_parse returned -0x%x", -ret);   /**< Log error if certificate parsing fails */
         return;
     }
 
+    /* Set default SSL configuration */
     if ((ret = mbedtls_ssl_config_defaults(&conf, MBEDTLS_SSL_IS_CLIENT, MBEDTLS_SSL_TRANSPORT_STREAM, MBEDTLS_SSL_PRESET_DEFAULT)) != 0)
     {
-        ESP_LOGE(TAG, "mbedtls_ssl_config_defaults returned -0x%x", -ret);
+        ESP_LOGE(TAG, "mbedtls_ssl_config_defaults returned -0x%x", -ret);  /**< Log error if SSL config setup fails */
         return;
     }
 
-    mbedtls_ssl_conf_authmode(&conf, MBEDTLS_SSL_VERIFY_REQUIRED);
-    mbedtls_ssl_conf_ca_chain(&conf, &cacert, NULL);
-    mbedtls_ssl_conf_rng(&conf, mbedtls_ctr_drbg_random, &ctr_drbg);
+    mbedtls_ssl_conf_authmode(&conf, MBEDTLS_SSL_VERIFY_REQUIRED);      /**< Set SSL authentication mode */
+    mbedtls_ssl_conf_ca_chain(&conf, &cacert, NULL);                    /**< Set SSL CA chain */
+    mbedtls_ssl_conf_rng(&conf, mbedtls_ctr_drbg_random, &ctr_drbg);    /**< Set SSL random number generator function */
 
+    /* Set up SSL context with the provided configuration */
     if ((ret = mbedtls_ssl_setup(&ssl, &conf)) != 0)
     {
-        ESP_LOGE(TAG, "mbedtls_ssl_setup returned -0x%x", -ret);
+        ESP_LOGE(TAG, "mbedtls_ssl_setup returned -0x%x", -ret);        /**< Log error if SSL context setup fails */
         return;
     }
 
+    /* Set the hostname for the SSL context */
     if ((ret = mbedtls_ssl_set_hostname(&ssl, brokerAddress)) != 0)
     {
-        ESP_LOGE(TAG, "mbedtls_ssl_set_hostname returned -0x%x", -ret);
+        ESP_LOGE(TAG, "mbedtls_ssl_set_hostname returned -0x%x", -ret); /**< Log error if hostname setting fails */
         return;
     }
 
-    mbedtls_net_init(&server_fd);
+    mbedtls_net_init(&server_fd); /**< Re-initialize mbedtls networking context */
 
     char port_str[6];
-    snprintf(port_str, sizeof(port_str), "%d", port);
+    snprintf(port_str, sizeof(port_str), "%d", port); /**< Convert the port number to a string */
 
+    /* Establish a network connection to the provided broker address and port */
     if ((ret = mbedtls_net_connect(&server_fd, brokerAddress, port_str, MBEDTLS_NET_PROTO_TCP)) != 0)
     {
-        ESP_LOGE(TAG, "mbedtls_net_connect returned -0x%x", -ret);
+        ESP_LOGE(TAG, "mbedtls_net_connect returned -0x%x", -ret); /**< Log error if network connection fails */
         return;
     }
 
-        mbedtls_ssl_set_bio(&ssl, &server_fd, mbedtls_net_send, mbedtls_net_recv, NULL);
+    /* Set up the SSL context with the network connection */
+    mbedtls_ssl_set_bio(&ssl, &server_fd, mbedtls_net_send, mbedtls_net_recv, NULL); /**< Associate the SSL context with the network context using send and receive functions */
 
+    /* Perform the SSL handshake */
     while ((ret = mbedtls_ssl_handshake(&ssl)) != 0)
     {
         if (ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE)
         {
-            ESP_LOGE(TAG, "mbedtls_ssl_handshake returned -0x%x", -ret);
+            ESP_LOGE(TAG, "mbedtls_ssl_handshake returned -0x%x", -ret); /**< Log error if SSL handshake fails */
             return;
         }
     }
 
-    ESP_LOGI(TAG, "SSL successfully connected!"); /**< Log SSL connection success */
+    /* Log SSL connection success */
+    ESP_LOGI(TAG, "SSL successfully connected!");
 
-    connected = 1;
+    connected = 1; /**< Set the connected flag to indicate a successful connection */
 }
 
 /**
@@ -151,28 +163,41 @@ void ssl_connect_socket(const char* brokerAddress, uint16_t port)
  */
 void ssl_send_data(const char* data, uint16_t size)
 {
-    if (!connected) return;
+    if (!connected) return;             /**< Check if the SSL connection has been established; return if not connected */
 
     /* Send data over SSL connection */
-    char* TAG = "ssl_send_data";                            /**< Declare and initialize TAG for logging purposes */
+    char* TAG = "ssl_send_data";        /**< Declare and initialize TAG for logging purposes */
 
     int ret;
+
+    /* Attempt to send data over the SSL connection */
     while ((ret = mbedtls_ssl_write(&ssl, (const unsigned char *)data, size)) <= 0)
     {
+        /* Check if the mbedtls_ssl_write function is waiting for read or write operation */
         if (ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE)
         {
-            ESP_LOGE(TAG, "mbedtls_ssl_write returned -0x%x", -ret);
+            ESP_LOGE(TAG, "mbedtls_ssl_write returned -0x%x", -ret); /**< Log error if data sending fails */
             return;
         }
     }
 
-    ESP_LOGI(TAG, "Data sent successfully!");              /**< Log data sending success */
+    ESP_LOGI(TAG, "Data sent successfully!"); /**< Log data sending success */
 }
 
+/**
+ * @brief Set the mbedtls network context to non-blocking mode.
+ *
+ * This function sets the file descriptor of the given mbedtls network context to non-blocking mode.
+ * In non-blocking mode, the file descriptor will not wait for an operation to complete before returning.
+ *
+ * @param[in,out] ctx A pointer to the mbedtls_net_context structure to be set to non-blocking mode.
+ */
 static void mbedtls_net_set_nonblocking(mbedtls_net_context *ctx)
 {
-    if (fcntl(ctx->fd, F_SETFL, fcntl(ctx->fd, F_GETFL) | O_NONBLOCK) < 0) {
-        perror("mbedtls_net_set_nonblock");
+    /* Attempt to set the mbedtls network context's file descriptor to non-blocking mode */
+    if (fcntl(ctx->fd, F_SETFL, fcntl(ctx->fd, F_GETFL) | O_NONBLOCK) < 0)
+    {
+        perror("mbedtls_net_set_nonblock"); /**< Print error message if setting to non-blocking mode fails */
     }
 }
 
@@ -185,7 +210,7 @@ static void mbedtls_net_set_nonblocking(mbedtls_net_context *ctx)
  */
 void ssl_receive_data(void)
 {
-    if (!connected) return;
+    if (!connected) return;                                             /**< Check if the SSL connection has been established; return if not connected */
 
     char* TAG = "ssl_receive_data";                                     /**< Declare and initialize TAG for logging purposes */
 

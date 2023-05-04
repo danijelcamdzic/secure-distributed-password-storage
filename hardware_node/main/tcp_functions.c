@@ -15,6 +15,9 @@
 /* TCP Socket */
 int sock_tcp;
 
+/* Connection flag */
+static uint8_t connected = 0;
+
 /* ------------------------- FUNCTION DEFINITIONS ------------------------------------ */
 
 /**
@@ -76,6 +79,8 @@ void tcp_connect_socket(const char* brokerAddress, uint16_t port)
         return;
     }
     ESP_LOGI(TAG, "Socket successfully connected!");                    /**< Log socket connection success */
+
+    connected = 1;  /**< Set the connected flag to indicate a successful connection */
 }
 
 /**
@@ -89,10 +94,12 @@ void tcp_connect_socket(const char* brokerAddress, uint16_t port)
  */
 void tcp_send_data(const char* data, uint16_t size)
 {
+    if (!connected) return;                                 /**< Check if the TCP connection has been established; return if not connected */
+
     /* Send data over TCP connection */
     char* TAG = "tcp_send_data";                            /**< Declare and initialize TAG for logging purposes */
 
-    int err = send(sock_tcp, data, size, 0);                    /**< Send data through the socket */
+    int err = send(sock_tcp, data, size, 0);                /**< Send data through the socket */
 
     /* Check if data was sent successfully */
     if (err < 0) {
@@ -109,6 +116,8 @@ void tcp_send_data(const char* data, uint16_t size)
  */
 void tcp_receive_data(void)
 {
+    if (!connected) return;                                             /**< Check if the TCP connection has been established; return if not connected */
+
     char* TAG = "tcp_receive_data";                                     /**< Declare and initialize TAG for logging purposes */                                                
 
     /* Set socket to non-blocking mode */
