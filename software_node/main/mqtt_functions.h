@@ -32,7 +32,7 @@
 /* Variable declarations for general broker connection */
 extern const std::string SERVER_ADDRESS;
 extern const std::string CLIENT_ID;
-extern const std::string SERVER_CERTICIATE_PATH;
+extern const std::string SERVER_CERTIFICATE_PATH;
 
 /* Variable declarations for commanding the hardware nodes */
 extern const std::string RETRIEVE_PASSWORD_COMMAND;             /**< Used in the restore password command */
