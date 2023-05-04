@@ -7,7 +7,8 @@
  */
 
 /* Included libraries */
-#include "MQTT311Client/MQTT311Client_Driver.h"    
+#include "MQTT311Client/MQTT311Client_Driver.h"   
+#include "MQTT311Client/MQTT311Client_Pingreq.h" 
 
 /* Variable definitions */
 
@@ -44,6 +45,9 @@ static void prvMQTTQueueSendTask( void *pvParameters )
 
     xNextWakeTime = xTaskGetTickCount();
 
+    /* Initialize the last sent time */
+    TickType_t xLastSentTime = xTaskGetTickCount();
+
     for( ;; )
 	{     
         if ( xMQTTSemaphore != NULL )
@@ -57,6 +61,19 @@ static void prvMQTTQueueSendTask( void *pvParameters )
                 {
                     /* Send appropriate packet */
                     MQTT311Client_SendMQTTPacket(&mqtt_packet);
+
+                    /* Update the last sent time */
+                    xLastSentTime = xTaskGetTickCount();
+                } else {
+                    /* Check if PING_TIME has passed since the last packet was sent */
+                    if( ( xTaskGetTickCount() - xLastSentTime ) >= PING_TIME )
+                    {
+                        /* Send the "Ping" packet */
+                        MQTT311Client_Pingreq();
+
+                        /* Update the last sent time */
+                        xLastSentTime = xTaskGetTickCount();
+                    }
                 }
                 /* Give sempahore back and delay the task */
                 xSemaphoreGive( xMQTTSemaphore );
@@ -128,6 +145,7 @@ void MQTT311Client_CreateMQTTFreeRTOSTasks(void)
     userdata.username = NULL;
     userdata.password = NULL;
     userdata.deviceID = NULL;
+    userdata.keepAlive = 120;   /**< Default value for the keep alive */
 
     /* Create the queue. */
     xMQTTQueue = xQueueCreate(mqttQUEUE_LENGTH, sizeof(struct MQTTPacket));
