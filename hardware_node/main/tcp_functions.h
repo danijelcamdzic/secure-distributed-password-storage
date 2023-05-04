@@ -27,7 +27,7 @@
 #endif
 
 /* Variable to be used as tcp socket */
-extern int sock;
+extern int sock_tcp;
 
 /* TCP function prototypes */
 void tcp_connect_socket(const char* brokerAddress, uint16_t port);

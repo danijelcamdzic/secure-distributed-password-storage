@@ -9,12 +9,11 @@
 
 #include "tcp_functions.h"
 #include "MQTT311Client/MQTT311Client.h"
-#include "RSA/RSA.h"
 
 /* ------------------------- VARIABLE DEFINITIONS ------------------------------------ */
 
 /* TCP Socket */
-int sock;
+int sock_tcp;
 
 /* ------------------------- FUNCTION DEFINITIONS ------------------------------------ */
 
@@ -62,18 +61,18 @@ void tcp_connect_socket(const char* brokerAddress, uint16_t port)
 #endif
 
     /* Create the socket */
-    sock = socket(addr_family, SOCK_STREAM, ip_protocol);
-    if (sock < 0) {
+    sock_tcp = socket(addr_family, SOCK_STREAM, ip_protocol);
+    if (sock_tcp < 0) {
         ESP_LOGI(TAG, "Unable to create socket: errno %d", errno);      /**< Log if socket creation failed */
         return;
     }
     ESP_LOGI(TAG, "Socket created, connecting to %s:%d", brokerAddress, port); /**< Log socket creation success */
 
     /* Connect to the socket */
-    int err = connect(sock, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
+    int err = connect(sock_tcp, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
     if (err != 0) {
         ESP_LOGI(TAG, "Socket unable to connect: errno %d", errno);     /**< Log if socket connection failed */
-        close(sock);                                                    /**< Close the socket */
+        close(sock_tcp);                                                    /**< Close the socket */
         return;
     }
     ESP_LOGI(TAG, "Socket successfully connected!");                    /**< Log socket connection success */
@@ -93,7 +92,7 @@ void tcp_send_data(const char* data, uint16_t size)
     /* Send data over TCP connection */
     char* TAG = "tcp_send_data";                            /**< Declare and initialize TAG for logging purposes */
 
-    int err = send(sock, data, size, 0);                    /**< Send data through the socket */
+    int err = send(sock_tcp, data, size, 0);                    /**< Send data through the socket */
 
     /* Check if data was sent successfully */
     if (err < 0) {
@@ -113,7 +112,7 @@ void tcp_receive_data(void)
     char* TAG = "tcp_receive_data";                                     /**< Declare and initialize TAG for logging purposes */                                                
 
     /* Set socket to non-blocking mode */
-    if (fcntl(sock, F_SETFL, fcntl(sock, F_GETFL) | O_NONBLOCK) < 0) {
+    if (fcntl(sock_tcp, F_SETFL, fcntl(sock_tcp, F_GETFL) | O_NONBLOCK) < 0) {
         ESP_LOGI(TAG, "Cannot put socket in non-blocking mode!");       /**< Log error if unable to set non-blocking mode */
     }
 
@@ -122,7 +121,7 @@ void tcp_receive_data(void)
         char temp_buffer[15];                                           /**< Define a temporary buffer of length 15 */
 
         /* Receive data from the socket */
-        int len = recv(sock, temp_buffer, sizeof(temp_buffer) - 1, 0);
+        int len = recv(sock_tcp, temp_buffer, sizeof(temp_buffer) - 1, 0);
 
         if (len < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
             ESP_LOGI(TAG, "No data to read...");                         /**< Log if no data is available to read */
