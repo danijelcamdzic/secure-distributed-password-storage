@@ -29,10 +29,10 @@
 /* Variable definitions */
 
 /* External function pointers */
-MQTT311Client_ConnectTCPSocketPtr MQTT311Client_ConnectTCPSocket = NULL;
-MQTT311Client_CloseTCPSocketPtr MQTT311Client_CloseTCPSocket = NULL;
-MQTT311Client_SendToTCPSocketPtr MQTT311Client_SendToTCPSocket = NULL;
-MQTT311Client_ReadFromTCPSocketPtr MQTT311Client_ReadFromTCPSocket = NULL;
+MQTT311Client_ConnectSocketPtr MQTT311Client_ConnectSocket = NULL;
+MQTT311Client_CloseSocketPtr MQTT311Client_CloseSocket = NULL;
+MQTT311Client_SendToSocketPtr MQTT311Client_SendToSocket = NULL;
+MQTT311Client_ReadFromSocketPtr MQTT311Client_ReadFromSocket = NULL;
 MQTT311Client_PrintPtr MQTT311Client_Print = NULL;
 MQTT311Client_ProcessBufferDataPtr MQTT311Client_ProcessBufferData = NULL;
 
@@ -56,39 +56,39 @@ static void MQTT311Client_SetPortNumber(uint16_t port);
 
 /* Setting the external functions */
 /**
- * @brief Sets the MQTT 3.1.1 Connect TCP Socket function.
- * @param tcp_connect_socket Function pointer to the user-defined MQTT 3.1.1 Connect TCP Socket function.
+ * @brief Sets the MQTT 3.1.1 Connect Socket function.
+ * @param connect_socket Function pointer to the user-defined MQTT 3.1.1 Connect Socket function.
  */
-void MQTT311Client_SetConnectTCPSocket(MQTT311Client_ConnectTCPSocketPtr tcp_connect_socket)
+void MQTT311Client_SetConnectSocket(MQTT311Client_ConnectSocketPtr connect_socket)
 {
-    MQTT311Client_ConnectTCPSocket = tcp_connect_socket;
+    MQTT311Client_ConnectSocket = connect_socket;
 }
 
 /**
- * @brief Sets the MQTT 3.1.1 Close TCP Socket function.
- * @param close_tcp_socket Function pointer to the user-defined MQTT 3.1.1 Close TCP Socket function.
+ * @brief Sets the MQTT 3.1.1 Close Socket function.
+ * @param close_socket Function pointer to the user-defined MQTT 3.1.1 Close Socket function.
  */
-void MQTT311Client_SetCloseTCPSocket(MQTT311Client_CloseTCPSocketPtr close_tcp_socket)
+void MQTT311Client_SetCloseSocket(MQTT311Client_CloseSocketPtr close_socket)
 {
-    MQTT311Client_CloseTCPSocket = close_tcp_socket;
+    MQTT311Client_CloseSocket = close_socket;
 }
 
 /**
- * @brief Sets the MQTT 3.1.1 Send to TCP Socket function.
- * @param send_to_tcp_socket Function pointer to the user-defined MQTT 3.1.1 Send to TCP Socket function.
+ * @brief Sets the MQTT 3.1.1 Send to Socket function.
+ * @param send_to__socket Function pointer to the user-defined MQTT 3.1.1 Send to Socket function.
  */
-void MQTT311Client_SetSendToTCPSocket(MQTT311Client_SendToTCPSocketPtr send_to_tcp_socket)
+void MQTT311Client_SetSendToSocket(MQTT311Client_SendToSocketPtr send_to_socket)
 {
-    MQTT311Client_SendToTCPSocket = send_to_tcp_socket;
+    MQTT311Client_SendToSocket = send_to_socket;
 }
 
 /**
- * @brief Sets the MQTT 3.1.1 Read from TCP Socket function.
- * @param read_from_tcp_socket Function pointer to the user-defined MQTT 3.1.1 Read from TCP Socket function.
+ * @brief Sets the MQTT 3.1.1 Read from Socket function.
+ * @param read_from_socket Function pointer to the user-defined MQTT 3.1.1 Read from Socket function.
  */
-void MQTT311Client_SetReadFromTCPSocket(MQTT311Client_ReadFromTCPSocketPtr read_from_tcp_socket)
+void MQTT311Client_SetReadFromSocket(MQTT311Client_ReadFromSocketPtr read_from_socket)
 {
-    MQTT311Client_ReadFromTCPSocket = read_from_tcp_socket;
+    MQTT311Client_ReadFromSocket = read_from_socket;
 }
 
 /**
@@ -265,14 +265,14 @@ void MQTT311Client_SetUsernameAndPassword(const char* username, const char* pass
 }
 
 /**
- * @brief Establishes a TCP connection to the MQTT broker over a TCP port.
+ * @brief Establishes a  connection to the MQTT broker.
  *
- * This function is used to establish a TCP connection to the MQTT broker over a TCP port.
+ * This function is used to establish a  connection to the MQTT broker.
  * It takes the broker address as a string input, the port number as a uint16_t input, and
  * does not return any value.
  * 
  * @param brokerName The broker address of the MQTT broker.
- * @param port The port number over which the TCP connection is to be established.
+ * @param port The port number over which the  connection is to be established.
  *
  * @return None.
  */ 
@@ -280,7 +280,7 @@ void MQTT311Client_EstablishConnectionToMQTTBroker(const char* brokerName, uint1
 {
     MQTT311Client_SetBrokerAddress(brokerName);
     MQTT311Client_SetPortNumber(port);
-    MQTT311Client_ConnectTCPSocket(brokerName, port);
+    MQTT311Client_ConnectSocket(brokerName, port);
 }
 
 /**
@@ -340,7 +340,7 @@ void MQTT311Client_AppendTopicName(const char* topic_name)
  */ 
 void MQTT311Client_SendToMQTTBroker(uint16_t size) 
 {
-    MQTT311Client_SendToTCPSocket((const char *)MQTT311_SEND_BUFFER, size);
+    MQTT311Client_SendToSocket((const char *)MQTT311_SEND_BUFFER, size);
 }
 
 /**
@@ -355,7 +355,7 @@ void MQTT311Client_SendToMQTTBroker(uint16_t size)
  */ 
 void MQTT311Client_ReceiveFromMQTTBroker(void) 
 {
-    MQTT311Client_ReadFromTCPSocket();
+    MQTT311Client_ReadFromSocket();
 }
 
 /**

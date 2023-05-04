@@ -21,14 +21,14 @@
 #define MQTT311_RECEIVED_BYTES  (number_of_bytes_received)
 
 /* External functions for socket connection */
-typedef void (*MQTT311Client_ConnectTCPSocketPtr)(const char*, uint16_t);
-typedef void (*MQTT311Client_CloseTCPSocketPtr)(void);
-typedef void (*MQTT311Client_SendToTCPSocketPtr)(const char*, uint16_t);
-typedef void (*MQTT311Client_ReadFromTCPSocketPtr)(void);
-extern MQTT311Client_ConnectTCPSocketPtr MQTT311Client_ConnectTCPSocket;
-extern MQTT311Client_CloseTCPSocketPtr MQTT311Client_CloseTCPSocket;
-extern MQTT311Client_SendToTCPSocketPtr MQTT311Client_SendToTCPSocket;
-extern MQTT311Client_ReadFromTCPSocketPtr MQTT311Client_ReadFromTCPSocket;
+typedef void (*MQTT311Client_ConnectSocketPtr)(const char*, uint16_t);
+typedef void (*MQTT311Client_CloseSocketPtr)(void);
+typedef void (*MQTT311Client_SendToSocketPtr)(const char*, uint16_t);
+typedef void (*MQTT311Client_ReadFromSocketPtr)(void);
+extern MQTT311Client_ConnectSocketPtr MQTT311Client_ConnectSocket;
+extern MQTT311Client_CloseSocketPtr MQTT311Client_CloseSocket;
+extern MQTT311Client_SendToSocketPtr MQTT311Client_SendToSocket;
+extern MQTT311Client_ReadFromSocketPtr MQTT311Client_ReadFromSocket;
 
 /* External functions for debugging */
 typedef void (*MQTT311Client_PrintPtr)(char*);
@@ -112,10 +112,10 @@ extern uint16_t current_index;
 extern QueueHandle_t xMQTTQueue;
 
 /* Function declarations */
-void MQTT311Client_SetConnectTCPSocket(MQTT311Client_ConnectTCPSocketPtr tcp_connect_socket);
-void MQTT311Client_SetCloseTCPSocket(MQTT311Client_CloseTCPSocketPtr close_tcp_socket);
-void MQTT311Client_SetSendToTCPSocket(MQTT311Client_SendToTCPSocketPtr send_to_tcp_socket);
-void MQTT311Client_SetReadFromTCPSocket(MQTT311Client_ReadFromTCPSocketPtr read_from_tcp_socket);
+void MQTT311Client_SetConnectSocket(MQTT311Client_ConnectSocketPtr connect_socket);
+void MQTT311Client_SetCloseSocket(MQTT311Client_CloseSocketPtr close_socket);
+void MQTT311Client_SetSendToSocket(MQTT311Client_SendToSocketPtr send_to_socket);
+void MQTT311Client_SetReadFromSocket(MQTT311Client_ReadFromSocketPtr read_from_socket);
 void MQTT311Client_SetPrint(MQTT311Client_PrintPtr print);
 void MQTT311Client_SetProcessBufferData(MQTT311Client_ProcessBufferDataPtr mqtt_process_buffer_data);
 void MQTT311Client_SendMQTTPacket(struct MQTTPacket *mqtt_packet);
