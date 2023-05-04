@@ -62,6 +62,16 @@ static void prvMQTTQueueSendTask( void *pvParameters )
 
                     /* Update the last sent time */
                     xLastSentTime = xTaskGetTickCount();
+                } else {
+                    /* Check if PING_TIME has passed since the last packet was sent */
+                    if( ( xTaskGetTickCount() - xLastSentTime ) >= PING_TIME )
+                    {
+                        /* Send the "Ping" packet */
+                        MQTT311Client_Pingreq();
+
+                        /* Update the last sent time */
+                        xLastSentTime = xTaskGetTickCount();
+                    }
                 }
                 /* Give sempahore back and delay the task */
                 xSemaphoreGive( xMQTTSemaphore );
@@ -143,6 +153,7 @@ void MQTT311Client_CreateMQTTFreeRTOSTasks(void)
     userdata.username = NULL;
     userdata.password = NULL;
     userdata.deviceID = NULL;
+    userdata.keepAlive = 120;   /**< Default value for the keep alive */
 
     /* Create the queue. */
     xMQTTQueue = xQueueCreate(mqttQUEUE_LENGTH, sizeof(struct MQTTPacket));

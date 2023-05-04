@@ -28,6 +28,9 @@
 extern TaskHandle_t xMQTTSendTask;
 extern TaskHandle_t xMQTTCheckSubMesTask;
 
+/* Ping timing define */
+#define PING_TIME                           pdMS_TO_TICKS(userdata.keepAlive*1000*0.6) /**< 60% of time defined in the keep alive interval */
+
 /* Function declarations */
 void MQTT311Client_CreateMQTTFreeRTOSTasks(void);
 
