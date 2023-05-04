@@ -26,7 +26,7 @@
 #include "mqtt/async_client.h"
 
 /* Wait for 15s for message confirmations or passphrase pieces */
-#define WAIT_PERIOD_MS   15000
+#define WAIT_PERIOD_MS   30000
 
 /* Variable declarations for commanding the hardware nodes */
 extern const std::string RETRIEVE_PASSWORD_COMMAND;             /**< Used in the restore password command */

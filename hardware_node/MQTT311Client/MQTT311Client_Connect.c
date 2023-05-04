@@ -240,6 +240,7 @@ void MQTT311Client_Connect(uint8_t connect_flags, uint16_t keepalive, const char
 
     /* Filling up the structure - Keep Alive */
     connect_message_data->keep_alive = keepalive;
+    userdata.keepAlive = keepalive;
 
     /* Filling up the structure - Will Topic and Will Message Data */
     connect_message_data->willTopic  = (char*) pvPortMalloc(strlen(will_topic)+1);

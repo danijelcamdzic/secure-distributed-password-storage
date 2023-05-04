@@ -8,8 +8,10 @@
 
 /* Included libraries */
 #include "MQTT311Client/MQTT311Client_Driver.h"    
+#include "MQTT311Client/MQTT311Client_Pingreq.h"
 
 /* Variable definitions */
+#define PING_TIME                           pdMS_TO_TICKS(userdata.keepAlive*1000*0.7)
 
 /* Task handle */
 TaskHandle_t xMQTTSendTask = NULL;
@@ -44,6 +46,9 @@ static void prvMQTTQueueSendTask( void *pvParameters )
 
     xNextWakeTime = xTaskGetTickCount();
 
+    /* Initialize the last sent time */
+    TickType_t xLastSentTime = xTaskGetTickCount();
+
     for( ;; )
 	{     
         if ( xMQTTSemaphore != NULL )
@@ -57,6 +62,9 @@ static void prvMQTTQueueSendTask( void *pvParameters )
                 {
                     /* Send appropriate packet */
                     MQTT311Client_SendMQTTPacket(&mqtt_packet);
+
+                    /* Update the last sent time */
+                    xLastSentTime = xTaskGetTickCount();
                 }
                 /* Give sempahore back and delay the task */
                 xSemaphoreGive( xMQTTSemaphore );
@@ -67,6 +75,16 @@ static void prvMQTTQueueSendTask( void *pvParameters )
         else
         {
             /* Do nothing */
+        }
+
+        /* Check if SET_TIME has passed since the last packet was sent */
+        if( ( xTaskGetTickCount() - xLastSentTime ) >= PING_TIME )
+        {
+            /* Call the Pingreq function */
+            MQTT311Client_Pingreq();
+
+            /* Update the last sent time */
+            xLastSentTime = xTaskGetTickCount();
         }
     }
 }

@@ -22,7 +22,7 @@
 /* MQTT connection specific defines */
 #define BROKER_ADDRESS              "mqtt.eclipseprojects.io"
 #define BROKER_PORT_TCP             1883
-#define KEEP_ALIVE                  600
+#define KEEP_ALIVE                  60
 #define CLIENT_ID                   "hardware_node_1"
 
 /* Topics for subscribing and publishing the data */
