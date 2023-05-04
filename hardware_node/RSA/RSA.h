@@ -31,12 +31,6 @@
 #include "mbedtls/platform.h"
 #include "mbedtls/base64.h"
 
-/* Control type over which public key to use */
-typedef enum PublicKeyControl_e {
-    MASTER_PUBLIC_KEY = 0,
-    DEVICE_PUBLIC_KEY
-} PublicKeyControl_t;
-
 /* Macros for accessing the internal variables */
 #define RSA_ENCRYPTED_BUFFER    (encrypted_text)
 #define RSA_MESSAGE_TO_ENCRYPT  (text_to_encrypt)
@@ -48,9 +42,6 @@ typedef enum PublicKeyControl_e {
 
 /* Master's Public RSA key */
 extern const unsigned char *masterkey;
-
-/* Public RSA key */
-extern const unsigned char *key;
 
 /* Private RSA key */
 extern const unsigned char *private_key;

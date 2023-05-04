@@ -1,5 +1,6 @@
 idf_component_register(SRCS "main.c"
                             "tcp_functions.c"
+                            "ssl_functions.c"
                             "mqtt_functions.c"
                             "nvs_functions.c"
                             "../MQTT311Client/MQTT311Client_Utilities.c"

@@ -29,7 +29,6 @@
 #include "rsa_functions.h"
 #include "shamir_secret_sharing_functions.h"
 
-
 /**
  * @brief Reads a password from the user without displaying the typed characters.
  * 
@@ -165,8 +164,8 @@ int main(int argc, char *argv[])
     std::cout << "Please enter your MQTT password: ";
     mqtt_password = read_password();
 
-    /* Connect to the MQTT broker */
-    mqtt_connect(mqtt_username, mqtt_password);
+    /* Connect to the MQTT broker (SSL if certificate included in call, TCP otherwise) */
+    mqtt_connect(mqtt_username, mqtt_password, SERVER_CERTICIATE_PATH);
     /* Subscribe to all topics from the list */
     for (const std::string& topic : sub_topics) {
         mqtt_subscribe(topic);
@@ -213,7 +212,7 @@ int main(int argc, char *argv[])
         /* Wait for confirmation of reception from the hardware nodes (wait for SHAMIR_NUM_SHARES confirmations) */
         mqttCallbackFunction.wait_for_messages(SHAMIR_NUM_SHARES, WAIT_PERIOD_MS);
 
-        /** Check if the receive messages are OK
+        /** Check if the received messages are OK
         *   This block of code functions properly because the only topics this app is subscribing to are the ones
         *   from which the hardware nodes are sending data. No other topics should be subscribed.
         *   If other topics are subscribed to, this part will not function and the wait_for_messages function should be
@@ -242,8 +241,9 @@ int main(int argc, char *argv[])
         }
         /* Notify correct password saving */
         std::cout << "The shares have been sent and confirmed by the hardware nodes!" << std::endl;
+    } 
     /* Retrieve password from the hardware nodes */
-    } else {
+    else {
         /* Send command to retrieve the password from hardware nodes */
         std::vector<unsigned char> retrieve_message_command(RETRIEVE_PASSWORD_COMMAND.begin(), RETRIEVE_PASSWORD_COMMAND.end());
         mqtt_publish(TOPIC_PUB_ALL, retrieve_message_command);

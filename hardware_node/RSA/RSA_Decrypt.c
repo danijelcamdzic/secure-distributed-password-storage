@@ -1,5 +1,5 @@
 /**
- * @file RSA_Dencrypt.c
+ * @file RSA_Decrypt.c
  * @brief Contains implementation of RSA decrypt algorithm
  *
  * @author Danijel Camdzic
