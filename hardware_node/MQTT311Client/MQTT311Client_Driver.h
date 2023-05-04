@@ -21,6 +21,9 @@
 #define mainMQTT_SEND_FREQUENCY_MS          (1000/portTICK_PERIOD_MS)
 #define mainMQTT_SUB_MES_FREQUENCY_MS       (1000/portTICK_PERIOD_MS)
 
+/* Ping timing define */
+#define PING_TIME                           pdMS_TO_TICKS(userdata.keepAlive*1000*0.6) /**< 60% of time defined in the keep alive interval */
+
 /* Task Handle */
 extern TaskHandle_t xMQTTSendTask;
 extern TaskHandle_t xMQTTCheckSubMesTask;
