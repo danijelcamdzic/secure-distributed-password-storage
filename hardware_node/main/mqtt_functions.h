@@ -23,8 +23,13 @@
 #define BROKER_ADDRESS              "mqtt.eclipseprojects.io"
 #define BROKER_PORT_TCP             1883
 #define BROKER_PORT_SSL             8883
-#define KEEP_ALIVE                  600
+#define KEEP_ALIVE                  120
 #define CLIENT_ID                   "hardware_node_1"
+#define USERNAME                    ""
+#define PASSWORD                    ""
+
+/* SSL certificate */
+extern const unsigned char *certificate;
 
 /* Topics for subscribing and publishing the data */
 #define SUB_TOPIC                   "/topic/pub/hw_node_1"          /**< On this topic the encrypted data is received */

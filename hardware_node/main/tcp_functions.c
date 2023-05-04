@@ -10,10 +10,17 @@
 #include "tcp_functions.h"
 #include "MQTT311Client/MQTT311Client.h"
 
+/* ------------------------------- DEFINES ------------------------------------------ */
+
+/* Defines for configuring the TCP Socket for IPv4 */
+#ifndef CONFIG_EXAMPLE_IPV4
+#define CONFIG_EXAMPLE_IPV4
+#endif
+
 /* ------------------------- VARIABLE DEFINITIONS ------------------------------------ */
 
 /* TCP Socket */
-int sock_tcp;
+static int sock_tcp;
 
 /* Connection flag */
 static uint8_t connected = 0;
@@ -66,7 +73,7 @@ void tcp_connect_socket(const char* brokerAddress, uint16_t port)
     /* Create the socket */
     sock_tcp = socket(addr_family, SOCK_STREAM, ip_protocol);
     if (sock_tcp < 0) {
-        ESP_LOGI(TAG, "Unable to create socket: errno %d", errno);      /**< Log if socket creation failed */
+        ESP_LOGI(TAG, "Unable to create socket!");                      /**< Log if socket creation failed */
         return;
     }
     ESP_LOGI(TAG, "Socket created, connecting to %s:%d", brokerAddress, port); /**< Log socket creation success */
@@ -74,13 +81,19 @@ void tcp_connect_socket(const char* brokerAddress, uint16_t port)
     /* Connect to the socket */
     int err = connect(sock_tcp, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
     if (err != 0) {
-        ESP_LOGI(TAG, "Socket unable to connect: errno %d", errno);     /**< Log if socket connection failed */
-        close(sock_tcp);                                                    /**< Close the socket */
+        ESP_LOGI(TAG, "Socket unable to connect!");                     /**< Log if socket connection failed */
+        close(sock_tcp);                                                /**< Close the socket */
         return;
     }
     ESP_LOGI(TAG, "Socket successfully connected!");                    /**< Log socket connection success */
 
-    connected = 1;  /**< Set the connected flag to indicate a successful connection */
+    /* Set socket to non-blocking mode */
+    if (fcntl(sock_tcp, F_SETFL, fcntl(sock_tcp, F_GETFL) | O_NONBLOCK) < 0) {
+        ESP_LOGI(TAG, "Cannot put socket in non-blocking mode!");       /**< Print error message if setting to non-blocking mode fails */
+    } else {
+        ESP_LOGI(TAG, "Socket set to non-blocking mode...");
+        connected = 1;  /**< Set the connected flag to indicate a successful connection */
+    }
 }
 
 /**
@@ -99,7 +112,8 @@ void tcp_send_data(const char* data, uint16_t size)
     /* Send data over TCP connection */
     char* TAG = "tcp_send_data";                            /**< Declare and initialize TAG for logging purposes */
 
-    int err = send(sock_tcp, data, size, 0);                /**< Send data through the socket */
+    /* Send data through the socket */
+    int err = send(sock_tcp, data, size, 0);           
 
     /* Check if data was sent successfully */
     if (err < 0) {
@@ -119,11 +133,6 @@ void tcp_receive_data(void)
     if (!connected) return;                                             /**< Check if the TCP connection has been established; return if not connected */
 
     char* TAG = "tcp_receive_data";                                     /**< Declare and initialize TAG for logging purposes */                                                
-
-    /* Set socket to non-blocking mode */
-    if (fcntl(sock_tcp, F_SETFL, fcntl(sock_tcp, F_GETFL) | O_NONBLOCK) < 0) {
-        ESP_LOGI(TAG, "Cannot put socket in non-blocking mode!");       /**< Log error if unable to set non-blocking mode */
-    }
 
     /* Receive everything in a loop until there is no data to receive */
     while(1) {

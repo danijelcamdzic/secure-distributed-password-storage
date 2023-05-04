@@ -287,7 +287,7 @@ void app_main(void)
     /* Connect to MQTT broker */
     MQTT311Client_CreateClient(CLIENT_ID);
     MQTT311Client_EstablishConnectionToMQTTBroker(BROKER_ADDRESS, BROKER_PORT_SSL);
-    MQTT311Client_SetUsernameAndPassword("", "");
+    MQTT311Client_SetUsernameAndPassword(USERNAME, PASSWORD);
     MQTT311Client_Connect(0xC2, KEEP_ALIVE, "", "");
    
     /* Subscribe to MQTT topics */

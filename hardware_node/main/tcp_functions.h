@@ -21,14 +21,6 @@
 #include "lwip/err.h"
 #include "lwip/sys.h"
 
-/* Defines for configuring the TCP Socket for IPv4 */
-#ifndef CONFIG_EXAMPLE_IPV4
-#define CONFIG_EXAMPLE_IPV4
-#endif
-
-/* Variable to be used as tcp socket */
-extern int sock_tcp;
-
 /* TCP function prototypes */
 void tcp_connect_socket(const char* brokerAddress, uint16_t port);
 void tcp_send_data(const char* data, uint16_t size);
