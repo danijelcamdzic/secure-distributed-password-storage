@@ -36,6 +36,7 @@ extern const std::string END_MESSAGE_FLAG;                      /**< Sent at the
 /* Variable declarations for general broker connection */
 extern const std::string SERVER_ADDRESS;
 extern const std::string CLIENT_ID;
+extern const std::string SERVER_CERTICIATE_PATH;
 
 /* Variable declarations for communication with hardware nodes */
 extern const std::string TOPIC_SUB_HW_1;                        /**< On this topic the hardware node 1 sends messages */
@@ -63,8 +64,7 @@ private:
 extern callback mqttCallbackFunction;
 
 /* Function prototypes */
-void mqtt_connect(const std::string& username, const std::string& password);
-void mqtt_connect(const std::string& username, const std::string& password, const std::string& certFile);
+void mqtt_connect(const std::string& username, const std::string& password, const std::string& certFile = "");
 void mqtt_subscribe(const std::string& topic);
 void mqtt_publish(const std::string& topic, const std::vector<unsigned char>& message);
 

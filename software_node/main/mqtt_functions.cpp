@@ -16,6 +16,7 @@ const std::string END_MESSAGE_FLAG("END_MESSAGE");                          /**<
 /* Variable for general broker connection */
 const std::string SERVER_ADDRESS("tcp://mqtt.eclipseprojects.io:1883");
 const std::string CLIENT_ID("access_node");
+const std::string SERVER_CERTICIATE_PATH("../mqtt_ecplipseprojects_io_certificate.pem");
 
 /* Variable for communication with hardware nodes */
 const std::string TOPIC_SUB_HW_1("/topic/sub/hw_node_1");                   /**< On this topic the hardware node 1 sends messages */
@@ -174,15 +175,18 @@ void callback::wait_for_messages(uint32_t num_unique_topics, uint32_t timeout_du
 
     /* The lock will be automatically released when the function returns, as std::unique_lock follows RAII principles */
 }
+
 /**
- * @brief Connect to the MQTT broker and set the callback function to receive the messages
+ * @brief Connect to the MQTT broker with TCP/SSL and set the callback function to receive the messages
  * @param[in] username The username for connecting to the MQTT broker
  * @param[in] password The password for connecting to the MQTT broker
+ * @param[in] certificatePath The path to the certificate file for TCP/SSL connection
  *
  * This function sets the callback function which receives the MQTT messages and does further processing.
- * It also connects to the MQTT broker using the connOpts options and provided username and password.
+ * It also connects to the MQTT broker using the connOpts options and provided username, password, and (optinally)
+ * certificate file.
  */
-void mqtt_connect(const std::string& username, const std::string& password)
+void mqtt_connect(const std::string& username, const std::string& password, const std::string& certificatePath)
 {
     /* Set the callback function */
     client.set_callback(mqttCallbackFunction);
@@ -195,41 +199,22 @@ void mqtt_connect(const std::string& username, const std::string& password)
     connOpts.set_user_name(username.c_str());
     connOpts.set_password(password.c_str());
 
-    /* Connect to the MQTT server using the connOpts */
-    std::cout << "Connecting to the MQTT server..." << std::endl;
-    client.connect(connOpts)->wait();
-    std::cout << "Connected successfully!" << std::endl;
-}
+    /* Check whether to connect with TCP or SSL */
+    if (certificatePath != "") {
+        /* Set the SSL/TLS options */
+        mqtt::ssl_options sslOpts;
+        sslOpts.set_trust_store(certificatePath);
+        connOpts.set_ssl(sslOpts);
 
-/**
- * @brief Connect to the MQTT broker with SSL and set the callback function to receive the messages
- * @param[in] username The username for connecting to the MQTT broker
- * @param[in] password The password for connecting to the MQTT broker
- * @param[in] certFile The path to the certificate file for SSL/TLS connection
- *
- * This function sets the callback function which receives the MQTT messages and does further processing.
- * It also connects to the MQTT broker using the connOpts options and provided username, password, and certificate file.
- */
-void mqtt_connect(const std::string& username, const std::string& password, const std::string& certFile)
-{
-    /* Set the callback function */
-    client.set_callback(mqttCallbackFunction);
-
-    /* Set the keepalive interval and clean session */
-    connOpts.set_keep_alive_interval(120);
-    connOpts.set_clean_session(true);
-
-    /* Set the username and password for the connection */
-    connOpts.set_user_name(username.c_str());
-    connOpts.set_password(password.c_str());
-
-    /* Set the SSL/TLS options */
-    mqtt::ssl_options sslOpts;
-    sslOpts.set_trust_store(certFile);
-    connOpts.set_ssl(sslOpts);
+        /* Announce connection with SSL */
+        std::cout << "Connecting to the MQTT server with SSL..." << std::endl;
+    }
+    else {
+        /* Announce connection with TCP */
+        std::cout << "Connecting to the MQTT server with TCP..." << std::endl;
+    }
 
     /* Connect to the MQTT server using the connOpts */
-    std::cout << "Connecting to the MQTT server with SSL..." << std::endl;
     client.connect(connOpts)->wait();
     std::cout << "Connected successfully!" << std::endl;
 }
