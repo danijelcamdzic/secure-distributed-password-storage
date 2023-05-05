@@ -153,7 +153,7 @@ void tcp_receive_data(void)
 
             MQTT311_RECEIVED_BYTES += len;                              /**< Increment the number of bytes received */
 
-            ESP_LOGI(TAG, "Received %d bytes from the socket", len);
+            ESP_LOGI(TAG, "Received %d bytes from the TCP connection", len);
         }
         /* Wait a short period */
         vTaskDelay(pdMS_TO_TICKS(50));
