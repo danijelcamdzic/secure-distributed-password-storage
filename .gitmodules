@@ -1,3 +1,6 @@
 [submodule "software_node/paho.mqtt.cpp"]
 	path = software_node/paho.mqtt.cpp
 	url = https://github.com/eclipse/paho.mqtt.cpp.git
+[submodule "hardware_node/mqtt311-client-library"]
+	path = hardware_node/mqtt311-client-library
+	url = git@github.com:danijelcamdzic/mqtt311-client-library.git
