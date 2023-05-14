@@ -1,24 +1,11 @@
+file(GLOB MQTT_SOURCES "../mqtt311-client-library/MQTT311Client/*.c")
+file(GLOB RSA_SOURCES "../RSA/*.c")
+
 idf_component_register(SRCS "main.c"
                             "tcp_functions.c"
                             "ssl_functions.c"
                             "mqtt_functions.c"
                             "nvs_functions.c"
-                            "../mqtt311-client-library/MQTT311Client/MQTT311Client_Utilities.c"
-                            "../mqtt311-client-library/MQTT311Client/MQTT311Client_Driver.c"
-                            "../mqtt311-client-library/MQTT311Client/MQTT311Client_Connect.c"
-                            "../mqtt311-client-library/MQTT311Client/MQTT311Client_Connack.c"
-                            "../mqtt311-client-library/MQTT311Client/MQTT311Client_Publish.c"
-                            "../mqtt311-client-library/MQTT311Client/MQTT311Client_Puback.c"
-                            "../mqtt311-client-library/MQTT311Client/MQTT311Client_Pubrec.c"
-                            "../mqtt311-client-library/MQTT311Client/MQTT311Client_Pubrel.c"
-                            "../mqtt311-client-library/MQTT311Client/MQTT311Client_Pubcomp.c"
-                            "../mqtt311-client-library/MQTT311Client/MQTT311Client_Subscribe.c"
-                            "../mqtt311-client-library/MQTT311Client/MQTT311Client_Suback.c"
-                            "../mqtt311-client-library/MQTT311Client/MQTT311Client_Pingreq.c"
-                            "../mqtt311-client-library/MQTT311Client/MQTT311Client_Pingresp.c"
-                            "../RSA/RSA.c"
-                            "../RSA/RSA_Encrypt.c"
-                            "../RSA/RSA_Decrypt.c"
-                            "../RSA/RSA_Utilities.c"
+                            ${MQTT_SOURCES}
+                            ${RSA_SOURCES}
                     INCLUDE_DIRS "." "../mqtt311-client-library/MQTT311Client" "../mqtt311-client-library" "../RSA" "..")
-
