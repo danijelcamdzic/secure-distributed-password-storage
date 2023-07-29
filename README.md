@@ -1,7 +1,7 @@
 # About
-This project implements the **Secure Distributed Password Storage** system that is proposed in my master thesis. Here a an abstract takes from my thesis:
+This project implements the **Secure Distributed Password Storage** system that is proposed in my master thesis. Here is an abstract taken from my thesis:
 
-" _This thesis aims to present a new system for storing and recovering passwords and other types of sensitive information. It attempts to solve problems that centralized solutions suffer from and bring the power of data possession back into the hands of users. It demonstrates a low-cost, space-effective, distributed solution with the top priority being the security and privacy of the user's data._
+"_This thesis aims to present a new system for storing and recovering passwords and other types of sensitive information. It attempts to solve problems that centralized solutions suffer from and bring the power of data possession back into the hands of users. It demonstrates a low-cost, space-effective, distributed solution with the top priority being the security and privacy of the user's data._
 
 _The system presented is based on a master/slave model in the form of software/hardware node entities which employ the publish/subscribe model of the MQTT communication protocol. The underlying security measures utilize the RSA Encryption method and Shamir's Secret Sharing Scheme._
 
