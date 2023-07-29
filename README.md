@@ -148,11 +148,11 @@ This section will guide you through the process of setting up the necessary tool
 git clone --recursive https://github.com/danijelcamdzic/secure-distributed-password-storage.git
 ```
 
-Now, let's set up the environment for the software access node and the hardware nodes.
+Now, let's set up the environment for the software node and the hardware nodes.
 
-## Software Access Node
+## software node
 
-To set up the software access node, we'll need to install the Paho MQTT C++ library, OpenSSL, and CMake. Follow the instructions below:
+To set up the software node, we'll need to install the Paho MQTT C++ library, OpenSSL, and CMake. Follow the instructions below:
 
 ### Install Paho MQTT C++ library
 
@@ -252,11 +252,11 @@ idf.py flash
 
 # Usage
 
-This section will guide you through the process of using the Secure Distributed Password Storage and Recovery system. We'll start with the software access node.
+This section will guide you through the process of using the SDPSR system. We'll start with the software node.
 
 ## Software Node
 
-To use the software access node, follow these steps:
+To use the software node, follow these steps:
 
 1. Add the public RSA (2048-bit) keys of the hardware nodes to the software_node folder in .pem format. Also, add your private and public RSA 2048-bit keys to the same folder in .pem format. To generate an RSA 2048-bit key in PEM format, use the following OpenSSL command:
 
@@ -290,9 +290,9 @@ const std::vector<std::string> public_keys_hw_nodes = {RSA_PUBLIC_KEY_HW_NODE_1}
 
 ```cpp
 /* Variable for general broker connection */
-const std::string SERVER_ADDRESS("tcp://mqtt.eclipseprojects.io:1883");
+const std::string SERVER_ADDRESS("tcp://test.mosquitto.org:1883");
 const std::string CLIENT_ID("access_node");
-const std::string SERVER_CERTICIATE_PATH("../mqtt_ecplipseprojects_io_certificate.pem");    /**< Can be empty if only TCP connection will be used*/
+const std::string SERVER_CERTICIATE_PATH("../mosquitto.org.pem");    /**< Can be empty if only TCP connection will be used*/
 
 /* Variable for commanding the hardware nodes */
 const std::string RETRIEVE_PASSWORD_COMMAND("GetPassEND_MESSAGE");          /**< Used in the restore password command */
