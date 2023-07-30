@@ -12,7 +12,7 @@ _Through the analysis and practical demonstration, this thesis aims to demonstra
 # Detailed Documentation
 For more in-depth information, see the following documents:
 
-- [System Architecture](doc/system_architecture.md).
+- [System Architecture](doc/system_architecture.md)
 - [System Design](doc/system_design.md)
 - [Results](doc/results.md)
 
