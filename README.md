@@ -92,7 +92,7 @@ or
 You will be prompted for your MQTT credentials and the password to save, or you will receive a password, depending on the command you used.
 
 
-## Hardware Node
+## Hardware Nodes
 
 1. In the `RSA_Encrypt.c` file, add the software node's (master) public key:
 
@@ -213,7 +213,7 @@ cmake ..
 make
 ```
 
-## Hardware Node
+## Hardware Nodes
 
 To set up the hardware nodes, follow the steps to set up the ESP32 build environment as described in the official [documentation](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/linux-macos-setup.html) of the esp32.
 
