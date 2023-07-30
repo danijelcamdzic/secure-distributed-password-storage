@@ -9,11 +9,14 @@ _The basis of the system is the exchange of RSA encrypted MQTT messages, whose c
 
 _Through the analysis and practical demonstration, this thesis aims to demonstrate the robustness and security of the system, showcasing its advantages in terms of resistance to attacks, protection of confidential data, efficiency in recovering secret information, and the superiority of distributed over centralized data storage._"
 
-If you wish to learn more about the architecture of the system click [here](doc/architecture.md).
+# Detailed Documentation
+For more in-depth information, see the following documents:
 
-If you wish to learn more about the design of the system click [here](doc/design.md)
+- [System Architecture](doc/system_architecture.md).
+- [System Design](doc/system_design.md)
+- [Results](doc/results.md)
 
-If you wish to see what results can be achieved with the utilization of this system click [here](doc/results.md) and also have a look at the demonstration video by clicking [here](demonstration.mp4).
+To see this system in action, check out the demonstration video by clicking [here](demonstration.mp4).
 
 # Usage
 
