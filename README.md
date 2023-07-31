@@ -112,6 +112,10 @@ const unsigned char *private_key = (const unsigned char *)"-----BEGIN PRIVATE KE
                                                             "-----END PRIVATE KEY-----\n";
 ```
 
+> The public and the private keys are stored as "const" variables which means that they are stored in the FLASH by default on the ESP32. Even though it is true that these keys protect only one password share that is being delivered and stored on a particular ESP32 device, a skilled attacker can find these keys by using some flash dump software and obtain that one password share which may or may not mean much. This presumes that the ESP32 has been successfully stolen from the user. 
+
+For users who want additional protection against unauthorized acquiring of the RSA keys by an attacker, the entire flash contents of the ESP32 can be encrypted. Follow the [official](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/security/flash-encryption.html) documentation on how to do this. Bear in mind, however, that this process is irreversible and creates additional keys to remember and save for each ESP32 that flash encryption is applied to.
+
 3. Edit MQTT configuration:
 
 ```cpp
@@ -139,10 +143,6 @@ Make sure to add the full certificate if you are using `ssl_functions.h` to conn
 Also make sure to set the `CLIENT_ID` to a unique value for each hardware node.
 
 After configuring the RSA keys and MQTT settings, the hardware node is ready to be used with the software node.
-
-> The public and the private keys are stored as "const" variables which means that they are stored in the FLASH by default on the ESP32. Even though it is true that these keys protect only one password share that is being delivered and stored on a particular ESP32 device, a skilled attacker can find these keys by using some flash dump software and obtain that one password share which may or may not mean much. This presumes that the ESP32 has been successfully stolen from the user. 
-
-For users who want additional protection against unauthorized acquiring of the RSA keys by an attacker, the entire flash contents of the ESP32 can be encrypted. Follow the [official](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/security/flash-encryption.html) documentation on how to do this. Bear in mind, however, that this process is irreversible and creates additional keys to remember and save for each ESP32 that flash encryption is applied to.
 
 # Installation
 
